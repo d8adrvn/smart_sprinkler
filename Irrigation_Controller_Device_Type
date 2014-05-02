@@ -1,0 +1,242 @@
+/**
+ *  Irrigation Controller
+ *  Device Type Code
+ *	Creates connected irrigation controller in SmartThings physical graph
+ *  Stay tuned for a smarter controller!
+ *  Author: stan@dotson.info
+ *  Date: 2013-11-11
+ *  Copyright 2014 Stan Dotson
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License. You may obtain a copy of the License at:
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software distributed under the License is distributed
+ *  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
+ *  for the specific language governing permissions and limitations under the License.
+ */
+ 
+ // for the UI
+preferences {
+	input("oneTimer", "text", title: "Zone One", description: "Zone One Time", required: true)
+ 	input("twoTimer", "text", title: "Zone Two", description: "Zone Two Time", required: true)
+  	input("threeTimer", "text", title: "Zone Three", description: "Zone Three Time", required: true)
+  	input("fourTimer", "text", title: "Zone Four", description: "Zone Four Time", required: true)
+  	input("fiveTimer", "text", title: "Zone Five", description: "Zone Five Time", required: true)
+  	input("sixTimer", "text", title: "Zone Six", description: "Zone Six Time", required: true)
+  	input("sevenTimer", "text", title: "Zone Seven", description: "Zone Seven Time", required: true)
+  	input("eightTimer", "text", title: "Zone Eight", description: "Zone Eight Time", required: true)
+ 	//String header = "stationTimes"
+    ///String stationTimes = "${header},${oneTimer},${twoTimer},${threeTimer},${fourTimer},${fiveTimer},${sixTimer},${sevenTimer},${eightTimer}"
+    //log.debug "created station times string: ${stationTimes}"
+ 	//zigbee.smartShield(text: "${stationTimes}").format()  Note: can't seem to send from here
+ }
+metadata {
+	definition (name: "Irrigation Controller", author: "stan@dotson.info") {
+    	capability "Switch"
+		command "oneOn"
+		command "oneOff"
+		command "twoOn"
+		command "twoOff"
+		command "threeOn"
+		command "threeOff"
+		command "fourOn"
+		command "fourOff"
+		command "fiveOn"
+		command "fiveOff"
+		command "sixOn"
+		command "sixOff"
+		command "sevenOn"
+		command "sevenOff"
+		command "eightOn"
+		command "eightOff"
+        command "sendTimes"
+        command "update"
+	}
+
+	simulator {
+		// TODO: define status and reply messages here
+	}
+    
+    tiles {
+		standardTile("allZonesTile", "device.switch", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
+        	state "offAll", label: 'All Off', action: "Switch.on", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "onAll"
+			state "onAll", label: 'All on', action: "Switch.off",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "offAll"
+        }
+        standardTile("zoneOneTile", "device.zoneOne", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
+			state "off1", label: 'One', action: "oneOn", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "queue1"
+			state "queue1", label: 'One', action: "oneOff",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "off1"
+            state "on1", label: 'One', action: "oneOff",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "off1"
+        }     
+		standardTile("zoneTwoTile", "device.zoneTwo", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
+			state "off2", label: 'Two', action: "twoOn", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "queue2"
+			state "queue2", label: 'Two', action: "twoOff",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "off2"
+            state "on2", label: 'Two', action: "twoOff",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "off2"
+        } 
+        standardTile("zoneThreeTile", "device.zoneThree", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
+			state "off3", label: 'Three', action: "threeOn", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "queue3"
+			state "queue3", label: 'Three', action: "threeOff",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "off3"
+            state "on3", label: 'Three', action: "threeOff",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "off3"
+        } 
+        standardTile("zoneFourTile", "device.zoneFour", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
+			state "off4", label: 'Four', action: "fourOn", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "queue4"
+			state "queue4", label: 'Four', action: "fourOff",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "off4"
+            state "on4", label: 'Four', action: "fourOff",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "off4"
+        } 
+        standardTile("zoneFiveTile", "device.zoneFive", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
+			state "off5", label: 'Five', action: "fiveOn", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "queue5"
+			state "queue5", label: 'Five', action: "fiveOff",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "off5"
+            state "on5", label: 'Five', action: "fiveOff",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "off5"
+        } 
+        standardTile("zoneSixTile", "device.zoneSix", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
+			state "off6", label: 'Six', action: "sixOn", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "queue6"
+			state "queue6", label: 'Six', action: "sixOff",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "off6"
+            state "on6", label: 'Six', action: "sixOff",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "off6"
+        } 
+        standardTile("zoneSevenTile", "device.zoneSeven", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
+			state "off7", label: 'Seven', action: "sevenOn", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "queue7"
+			state "queue7", label: 'Seven', action: "sevenOff",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "off7"
+            state "on7", label: 'Seven', action: "sevenOff",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "off7"
+        } 
+        standardTile("zoneEightTile", "device.zoneEight", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
+			state "off8", label: 'Eight', action: "eightOn", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "queue8"
+			state "queue8", label: 'Eight', action: "eightOff",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "off8"
+            state "on8", label: 'Eight', action: "eightOff",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "off8"
+        } 
+        valueTile("arduinoMsg", "device.greeting", inactiveLabel: false) {
+			state "display", label:'${currentValue}', unit:""
+		}
+        standardTile("refreshTile", "device.refresh", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
+        	state "updated", action: "update", icon: "st.secondary.refresh", backgroundColor: "#ffffff", nextState: "checking"
+            state "checking", action: "update", icon: "st.secondary.refresh", backgroundColor: "#53a7c0", nextState: "updated"
+            }
+        standardTile("timesTile", "device.timers", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
+        	state "sent", action: "sendTimes", icon: "st.Health & Wellness.health7", backgroundColor: "#ffffff", nextState: "sending"
+            state "sending", action: "sendTimes", icon: "st.Health & Wellness.health7", backgroundColor: "#53a7c0", nextState: "sent"
+            }
+		main "allZonesTile"
+		details(["allZonesTile","zoneOneTile","zoneTwoTile","zoneThreeTile","zoneFourTile","zoneFiveTile","zoneSixTile","zoneSevenTile","zoneEightTile","refreshTile", "timesTile"])
+	}
+    }
+
+// parse events into attributes to create events
+def parse(String description) {
+	log.debug "Parsing '${description}'"
+	def value = zigbee.parse(description)?.text
+    log.debug "Print value = '${value}'"
+    def isStateChange = value != "ping"  //evaluates whether value is something other than ping
+	def isPhysical = value in ["onAll","offAll","on1","queue1","off1","on2","queue2","off2","on3","queue3","off3","on4","queue4","off4",
+    "on5","queue6","off6","on7","queue7","off7","on8","queue8","off8"]  //evaluates device completed a physical action, e.g. relay switch
+    def displayed = value && isStateChange  //evaluates whether to display message 
+    def linkText = getLinkText(device)
+	def descriptionText = getDescriptionText(description, linkText, value)
+	def name = value in ["onAll","offAll"] ? "switch" : value in ["on1","queue1", "off1"] ? "zoneOne" : value in ["on2","queue2", "off2"] ? "zoneTwo" 
+    : value in ["on3","queue3", "off3"] ? "zoneThree": value in ["on4","queue4", "off4"] ? "zoneFour": value in ["on5","queue5", "off5"] ? "zoneFive"
+    : value in ["on6","queue6", "off6"] ? "zoneSix": value in ["on7","queue7", "off7"] ? "zoneSeven": value in ["on8","queue8", "off8"] ? "zoneEight"
+    : value in ["updated"] ? "refresh" : value in ["sent"] ? "timers" : value && value != "ping" ? "update" : null
+	def result = createEvent(name: name, value: value)
+	log.debug "Parse returned ${result?.descriptionText}"
+	return result
+}
+
+// handle commands
+def oneOn() {
+	log.debug "Executing 'on,1'"
+	zigbee.smartShield(text: "on,1").format()
+}
+def oneOff() {
+	log.debug "Executing 'off,1'"
+	zigbee.smartShield(text: "off,1").format()
+}
+def twoOn() {
+	log.debug "Executing 'on,2'"
+	zigbee.smartShield(text: "on,2").format()
+    }
+
+def twoOff() {
+	log.debug "Executing 'off,2'"
+	zigbee.smartShield(text: "off,2").format()
+}
+
+def threeOn() {
+	log.debug "Executing 'on,3'"
+	zigbee.smartShield(text: "on,3").format()
+}
+
+def threeOff() {
+	log.debug "Executing 'off,3'"
+	zigbee.smartShield(text: "off,3").format()
+}
+
+def fourOn() {
+	log.debug "Executing 'on,4'"
+	zigbee.smartShield(text: "on,4").format()
+}
+
+def fourOff() {
+	log.debug "Executing 'off,4'"
+	zigbee.smartShield(text: "off,4").format()
+}
+
+def fiveOn() {
+	log.debug "Executing 'on,5'"
+	zigbee.smartShield(text: "on,5").format()
+}
+
+def fiveOff() {
+	log.debug "Executing 'off,5'"
+	zigbee.smartShield(text: "off,5").format()
+}
+
+def sixOn() {
+	log.debug "Executing 'on,6'"
+	zigbee.smartShield(text: "on,6").format()
+}
+
+def sixOff() {
+	log.debug "Executing 'off,6'"
+	zigbee.smartShield(text: "off,6").format()
+}
+
+def sevenOn() {
+	log.debug "Executing 'on,7'"
+	zigbee.smartShield(text: "on,7").format()
+}
+
+def sevenOff() {
+	log.debug "Executing 'off,7'"
+	zigbee.smartShield(text: "off,7").format()
+}
+
+def eightOn() {
+	log.debug "Executing 'on,8'"
+	zigbee.smartShield(text: "on,8").format()
+}
+
+def eightOff() {
+	log.debug "Executing 'off,8'"
+	zigbee.smartShield(text: "off,8").format()
+}
+def on() {
+	log.debug "Executing 'allOn'"
+	zigbee.smartShield(text: "allOn,1").format()
+}
+
+def off() {
+	log.debug "Executing 'allOff'"
+	zigbee.smartShield(text: "allOff,1").format()
+}
+
+def update() {
+	log.debug "Execting refresh of tiles"
+    zigbee.smartShield(text: "update,1").format()
+    }
+    
+def sendTimes() {
+	log.debug "sending times"
+    String header = "stationTimes"
+    String stationTimes = "${header},${oneTimer},${twoTimer},${threeTimer},${fourTimer},${fiveTimer},${sixTimer},${sevenTimer},${eightTimer}"
+    //preferences appear to be global variables
+    zigbee.smartShield(text: "${stationTimes}").format()
+    }

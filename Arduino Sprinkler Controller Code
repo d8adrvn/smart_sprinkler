@@ -10,7 +10,7 @@
  * A timer library was added to use the CPU clock to manage time rather than using the CPU
  * By using the timer library, the CPU remains ready to process any changes to the queue
  * Timer library was created by Simon Monk as modified by JChristensen  https://github.com/JChristensen/Timer
- *  Relays 1-8 are controlled by Arduino pins 13-6, respectively
+ *  Relays 1-8 are controlled by Arduino pins 12-5, respectively
  * 24V power source connects to common (middle) contacts on the relay
  * Irrigation valve wires use the normally open contacts on relay
  *

@@ -10,7 +10,7 @@
  * A timer library was added to use the CPU clock to manage time rather than using the CPU
  * By using the timer library, the CPU remains ready to process any changes to the queue
  * Timer library was created by Simon Monk as modified by JChristensen  https://github.com/JChristensen/Timer
- *  Relays 1-8 are controlled by Arduino pins 12-5, respectively
+ *  Relays 1-8 are controlled by Arduino pins 12-6, respectively
  * 24V power source connects to common (middle) contacts on the relay
  * Irrigation valve wires use the normally open contacts on relay
  *
@@ -45,18 +45,10 @@ int trafficCop =0;  //tracks which station has the right of way (is on)
 int nextInLine =0; // tracks which station is next in line to turn on  (ok, so I am using too many global variables. cut me some slack)
 boolean isDebugEnabled=true;    // enable or disable debug in this example
 int stations=8; //number of stations or relays
-int waitTime=1000; //wait time between sending back to back messages to SmartThings hub
-// initialize arrays; for readability, values store [1]-[8] and [0] is not used
-//todo: change statement below to Zero's
-unsigned long stationTime[] = {
-  0,0,0,0,0,0,0,0,0};
-int queue[]={
-  0,0,0,0,0,0,0,0,0};
-int relay[9];
-
-//set pin to switch led on SmartThings shield
-int ledPin = 13;
-int stateLED;           // state to track last set value of LED
+// initialize arrays; for readability, zone values store [1]-[8] and [0] is not used
+long stationTime[] = {0,0,0,0,0,0,0,0,0}; 
+int queue[]={0,0,0,0,0,0,0,0,0};  
+int relay[9];  
 
 void setup()
 {
@@ -67,12 +59,11 @@ void setup()
     Serial.println("setup..");  // print out 'setup..' on start
   }
   // set SmartThings Shield LED
-  smartthing.shieldSetLED(0, 0, 1); // set to off to start 
-  pinMode(ledPin, OUTPUT);  
+  smartthing.shieldSetLED(0, 0, 1); // set to blue to start 
 
   // setup timed actions 
-  t.every(100L*60L*1000L, sendUpdate); //send update to smartThings hub every 10 min
-  t.every(60L*1000L, queueManager);// check queue to see if there is work to do
+  t.every(60L*60L*1000L, timeToUpdate); //send update to smartThings hub every 10 min
+  t.every(10L*60L*1000L, queueManager);// check queue to see if there is work to do
   //set up relays to control irrigation valves
   int i=1;
   while (i<9) {
@@ -81,7 +72,6 @@ void setup()
     digitalWrite(relay[i], HIGH);
     i++;
   }
-  queueManager();
 }
 
 void loop() {
@@ -113,10 +103,8 @@ void messageCallout(String message)
   if (strcmp(inValue[0],"on")==0) {   // add new station to queue
     int addStation=atoi(inValue[1]);
     queue[addStation]=1;
-    String action = "queue";
-    String command = action + addStation;
-    smartthing.send(command);
-    queueManager();
+    stationTime[addStation]=atol(inValue[2])*60L*1000L;
+    sendUpdate("");
   }
   if (strcmp(inValue[0],"off")==0) {
     int removeStation=atoi(inValue[1]);     
@@ -125,31 +113,23 @@ void messageCallout(String message)
     }
     //else remove from queue and update queue status to SmartThings
     queue[removeStation]=0;
-    String action = "off";
-    String command = action + removeStation;
-    smartthing.send(command);
+    sendUpdate("");
   }
-  if (strcmp(inValue[0],"stationTimes")==0) {
-    //if inMessage is a string with station times assign invalues into station run times 
+  if (strcmp(inValue[0],"update")==0) {
+    sendUpdate("ok,");
+  }
+  if (strcmp(inValue[0],"allOn")==0) {
     int i=1;
     while (i<stations+1) {
+      if (i != trafficCop) {
+        queue[i]=1;
+      }
       stationTime[i]=atoi(inValue[i])*60L*1000L;
       i++;
     }
-    delay(1000);
-    sendConfirmation();
+    sendUpdate("setAll,");
   }
-  if (strcmp(inValue[0],"update")==0) {
-    sendUpdate();
-  }
-  if (strcmp(inValue[0],"allOn")==0) {
-    smartthing.send("onAll");
-    allOn(); 
-  }
-  if (strcmp(inValue[0],"allOff")==0) {
-    smartthing.send("offAll");
-    allOff();
-  }
+  queueManager();
 }
 //run through queue to check to see if there is work to do
 void queueManager() 
@@ -164,26 +144,22 @@ void queueManager()
     i++;
   }
 }
-void toggleOn()
-{
+void toggleOn() {
   queue[trafficCop]=2;
   smartthing.shieldSetLED(83, 1, 0); //Orange for relay one
   digitalWrite(relay[trafficCop], LOW);
-  String action = "on";
-  String command = action + trafficCop;
-  smartthing.send(command);
   t.after (stationTime[trafficCop],toggleOff); 
+  sendUpdate("");
 }
 void toggleOff() {
   digitalWrite(relay[trafficCop], HIGH);
   smartthing.shieldSetLED(0, 0, 1);
-  String action = "off";
-  String command = action + trafficCop;
-  smartthing.send(command);
-  queue[trafficCop]=0; //remove relayOne from from queue
+  queue[trafficCop]=0; //remove relay from from queue
   trafficCop=0; //ready to check queue or watch for new commmonds
+  sendUpdate("");
   queueManager();
 }
+//added as requirement of switch capability.  
 void allOff() {
   int i=1;
   while(i<stations+1) {
@@ -193,45 +169,27 @@ void allOff() {
   }
   smartthing.shieldSetLED(0, 0, 1);
   trafficCop=0;
-  sendUpdate();
-  //ready to check queue or watch for new commmonds
+  sendUpdate("setAll,");
 }
-void allOn() {
-  int i=1;
-  while(i<stations+1) {
-    queue[i]=1;
-    i++;
-  }
-  smartthing.send("offAll");
-  sendUpdate();
-  queueManager();
+
+void timeToUpdate() {
+  sendUpdate("ok,");
 }
-void sendUpdate() {   //in repsonse to refresh and periodically update smartthings on status of queue
-  int i=1;
-  String action="default";
-  while(i<stations+1) {
+
+void sendUpdate(String message) {
+  String action="";
+  for (int i=1; i<stations+1; i++) {
     if (queue[i]==0) {
       action="off";
     }
     if (queue[i]==1) {
-      action="queue";
+      action="q";
     }
     if (queue[i]==2) {
       action="on";
     }
-    String command = String(action + i);
-    smartthing.send(command);
-    delay(waitTime);
-    i++;
+    message.concat (action + i + ",");
   }
-  smartthing.send("updated");
+  smartthing.send(message);
+  message = "";
 }
-void sendConfirmation() {
-  smartthing.send("sent");
-}
-
-
-
-
-
-

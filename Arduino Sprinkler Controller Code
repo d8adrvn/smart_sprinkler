@@ -157,7 +157,12 @@ void toggleOff() {
   queue[trafficCop]=0; //remove relay from from queue
   trafficCop=0; //ready to check queue or watch for new commmonds
   sendUpdate("");
-  queueManager();
+  
+  // LIBRARY BUG (timer.cpp)
+  //   The *current* timer code (on master branch) will cause the new event to be created with a lastEventTime that appears to be in the future.
+  //   If the next update occurs very soon after, unsigned int math will created a huge elapsed time, causing the new event to timeout prematurely.
+  //   A pull request has been submitted to fix this issue in the Timer class. Once accepted, this call can be put back. Although, it appears to be unnecessary.
+  //queueManager(); 
 }
 //added as requirement of switch capability.  
 void allOff() {

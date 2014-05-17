@@ -73,9 +73,11 @@ int nextInLine =0; // tracks which station is next in line to turn on  (ok, so I
 boolean isDebugEnabled=true;    // enable or disable debug in this example
 int stations=8; //number of stations or relays
 // initialize arrays; for readability, zone values store [1]-[8] and [0] is not used
-long stationTime[] = {0,0,0,0,0,0,0,0,0}; 
-int queue[]={0,0,0,0,0,0,0,0,0};  
+long stationTime[] = {0,0,0,0,0,0,0,0,0};
+int8_t stationTimer[] = {0,0,0,0,0,0,0,0,0}; 
+int queue[]={0,0,0,0,0,0,0,0,0};  // off: 0, queued: 1, running: 2
 int relay[9];  
+boolean doUpdate = false;
 
 void setup()
 {
@@ -104,8 +106,15 @@ void setup()
 void loop() {
   //run timer 
   t.update();
+
+  if (doUpdate) {
+    sendUpdate("ok,");
+    doUpdate = false;
+  }
+
   //run smartthing logic
   smartthing.run();
+  
 }
 
 //process incoming messages from SmartThings hub
@@ -131,7 +140,8 @@ void messageCallout(String message)
     int addStation=atoi(inValue[1]);
     queue[addStation]=1;
     stationTime[addStation]=atol(inValue[2])*60L*1000L;
-    sendUpdate("");
+    //sendUpdate("");
+    scheduleUpdate();
   }
   if (strcmp(inValue[0],"off")==0) {
     int removeStation=atoi(inValue[1]);     
@@ -140,10 +150,12 @@ void messageCallout(String message)
     }
     //else remove from queue and update queue status to SmartThings
     queue[removeStation]=0;
-    sendUpdate("");
+    //sendUpdate("");
+    scheduleUpdate();
   }
   if (strcmp(inValue[0],"update")==0) {
-    sendUpdate("ok,");
+    //sendUpdate("ok,");
+    scheduleUpdate();
   }
   if (strcmp(inValue[0],"allOn")==0) {
     int i=1;
@@ -154,9 +166,14 @@ void messageCallout(String message)
       stationTime[i]=atoi(inValue[i])*60L*1000L;
       i++;
     }
-    sendUpdate("setAll,");
+    //sendUpdate("setAll,");
+    scheduleUpdate();
   }
   queueManager();
+}
+
+void scheduleUpdate() {
+  doUpdate = true; 
 }
 //run through queue to check to see if there is work to do
 void queueManager() 
@@ -175,15 +192,18 @@ void toggleOn() {
   queue[trafficCop]=2;
   smartthing.shieldSetLED(83, 1, 0); //Orange for relay one
   digitalWrite(relay[trafficCop], HIGH);
-  t.after (stationTime[trafficCop],toggleOff); 
-  sendUpdate("");
+  stationTimer[trafficCop] = t.after (stationTime[trafficCop],toggleOff); 
+  //sendUpdate("");
+  scheduleUpdate();
 }
 void toggleOff() {
   digitalWrite(relay[trafficCop], LOW);
   smartthing.shieldSetLED(0, 0, 1);
   queue[trafficCop]=0; //remove relay from from queue
+  t.stop(stationTimer[trafficCop]);
   trafficCop=0; //ready to check queue or watch for new commmonds
-  sendUpdate("");
+  scheduleUpdate();
+  //sendUpdate("");
   
   // LIBRARY BUG (timer.cpp)
   //   The *current* timer code (on master branch) will cause the new event to be created with a lastEventTime that appears to be in the future.
@@ -201,11 +221,13 @@ void allOff() {
   }
   smartthing.shieldSetLED(0, 0, 1);
   trafficCop=0;
-  sendUpdate("setAll,");
+  //sendUpdate("setAll,");
+  scheduleUpdate();
 }
 
 void timeToUpdate() {
-  sendUpdate("ok,");
+  //sendUpdate("ok,");
+  scheduleUpdate();
 }
 
 void sendUpdate(String message) {
@@ -222,14 +244,9 @@ void sendUpdate(String message) {
       action="on";
     }
     message.concat (action + i + ",");
-    //message.concat (action);
-    //message.concat (i);
-    //message.concat (",");
-    //action = "";
   }
   Serial.println ("Update:");
   Serial.println (message);
   smartthing.send(message);
   message = "";
 }
-

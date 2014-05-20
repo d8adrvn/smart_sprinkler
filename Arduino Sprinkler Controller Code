@@ -91,7 +91,7 @@ void setup()
   smartthing.shieldSetLED(0, 0, 1); // set to blue to start
   
   // setup timed actions 
-  t.every(5L*60L*1000L, timeToUpdate); //send update to smartThings hub every 5 min
+  t.every(10L*60L*1000L, timeToUpdate); //send update to smartThings hub every 10 min
   t.every(10L*60L*1000L, queueManager);// check queue to see if there is work to do
   //set up relays to control irrigation valves
   int i=1;

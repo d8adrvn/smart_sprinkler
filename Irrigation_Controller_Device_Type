@@ -57,8 +57,10 @@ metadata {
     
     tiles {
 		standardTile("allZonesTile", "device.switch", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
-            state "setAll", label: 'Set all', action: "switch.on", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "sendingAll"
-			state "sendingAll", label: 'Sending All',icon: "st.Health & Wellness.health7", backgroundColor: "#53a7c0", nextState: "setAll"
+            state "off", label: 'Start', action: "switch.on", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "starting"
+			state "on", label: 'Running', action: "switch.off", icon: "st.Health & Wellness.health7", backgroundColor: "#53a7c0", nextState: "stopping"
+			state "starting", label: 'Starting...',icon: "st.Health & Wellness.health7", backgroundColor: "#53a7c0"
+			state "stopping", label: 'Stopping...', action: "switch.off", icon: "st.Health & Wellness.health7", backgroundColor: "#53a7c0"
         }
         standardTile("zoneOneTile", "device.zoneOne", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
 			state "off1", label: 'One', action: "oneOn", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "sending1"
@@ -108,23 +110,24 @@ metadata {
             state "q8", label: 'Eight', action: "eightOff",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "off8"
             state "on8", label: 'Eight', action: "eightOff",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "off8"
         } 
-        standardTile("refreshTile", "device.refresh", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
+        standardTile("refreshTile", "device.refresh", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true, decoration: "flat") {
         	state "ok", action: "update", icon: "st.secondary.refresh", backgroundColor: "#ffffff", nextState: "checking"
-            state "checking", action: "update", icon: "st.secondary.refresh", backgroundColor: "#53a7c0", nextState: "ok"
-            }
+        }
 		main "allZonesTile"
 		details(["zoneOneTile","zoneTwoTile","zoneThreeTile","zoneFourTile","zoneFiveTile","zoneSixTile","zoneSevenTile","zoneEightTile","refreshTile"])
 	}
-    }
+}
 
 // parse events into attributes to create events
 def parse(String description) {
 	log.debug "Parsing '${description}'"
+   	log.debug "Parsed: ${zigbee.parse(description)}"
+    
 	def value = zigbee.parse(description)?.text
   	if (value != null && value != " " && value != '"') {
     	String delims = ","
     	String[] tokens = value.split(delims)
-   	for (int x=0; x<tokens.length; x++) {
+   		for (int x=0; x<tokens.length; x++) {
             def isStateChange = tokens[x] != "ping"  //evaluates whether value is something other than ping
 			def isPhysical = tokens[x] in ["setAll","on1","q1","off1","on2","q2","off2","on3","q3","off3","on4","q4","off4",
     		"on5","q6","off6","on7","q7","off7","on8","q8","off8"]  //evaluates device completed a physical action, e.g. relay switch
@@ -135,25 +138,48 @@ def parse(String description) {
     		: tokens[x] in ["on3","q3", "off3"] ? "zoneThree": tokens[x] in ["on4","q4", "off4"] ? "zoneFour": tokens[x] in ["on5","q5", "off5"] ? "zoneFive"
     		: tokens[x] in ["on6","q6", "off6"] ? "zoneSix": tokens[x] in ["on7","q7", "off7"] ? "zoneSeven": tokens[x] in ["on8","q8", "off8"] ? "zoneEight"
     		: tokens[x] in ["ok"] ? "refresh" : null
+            
 			def result = createEvent(name: name, value: tokens[x])
 			log.debug "Parse returned ${result?.descriptionText}"
 			sendEvent(result)
         }
-    }  
+    }
+    
+	if(anyZoneOn()) {
+		return createEvent(name: "switch", value: "on")
+	} else {
+		return createEvent(name: "switch", value: "off")
+	}
 }
+
+def anyZoneOn() {
+    if(device.currentValue("zoneOne") == "on1") return true;
+    if(device.currentValue("zoneTwo") == "on2") return true;
+    if(device.currentValue("zoneThree") == "on3") return true;
+    if(device.currentValue("zoneFour") == "on4") return true;
+    if(device.currentValue("zoneFive") == "on5") return true;
+    if(device.currentValue("zoneSix") == "on6") return true;
+    if(device.currentValue("zoneSeven") == "on7") return true;
+    if(device.currentValue("zoneEight") == "on8") return true;
+    
+    false;
+}
+
 // handle commands
 def oneOn() {
 	log.debug "Executing 'on,1'"
 	zigbee.smartShield(text: "on,1,${oneTimer}").format()
 }
+
 def oneOff() {
 	log.debug "Executing 'off,1'"
 	zigbee.smartShield(text: "off,1").format()
 }
+
 def twoOn() {
 	log.debug "Executing 'on,2'"
 	zigbee.smartShield(text: "on,2,${twoTimer}").format()
-    }
+}
 
 def twoOff() {
 	log.debug "Executing 'off,2'"
@@ -232,4 +258,4 @@ def off() {
 def update() {
 	log.debug "Execting refresh"
     zigbee.smartShield(text: "update").format()
-    }
+}

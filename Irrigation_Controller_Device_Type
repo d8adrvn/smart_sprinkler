@@ -130,7 +130,7 @@ def parse(String description) {
    		for (int x=0; x<tokens.length; x++) {
             def isStateChange = tokens[x] != "ping"  //evaluates whether value is something other than ping
 			def isPhysical = tokens[x] in ["setAll","on1","q1","off1","on2","q2","off2","on3","q3","off3","on4","q4","off4",
-    		"on5","q6","off6","on7","q7","off7","on8","q8","off8"]  //evaluates device completed a physical action, e.g. relay switch
+    		"on5", “q5”, “off5”, “on6”,”q6","off6","on7","q7","off7","on8","q8","off8"]  //evaluates device completed a physical action, e.g. relay switch
     		def displayed = tokens[x] && isStateChange  //evaluates whether to display message 
     		def linkText = getLinkText(device)
 			def descriptionText = getDescriptionText(description, linkText, tokens[x])

@@ -1,19 +1,22 @@
 
 /**
-*****************************************************************************
- * Irrigation Controller v2
+ ****************************************************************************************************************************
+ * Irrigation Controller v2.3
  * Simple, elegant irrigation controller that takes advantage of the cloud and SmartThings ecosystem
- * Arduino UNO with SmartThings Shield  and 8 Relay Module
+ * Arduino UNO with SmartThings Shield  and an 8 Relay Module
  * Works by receiving irrigation run times from the Cloud and then builds a queue to execute
  * Will automatically shut off if power goes out and/or the queue finishes execution
  * Updates the Cloud if a station is queued and as each station turns on or off. 
- * A timer library was added to use the CPU clock to manage time rather than using the CPU
- * By using the timer library, the CPU remains ready to process any changes to the queue
- * Timer library was created by Simon Monk as modified by JChristensen  https://github.com/JChristensen/Timer
- *  Relays 1-8 are controlled by Arduino pins 12-5, respectively
- * 24V power source connects to common (middle) contacts on the relay
- * Irrigation valve wires use the normally open contacts on relay
+ * By using the timer library, the CPU remains ready to process any change requests to the queue
  *
+ ****************************************************************************************************************************
+ * Libraries:
+ * Timer library was created by Simon Monk as modified by JChristensen  https://github.com/JChristensen/Timer
+ *   KNOWN LIBRARY BUG (timer.cpp) - identified by mattnichols 5/20/14 - has no known affect on the code below
+ * SmartThings library available from https://www.dropbox.com/s/8hon320qmuio8fz/Shield%20Library.zip
+ * SoftwareSerial library was default library provided with Arduino IDE
+ *
+ ****************************************************************************************************************************
  *  Copyright 2014 Stan Dotson
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
@@ -24,9 +27,15 @@
  *  Unless required by applicable law or agreed to in writing, software distributed under the License is distributed
  *  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
  *  for the specific language governing permissions and limitations under the License.
-
-*****************************************************************************
-/// @note
+ ****************************************************************************************************************************
+ * Configuration:
+ * Relays 1-8 are controlled by Arduino pins 12-6, respectively
+ * 24V power source connects to common (middle) contacts on the relay
+ * Irrigation valve wires use the normally open (NO) contacts on relay
+ * This code works with "Active HIGH" relays, such as SeeedUino v2 relays.  
+ * To use with "Acitve LOW" relays, such as SainSmart, set isActiveHigh to false
+ ****************************************************************************************************************************
+/// @note Arduino Pin Configuration
 ///               ______________
 ///               |              |
 ///               |         SW[] |
@@ -52,6 +61,22 @@
 ///                    |____|
 ///
 //*****************************************************************************
+/// @note typical relay configuration and hook up to valves
+///              ---------------
+///              |              |
+///              |              |___
+///              |     ( )      |   |  'NC' normally closed (not used)
+///              |              |   *
+///              |              |  /
+///              |     ( )      | /   'comn' common (connect 24V power from transformer to here and daisy chain to remaining 7 relays)
+///              |              |
+///              |              |   *
+///              |     ( )      |___|  'NO' normally open (connect sprinkler valve wire here)
+///              |              |
+///              ---------------
+///
+///              note: the ground from 24V transformer is connected to common ground running to sprinkler valves
+/// ****************************************************************************************************************************
 */
 
 #include <SoftwareSerial.h>   
@@ -69,9 +94,11 @@ SmartThings smartthing(PIN_THING_RX, PIN_THING_TX, messageCallout);  // construc
 
 Timer t;
 int trafficCop =0;  //tracks which station has the right of way (is on)
-int nextInLine =0; // tracks which station is next in line to turn on  (ok, so I am using too many global variables. cut me some slack)
 boolean isDebugEnabled=true;    // enable or disable debug in this example
 int stations=8; //number of stations or relays
+boolean isActiveHigh=false; //set to true if using "active high" relay, set to false if using "active low" relay
+int relayOn = HIGH;
+int relayOff = LOW;
 // initialize arrays; for readability, zone values store [1]-[8] and [0] is not used
 long stationTime[] = {0,0,0,0,0,0,0,0,0};
 int8_t stationTimer[] = {0,0,0,0,0,0,0,0,0}; 
@@ -93,25 +120,31 @@ void setup()
   // setup timed actions 
   t.every(10L*60L*1000L, timeToUpdate); //send update to smartThings hub every 10 min
   t.every(10L*60L*1000L, queueManager);// check queue to see if there is work to do
+  
   //set up relays to control irrigation valves
+  if (!isActiveHigh) {
+    relayOn=LOW;
+    relayOff=HIGH;
+  }
   int i=1;
   while (i<9) {
     relay[i]= 13-i;
     pinMode(relay[i], OUTPUT); 
-    digitalWrite(relay[i], LOW);
+    digitalWrite(relay[i], relayOff);
     i++;
   }
 }
 
 void loop() {
-  //run timer 
+  
+   //run timer 
   t.update();
-
+  
   if (doUpdate) {
     sendUpdate("ok,");
     doUpdate = false;
   }
-
+ 
   //run smartthing logic
   smartthing.run();
   
@@ -190,31 +223,26 @@ void queueManager()
 void toggleOn() {
   queue[trafficCop]=2;
   smartthing.shieldSetLED(83, 1, 0); //Orange for relay one
-  digitalWrite(relay[trafficCop], HIGH);
+  digitalWrite(relay[trafficCop], relayOn);
   t.stop(stationTimer[trafficCop]); // Kill any previously started timers.
   stationTimer[trafficCop] = t.after (stationTime[trafficCop],toggleOff);
   scheduleUpdate();
 }
 void toggleOff() {
-  digitalWrite(relay[trafficCop], LOW);
+  digitalWrite(relay[trafficCop], relayOff);
   smartthing.shieldSetLED(0, 0, 1);
   queue[trafficCop]=0; //remove relay from from queue
   
   trafficCop=0; //ready to check queue or watch for new commmonds
   scheduleUpdate();
-  
-  // LIBRARY BUG (timer.cpp)
-  //   The *current* timer code (on master branch) will cause the new event to be created with a lastEventTime that appears to be in the future.
-  //   If the next update occurs very soon after, unsigned int math will created a huge elapsed time, causing the new event to timeout prematurely.
-  //   A pull request has been submitted to fix this issue in the Timer class. Once accepted, this call can be put back. Although, it appears to be unnecessary.
-  //queueManager(); 
 }
-//added as requirement of switch capability.  
+
+//added allOff as requirement of SmartThings switch capability.  
 void allOff() {
   int i=1;
   while(i<stations+1) {
     queue[i]=0;
-    digitalWrite(relay[i], LOW);
+    digitalWrite(relay[i], relayOff);
     i++;
   }
   smartthing.shieldSetLED(0, 0, 1);
@@ -226,7 +254,8 @@ void timeToUpdate() {
   scheduleUpdate();
 }
 
-void sendUpdate(String message) {
+void sendUpdate(String statusUpdate) {
+  // builds a status update to send to SmartThings hub
   String action="";
   for (int i=1; i<stations+1; i++) {
     
@@ -239,8 +268,8 @@ void sendUpdate(String message) {
     if (queue[i]==2) {
       action="on";
     }
-    message.concat (action + i + ",");
+    statusUpdate.concat (action + i + ",");
   }
-  smartthing.send(message);
-  message = "";
+  smartthing.send(statusUpdate);
+  statusUpdate = "";
 }

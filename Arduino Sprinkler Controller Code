@@ -1,7 +1,7 @@
 
 /**
  ****************************************************************************************************************************
- * Irrigation Controller
+ * Irrigation Controller 2.3
  * Simple, elegant irrigation controller that takes advantage of the cloud and SmartThings ecosystem
  * Arduino UNO with SmartThings Shield  and an 8 Relay Module
  * Works by receiving irrigation run times from the Cloud and then builds a queue to execute
@@ -12,7 +12,6 @@
  ****************************************************************************************************************************
  * Libraries:
  * Timer library was created by Simon Monk as modified by JChristensen  https://github.com/JChristensen/Timer
- *   KNOWN LIBRARY BUG (timer.cpp) - identified by mattnichols 5/20/14 - has no known affect on the code below
  * SmartThings library available from https://www.dropbox.com/s/8hon320qmuio8fz/Shield%20Library.zip
  * SoftwareSerial library was default library provided with Arduino IDE
  *
@@ -68,7 +67,7 @@
 ///              |     ( )      |   |  'NC' normally closed (not used)
 ///              |              |   *
 ///              |              |  /
-///              |     ( )      |      'comn' common (connect 24V power from transformer to here and daisy chain to remaining 7 relays)
+///              |     ( )      |/     'comn' common (connect 24V power from transformer to here and daisy chain to remaining 7 relays)
 ///              |              |
 ///              |              |   *
 ///              |     ( )      |___|  'NO' normally open (connect sprinkler valve wire here)
@@ -96,7 +95,7 @@ Timer t;
 int trafficCop =0;  //tracks which station has the right of way (is on)
 boolean isDebugEnabled=true;    // enable or disable debug in this example
 int stations=8; //number of stations or relays
-boolean isActiveHigh=true; //set to true if using "active high" relay, set to false if using "active low" relay
+boolean isActiveHigh=false; //set to true if using "active high" relay, set to false if using "active low" relay
 int relayOn = 1;
 int relayOff = 0;
 // initialize arrays; for readability, zone values store [1]-[8] and [0] is not used
@@ -136,14 +135,15 @@ void setup()
 }
 
 void loop() {
-  //run timer 
+  
+   //run timer 
   t.update();
-
+  
   if (doUpdate) {
     sendUpdate("ok,");
     doUpdate = false;
   }
-
+ 
   //run smartthing logic
   smartthing.run();
   

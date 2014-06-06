@@ -1,13 +1,27 @@
 /**
- *  Sprinkler Timer
+ *  Turn on Sprinklers Unless There's Rain - Sprinkler Timer 2
  *
- *  Author: matt@nichols.name
- */
+ *  Copyright 2014 Matthew Nichols
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License. You may obtain a copy of the License at:
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software distributed under the License is distributed
+ *  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
+ *  for the specific language governing permissions and limitations under the License.
+ *
+ *
+ * NOTE: This app is using experimental precipitation measurement from weather feature to determine if watering should occur.
+ *
+**/
+
 definition(
     name: "Turn on Sprinklers Unless There's Rain",
-    namespace: "name.nichols.matt.smartapps",
+    namespace: "d8adrvn/smart_sprinkler",
     author: "matt@nichols.name",
-    description: "Schedule sprinklers to turn on unless rain is in the forcast. Maximum of 4 days per week can be scheduled.",
+    description: "Schedule sprinklers run every n days unless rain is in the forecast.",
 	category: "Green Living",
     iconUrl: "https://s3.amazonaws.com/smartapp-icons/Meta/water_moisture.png",
     iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Meta/water_moisture@2x.png"

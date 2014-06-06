@@ -1,98 +1,105 @@
 /**
- *  Sprinkler Timer
+ *  Watering Days - Sprinkler Timer
  *
- *  Author: matt@nichols.name
- */
+ *  Copyright 2014 Matthew Nichols
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License. You may obtain a copy of the License at:
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software distributed under the License is distributed
+ *  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
+ *  for the specific language governing permissions and limitations under the License.
+ *
+**/
+
 definition(
     name: "Watering Days",
-    namespace: "name.nichols.matt.smartapps",
+    namespace: "d8adrvn/smart_sprinkler",
     author: "matt@nichols.name",
-    description: "Schedule sprinklers to turn on unless rain is in the forcast. Maximum of 4 days per week can be scheduled.",
+    description: "Schedule sprinklers to run on specified days of the week, unless rain is in the forecast.",
 	category: "Green Living",
     iconUrl: "https://s3.amazonaws.com/smartapp-icons/Meta/water_moisture.png",
     iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Meta/water_moisture@2x.png"
 )
 
 preferences {
-	section("Sunday"){
-		input "sundayTime", "time", title: "When?", required: false
+	section("Sunday") {
+		input "sun", "string", title: "Water?", description: "Yes | No", required: false
 	}
-	section("Monday"){
-		input "mondayTime", "time", title: "When?", required: false
+	section("Monday") {
+		input "mon", "string", title: "Water?", description: "Yes | No", required: false
 	}
-	section("Tuesday"){
-		input "tuesdayTime", "time", title: "When?", required: false
+	section("Tuesday") {
+		input "tue", "string", title: "Water?", description: "Yes | No", required: false
 	}
-	section("Wednesday"){
-		input "wednesdayTime", "time", title: "When?", required: false
+	section("Wednesday") {
+		input "wed", "string", title: "Water?", description: "Yes | No", required: false
 	}
-	section("Thursday"){
-		input "thursdayTime", "time", title: "When?", required: false
+	section("Thursday") {
+		input "thu", "string", title: "Water?", description: "Yes | No", required: false
 	}
-	section("Friday"){
-		input "fridayTime", "time", title: "When?", required: false
+	section("Friday") {
+		input "fri", "string", title: "Water?", description: "Yes | No", required: false
 	}
-	section("Saturday"){
-		input "saturdayTime", "time", title: "When?", required: false
+	section("Saturday") {
+		input "sat", "string", title: "Water?", description: "Yes | No", required: false
 	}
-	section("Sprinkler switches..."){
+	section("What time?") {
+		input "waterTime", "time", title: "When?", required: true
+	}
+	section("Sprinkler switches...") {
 		input "switches", "capability.switch", multiple: true
 	}
-	section("Zip code to check weather..."){
-		input "zipcode", "text", title: "Zipcode?", required: false
+	section("Zip code to check weather...") {
+		input "zipcode", "string", title: "Zipcode?", required: false
 	}
 }
 
 def installed() {
 	log.debug "Installed: $settings"
-    updateSchedules()
+    schedule(waterTime, scheduleCheck)
 }
 
 def updated() {
 	log.debug "Updated: $settings"
 	unschedule()
-    updateSchedules()
+    schedule(waterTime, scheduleCheck)
 }
-
-def updateSchedules() {
-    setDaySchedule(sundayTime, 1)
-    setDaySchedule(mondayTime, 2)
-    setDaySchedule(tuesdayTime, 3)
-    setDaySchedule(wednesdayTime, 4)
-    setDaySchedule(thrusdayTime, 5)
-    setDaySchedule(fridayTime, 6)
-    setDaySchedule(saturdayTime, 7)
-}
-
-def setDaySchedule(t,day) {
-	if (t) {
-    	def splitTime = t.split('T')[1].split(':')
-    	schedule("${splitTime[1]} ${splitTime[0]} * * ${day} ?", "scheduleCheck${day}")
-    }
-}
-
-def scheduleCheck1() { scheduleCheck() }
-def scheduleCheck2() { scheduleCheck() }
-def scheduleCheck3() { scheduleCheck() }
-def scheduleCheck4() { scheduleCheck() }
-def scheduleCheck5() { scheduleCheck() }
-def scheduleCheck6() { scheduleCheck() }
-def scheduleCheck7() { scheduleCheck() }
 
 def scheduleCheck() {
-	if(zipcode) {
-		def response = getWeatherFeature("forecast", zipcode)
-		if (isStormy(response)) {
-        	sendPush("Watering now!")
+	log.debug("Checking schedule")
+	 if (waterToday()) {
+		if(zipcode) {
+			def response = getWeatherFeature("forecast", zipcode)
+			if (!isStormy(response)) {
+	        	sendPush("Watering now!")
+				switches.on()
+			} else {
+	        	sendPush("Skipping watering today due to forecast.")
+	        }
+	    } else {
+			sendPush("Watering now!")
 			switches.on()
-		} else {
-        	sendPush("Skipping watering today due to weather")
-        }
-    } else {
-		sendPush("Watering now!")
-		switches.on()
+    	}
     }
     // Assuming that sprinklers will turn themselves off. Should add a delayed off?
+}
+
+def waterToday() {
+	def day = new Date().format("EEE", location.timeZone).toLowerCase()
+    return (day == "sun" && waterOn(sun)) ||
+	    (day == "mon" && waterOn(mon)) ||
+    	(day == "tue" && waterOn(tue)) ||
+    	(day == "wed" && waterOn(wed)) ||
+    	(day == "thu" && waterOn(thu)) ||
+    	(day == "fri" && waterOn(fri)) ||
+    	(day == "sat" && waterOn(sat))
+}
+
+def waterOn(day) {
+	day && day.toLowerCase() == "yes"
 }
 
 private isStormy(json) {

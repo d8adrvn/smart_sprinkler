@@ -51,6 +51,7 @@ metadata {
 		command "RelayOff7"
 		command "RelayOn8"
 		command "RelayOff8"
+		command "rainDelayed"
         command "update" 
 }
 	

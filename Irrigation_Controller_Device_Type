@@ -1,10 +1,10 @@
 /**
- *  Irrigation Controller v2.3
+ *  Irrigation Controller v2.4
  *  This SmartThings Device Type Code Works With Arduino Irrigation Controller also available at this site
  *  
  *
  *	Creates connected irrigation controller
- *  Author: stan@dotson.info
+ *  Author: Stan Dotson (stan@dotson.info) and Matthew Nichols (matt@nichols.name)
  *  Date: 2013-11-11
  *  Copyright 2014 Stan Dotson
  *
@@ -31,7 +31,7 @@ preferences {
 }
 
 metadata {
-	definition (name: "Irrigation Controller v2.3", version: "2.3", author: "stan@dotson.info") {
+	definition (name: "Irrigation Controller v2.4", version: "2.4", author: "stan@dotson.info") {
     	capability "Switch"
         capability "Polling"
         capability "Refresh"
@@ -66,6 +66,8 @@ tiles {
 		state "on", label: 'Running', action: "switch.off", icon: "st.Health & Wellness.health7", backgroundColor: "#53a7c0", nextState: "stopping"
 		state "starting", label: 'Starting...', action: "switch.on", icon: "st.Health & Wellness.health7", backgroundColor: "#53a7c0"
 		state "stopping", label: 'Stopping...', action: "switch.off", icon: "st.Health & Wellness.health7", backgroundColor: "#53a7c0"
+		state "rainDelayed", label: 'Rain Delay', icon: "st.Weather.weather10", backgroundColor: "#fff000"
+
     }
         standardTile("zoneOneTile", "device.zoneOne", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
 		state "off1", label: 'One', action: "RelayOn1", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff",nextState: "sending1"
@@ -168,8 +170,8 @@ def parse(String description) {
 	
 	if(anyZoneOn()) {
 		return createEvent(name: "switch", value: "on", displayed: true)
-	} else {
-		return createEvent(name: "switch", value: "off", displayed: true)
+	} else if (device.currentValue("switch") != "rainDelayed") {
+        	return createEvent(name: "switch", value: "off", displayed: true)
 	}
 }
 
@@ -289,4 +291,10 @@ def refresh() {
 def poll() {
 	log.debug "Executing polling"
     update()
+}
+def rainDelayed() {
+	log.debug "rain delayed"
+    if(device.currentValue("switch") != "on") {
+    	sendEvent (name:"switch", value:"rainDelayed", displayed: true)
+    }
 }

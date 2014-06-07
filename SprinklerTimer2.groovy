@@ -83,6 +83,7 @@ def scheduleCheck() {
     if(inches >= (wetThreshold?.toFloat() ?: 0.5)) {
 		sendPush("Looks like it was a wet day ($inches inches). Pushing back next watering day.")
         state.daysSinceLastWatering = 0
+        switches.rainDelayed()
 	} else if (daysSince() >= days) {
 		sendPush("Watering now!")
         state.triggered = true

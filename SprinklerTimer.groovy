@@ -1,117 +1,168 @@
 /**
- *  Sprinkler Timer
+ *  Watering Days - Sprinkler Scheduler With Smart Rain Gauge
  *
- *  Author: matt@nichols.name
- */
+ *  Rain gauge keeps track of rain fall and then skips the next watering if the gauge reads above a "threshold".
+ *  The "threshold" amount is entered as a preference
+ *  Each time a scheduled watering is skipped, the "threshold" amount is removed from rain guage until rain gauge is empty.
+ *  The program will skip scheduled waterings if the forecast for that day exceeds the "threshold" amount
+ *  
+ *
+ *  Copyright 2014 Matthew Nichols
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License. You may obtain a copy of the License at:
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software distributed under the License is distributed
+ *  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
+ *  for the specific language governing permissions and limitations under the License.
+ *
+**/
+
 definition(
-    name: "Watering Days",
-    namespace: "name.nichols.matt.smartapps",
+    name: "Watering Days v2",
+    namespace: "d8adrvn/smart_sprinkler",
     author: "matt@nichols.name",
-    description: "Schedule sprinklers to turn on unless rain is in the forcast. Maximum of 4 days per week can be scheduled.",
+    description: "Schedule your irrigation controller on specific days using a Smart Rain Gauge",
 	category: "Green Living",
     iconUrl: "https://s3.amazonaws.com/smartapp-icons/Meta/water_moisture.png",
     iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Meta/water_moisture@2x.png"
 )
 
 preferences {
-	section("Sunday"){
-		input "sundayTime", "time", title: "When?", required: false
+	section {
+        input (name: "days", 
+    	type: "enum", 
+    	title: "Which days of the week?", 
+        required: false,
+        multiple: true, 
+        metadata: [values: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']])
+        log.debug "days to run are: ${days}"
 	}
-	section("Monday"){
-		input "mondayTime", "time", title: "When?", required: false
+	section("Select times to turn them on...") {
+		input name: "waterTimeOne",  type: "time", required: true, title: "Turn them all on at..."
+        input name: "waterTimeTwo",  type: "time", required: false, title: "and again at..."
+        input name: "waterTimeThree",  type: "time", required: false, title: "and again at..."
 	}
-	section("Tuesday"){
-		input "tuesdayTime", "time", title: "When?", required: false
-	}
-	section("Wednesday"){
-		input "wednesdayTime", "time", title: "When?", required: false
-	}
-	section("Thursday"){
-		input "thursdayTime", "time", title: "When?", required: false
-	}
-	section("Friday"){
-		input "fridayTime", "time", title: "When?", required: false
-	}
-	section("Saturday"){
-		input "saturdayTime", "time", title: "When?", required: false
-	}
-	section("Sprinkler switches..."){
+	section("Sprinkler switches...") {
 		input "switches", "capability.switch", multiple: true
 	}
-	section("Zip code to check weather..."){
-		input "zipcode", "text", title: "Zipcode?", required: false
+	section("Zip code to check weather...") {
+		input "zipcode", "string", title: "Zipcode?", required: false
+	}
+	section("Skip a watering if it has or will rain X inches yesterday or today... (default 0.25)"){
+		input "wetThreshold", "string", title: "Inches?", required: false
 	}
 }
 
 def installed() {
 	log.debug "Installed: $settings"
-    updateSchedules()
+    scheduling()
+    schedule(waterTime, scheduleCheck)
 }
 
 def updated() {
 	log.debug "Updated: $settings"
 	unschedule()
-    updateSchedules()
+    scheduling()
+
 }
 
-def updateSchedules() {
-    setDaySchedule(sundayTime, 1)
-    setDaySchedule(mondayTime, 2)
-    setDaySchedule(tuesdayTime, 3)
-    setDaySchedule(wednesdayTime, 4)
-    setDaySchedule(thrusdayTime, 5)
-    setDaySchedule(fridayTime, 6)
-    setDaySchedule(saturdayTime, 7)
+// Scheduling
+def scheduling() {
+    schedule(waterTimeOne, "waterTimeOneStart")
+	if (waterTimeTwo) {
+    	schedule(waterTimeTwo, "waterTimeTwoStart")
+   	}
+	if (waterTimeThree) {
+    	schedule(waterTimeThree, "waterTimeThreeStart")
+   	}
+}
+def waterTimeOneStart() {
+	scheduleCheck()
+}
+def waterTimeTwoStart() {
+	scheduleCheck()
+}
+def waterTimeThreeStart() {
+	scheduleCheck()
 }
 
-def setDaySchedule(t,day) {
-	if (t) {
-    	def splitTime = t.split('T')[1].split(':')
-    	schedule("${splitTime[1]} ${splitTime[0]} * * ${day} ?", "scheduleCheck${day}")
-    }
-}
-
-def scheduleCheck1() { scheduleCheck() }
-def scheduleCheck2() { scheduleCheck() }
-def scheduleCheck3() { scheduleCheck() }
-def scheduleCheck4() { scheduleCheck() }
-def scheduleCheck5() { scheduleCheck() }
-def scheduleCheck6() { scheduleCheck() }
-def scheduleCheck7() { scheduleCheck() }
-
+// turn them on
 def scheduleCheck() {
-	if(zipcode) {
-		def response = getWeatherFeature("forecast", zipcode)
-		if (isStormy(response)) {
-        	sendPush("Watering now!")
-			switches.on()
-		} else {
-        	sendPush("Skipping watering today due to weather")
+	log.debug("Checking schedule")
+	 if (waterToday()) {
+     	if (zipcode) {
+			if (!wasWetYesterday() && !isWet() && !isStormy()) {
+//	        	sendPush("Watering now!")
+				log.trace "starting scheduled watering"
+               	switches.on()
+              	}
+          	else {
+				switches.rainDelayed()
+               	log.trace "watering is rain delayed"
+//	        	sendPush("Skipping watering today due to forecast.")
+	 		}
         }
-    } else {
-		sendPush("Watering now!")
-		switches.on()
+        else {  //no zip code entered so run without weather input
+//			sendPush("Watering now!; No Weather data")
+			log.trace "starting scheduled watering without weather data"
+			switches.on()
+    	}
     }
-    // Assuming that sprinklers will turn themselves off. Should add a delayed off?
 }
 
-private isStormy(json) {
-	def STORMY = ['rain', 'snow', 'showers', 'sprinkles', 'precipitation']
+def waterToday() {
+    def today = new Date().format("EEEE")  //bug alert: this uses UTC date not local date
+	log.debug "today: ${today}, days: ${days}"
+	if (days.contains(today)) {
+		return true
+	}
+	log.trace "watering is not scheduled for today"
+	return false
+}
 
-	def forecast = json?.forecast?.txt_forecast?.forecastday?.first()
-	if (forecast) {
-		def text = forecast?.fcttext?.toLowerCase()
-		if (text) {
-			def result = false
-			for (int i = 0; i < STORMY.size() && !result; i++) {
-				result = text.contains(STORMY[i])
-			}
-			return result
-		} else {
-			return false
-		}
-	} else {
-		log.warn "Did not get a forecast: $json"
+def wasWetYesterday() {
+ 	def yesterdaysWeather = getWeatherFeature("yesterday", zipcode)
+    def yesterdaysPrecip=yesterdaysWeather.history.dailysummary.precipi.toArray()
+   	def yesterdaysInches=yesterdaysPrecip[0].toFloat()
+    log.info("Checking yesterdays percipitation for $zipcode: $yesterdaysInches in")
+    
+    if (yesterdaysInches > wetThreshold.toFloat()) {
+        return true  //rainGuage is full
+    }
+ 	else {
+        return false // rainGuage is empty or below the line
+    }
+}
+
+def isWet() {
+	def todaysWeather = getWeatherFeature("conditions", zipcode)
+   	def todaysInches = todaysWeather.current_observation.precip_today_in.toFloat()
+	log.info("Checking percipitation for $zipcode: $todaysInches in")
+	if (todaysInches > wetThreshold.toFloat()) {
+  		return true  // rain gauge is full
+	}
+	else {
 		return false
 	}
+}
+
+def isStormy() {
+     def forecastWeather = getWeatherFeature("forecast", zipcode)
+     def forecastPrecip=forecastWeather.forecast.simpleforecast.forecastday.qpf_allday.in.toArray()
+     def forecastInches=forecastPrecip[0].toFloat()
+	log.info("Checking forecast percipitation for $zipcode: $forecastInches in")
+	if (forecastInches > wetThreshold.toFloat()) {
+    	return true  // rain guage is forecasted to be full
+	}
+	else {
+		return false
+	}
+}
+
+def initialize() {
+	// TODO: subscribe to attributes, devices, locations, etc.
+    //TODO: add rain guage tile to device type and subscribe to listen for "emptyRainGuage" custom command
 }

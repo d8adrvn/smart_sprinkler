@@ -37,7 +37,7 @@ preferences {
             type: "enum",
             title: "Water which days?",
             required: false,
-            multiple: false, // This must be changed to false for development (known ST IDE bug)
+            multiple: true, // This must be changed to false for development (known ST IDE bug)
             metadata: [values: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']])
             log.debug("wateringDays: $wateringDays")
         }

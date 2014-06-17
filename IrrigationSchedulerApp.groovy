@@ -83,12 +83,14 @@ preferences {
 def installed() {
     log.debug "Installed: $settings"
     scheduling()
+    state.daysSinceLastWatering = [0,0,0]
 }
 
 def updated() {
     log.debug "Updated: $settings"
     unschedule()
     scheduling()
+    state.daysSinceLastWatering = [0,0,0]
 }
 
 // Scheduling
@@ -103,12 +105,15 @@ def scheduling() {
 }
 
 def waterTimeOneStart() {
+    state.currentTimerIx = 0
     scheduleCheck()
 }
 def waterTimeTwoStart() {
+    state.currentTimerIx = 1
     scheduleCheck()
 }
 def waterTimeThreeStart() {
+    state.currentTimerIx = 2
     scheduleCheck()
 }
 
@@ -131,14 +136,14 @@ def scheduleCheck() {
     schedulerState = isRainDelay() ? "delay" : schedulerState
 
     if (schedulerState != "delay") {
-        state.daysSinceLastWatering = daysSince() + 1 // KNOWN ISSUE. This does not work if more than one time is scheduled.
+        state.daysSinceLastWatering[state.currentTimerIx] = daysSince() + 1
     }
 
     log.debug("Schedule effect $schedulerState. Days since last watering ${daysSince()}. Is watering day? ${isWateringDay()}. Enought time? ${enoughTimeElapsed(schedulerState)} ")
 
     if ((isWateringDay() && enoughTimeElapsed(schedulerState) && schedulerState != "delay") || schedulerState == "expedite") {
         sendPush("Watering now!")
-        state.daysSinceLastWatering = 0
+        state.daysSinceLastWatering[state.currentTimerIx] = 0
         water()
         // Assuming that sprinklers will turn themselves off. Should add a delayed off?
     }
@@ -162,8 +167,8 @@ def enoughTimeElapsed(schedulerState) {
 }
 
 def daysSince() {
-    if(!state.daysSinceLastWatering) state.daysSinceLastWatering = 0
-    state.daysSinceLastWatering
+    if(!state.daysSinceLastWatering) state.daysSinceLastWatering = [0,0,0]
+    state.daysSinceLastWatering[state.currentTimerIx] ?: 0
 }
 
 def isRainDelay() { 
@@ -213,7 +218,7 @@ def isStormy() {
 
     def forecastWeather = getWeatherFeature("forecast", zipcode)
     def forecastPrecip=forecastWeather.forecast.simpleforecast.forecastday.qpf_allday.in.toArray()
-    def forecastInches=forecastPrecip[0].toFloat()
+    def forecastInches=forecastPrecip[0]?.toFloat() ?: 0.0
     log.info("Checking forecast percipitation for $zipcode: $forecastInches in")
     if (forecastInches > (wetThreshold?.toFloat() ?: 0.5)) {
         return true  // rain guage is forecasted to be full

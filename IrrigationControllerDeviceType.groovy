@@ -196,145 +196,150 @@ def anyZoneOn() {
 
 // handle commands
 def RelayOn1() {
-    log.debug "Executing 'on,1'"
+    log.info "Executing 'on,1'"
     zigbee.smartShield(text: "on,1,${oneTimer}").format()
 }
 
 def RelayOn1For(value) {
-    value = value > 60 ? 60 : value
-    log.debug "Executing 'on,1,$value'"
+    value = checkTime(value)
+    log.info "Executing 'on,1,$value'"
     zigbee.smartShield(text: "on,1,${value}").format()
 }
 
 def RelayOff1() {
-    log.debug "Executing 'off,1'"
+    log.info "Executing 'off,1'"
     zigbee.smartShield(text: "off,1").format()
 }
 
 def RelayOn2() {
-    log.debug "Executing 'on,2'"
+    log.info "Executing 'on,2'"
     zigbee.smartShield(text: "on,2,${twoTimer}").format()
 }
 
 def RelayOn2For(value) {
-    value = value > 60 ? 60 : value
-    log.debug "Executing 'on,2,$value'"
+    value = checkTime(value)
+    log.info "Executing 'on,2,$value'"
     zigbee.smartShield(text: "on,2,${value}").format()
 }
 
 def RelayOff2() {
-    log.debug "Executing 'off,2'"
+    log.info "Executing 'off,2'"
     zigbee.smartShield(text: "off,2").format()
 }
 
 def RelayOn3() {
-    log.debug "Executing 'on,3'"
+    log.info "Executing 'on,3'"
     zigbee.smartShield(text: "on,3,${threeTimer}").format()
 }
 
 def RelayOn3For(value) {
-    value = value > 60 ? 60 : value
-    log.debug "Executing 'on,3,$value'"
+    value = checkTime(value)
+    log.info "Executing 'on,3,$value'"
     zigbee.smartShield(text: "on,3,${value}").format()
 }
 
 def RelayOff3() {
-    log.debug "Executing 'off,3'"
+    log.info "Executing 'off,3'"
     zigbee.smartShield(text: "off,3").format()
 }
 
 def RelayOn4() {
-    log.debug "Executing 'on,4'"
+    log.info "Executing 'on,4'"
     zigbee.smartShield(text: "on,4,${fourTimer}").format()
 }
 
 def RelayOn4For(value) {
-    value = value > 60 ? 60 : value
-    log.debug "Executing 'on,4,$value'"
+    value = checkTime(value)
+    log.info "Executing 'on,4,$value'"
     zigbee.smartShield(text: "on,4,${value}").format()
 }
 
 def RelayOff4() {
-    log.debug "Executing 'off,4'"
+    log.info "Executing 'off,4'"
     zigbee.smartShield(text: "off,4").format()
 }
 
 def RelayOn5() {
-    log.debug "Executing 'on,5'"
+    log.info "Executing 'on,5'"
     zigbee.smartShield(text: "on,5,${fiveTimer}").format()
 }
 
 def RelayOn5For(value) {
-    value = value > 60 ? 60 : value
-    log.debug "Executing 'on,5,$value'"
+    value = checkTime(value)
+    log.info "Executing 'on,5,$value'"
     zigbee.smartShield(text: "on,5,${value}").format()
 }
 
 def RelayOff5() {
-    log.debug "Executing 'off,5'"
+    log.info "Executing 'off,5'"
     zigbee.smartShield(text: "off,5").format()
 }
 
 def RelayOn6() {
-    log.debug "Executing 'on,6'"
+    log.info "Executing 'on,6'"
     zigbee.smartShield(text: "on,6,${sixTimer}").format()
 }
 
 def RelayOn6For(value) {
-    value = value > 60 ? 60 : value
-    log.debug "Executing 'on,6,$value'"
+    value = checkTime(value)
+    log.info "Executing 'on,6,$value'"
     zigbee.smartShield(text: "on,6,${value}").format()
 }
 
 def RelayOff6() {
-    log.debug "Executing 'off,6'"
+    log.info "Executing 'off,6'"
     zigbee.smartShield(text: "off,6").format()
 }
 
 def RelayOn7() {
-    log.debug "Executing 'on,7'"
+    log.info "Executing 'on,7'"
     zigbee.smartShield(text: "on,7,${sevenTimer}").format()
 }
 
 def RelayOn7For(value) {
-    value = value > 60 ? 60 : value
-    log.debug "Executing 'on,7,$value'"
+    value = checkTime(value)
+    log.info "Executing 'on,7,$value'"
     zigbee.smartShield(text: "on,7,${value}").format()
 }
 
 def RelayOff7() {
-    log.debug "Executing 'off,7'"
+    log.info "Executing 'off,7'"
     zigbee.smartShield(text: "off,7").format()
 }
 
 def RelayOn8() {
-    log.debug "Executing 'on,8'"
+    log.info "Executing 'on,8'"
     zigbee.smartShield(text: "on,8,${eightTimer}").format()
 }
 
 def RelayOn8For(value) {
-    value = value > 60 ? 60 : value
-    log.debug "Executing 'on,8,$value'"
+    value = checkTime(value)
+    log.info "Executing 'on,8,$value'"
     zigbee.smartShield(text: "on,8,${value}").format()
 }
 
 def RelayOff8() {
-    log.debug "Executing 'off,8'"
+    log.info "Executing 'off,8'"
     zigbee.smartShield(text: "off,8").format()
 }
 
 def on() {
-    log.debug "Executing 'allOn'"
+    log.info "Executing 'allOn'"
     zigbee.smartShield(text: "allOn,${oneTimer ?: 0},${twoTimer ?: 0},${threeTimer ?: 0},${fourTimer ?: 0},${fiveTimer ?: 0},${sixTimer ?: 0},${sevenTimer ?: 0},${eightTimer ?: 0}").format()
 }
 
 def off() {
-    log.debug "Executing 'allOff'"
+    log.info "Executing 'allOff'"
     zigbee.smartShield(text: "allOff").format()
 }
 
+def checkTime(t) {
+	def time = (t ?: 0).toInteger()
+    time > 60 ? 60 : time
+}
+
 def update() {
-    log.debug "Execting refresh"
+    log.info "Execting refresh"
     zigbee.smartShield(text: "update").format()
 }
 def refresh() {

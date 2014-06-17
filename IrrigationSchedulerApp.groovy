@@ -24,7 +24,7 @@ definition(
 	author: "matt@nichols.name",
 	description: "Schedule sprinklers run unless there is rain.",
 	category: "Green Living",
-	version: "2.5"
+	version: "2.5",
 	iconUrl: "https://s3.amazonaws.com/smartapp-icons/Meta/water_moisture.png",
 	iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Meta/water_moisture@2x.png"
 )
@@ -35,19 +35,18 @@ preferences {
 			input (
 				name: "wateringDays",
 				type: "enum",
-				title: "Which days of the week?",
+				title: "Water which days?",
 				required: false,
 				multiple: true, // This must be changed to false for development (known ST IDE bug)
 				metadata: [values: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']])
-				log.debug "days to run are: ${wateringDays}"
 		}
 
 		section("Water every...") {
-			input "days", "number", title: "Days?", required: false
+			input "days", "number", title: "Days?", description: "minimum # days between watering", required: false
 		}
 		
-		section("Select times to turn them on...") {
-			input name: "waterTimeOne",  type: "time", required: true, title: "Turn them all on at..."
+		section("Water when...") {
+			input name: "waterTimeOne",  type: "time", required: true, title: "Turn them on at..."
 			input name: "waterTimeTwo",  type: "time", required: false, title: "and again at..."
 			input name: "waterTimeThree",  type: "time", required: false, title: "and again at..."
 		}
@@ -57,19 +56,19 @@ preferences {
 		}
 	}
     
-	page(name: "sprinklerPage", title: "Sprinkler Controller Setup", install: true) {
+	page(name: "sprinklerPage", title: "Sprinkler Controller Setup", nextPage: "weatherPage", install: true) {
 		section("Sprinkler switches...") {
 			input "switches", "capability.switch", multiple: true
 		}
-		section("Zone Times") {
-			input "zone1", "string", title: "zone 1", multiple: false, required: false
-			input "zone2", "string", title: "zone 2", multiple: false, required: false
-			input "zone3", "string", title: "zone 3", multiple: false, required: false
-			input "zone4", "string", title: "zone 4", multiple: false, required: false
-			input "zone5", "string", title: "zone 5", multiple: false, required: false
-			input "zone6", "string", title: "zone 6", multiple: false, required: false
-			input "zone7", "string", title: "zone 7", multiple: false, required: false
-			input "zone8", "string", title: "zone 8", multiple: false, required: false
+		section("Zone Times...") {
+			input "zone1", "string", title: "Zone 1 Time", description: "minutes", multiple: false, required: false
+			input "zone2", "string", title: "Zone 2 Time", description: "minutes", multiple: false, required: false
+			input "zone3", "string", title: "Zone 3 Time", description: "minutes", multiple: false, required: false
+			input "zone4", "string", title: "Zone 4 Time", description: "minutes", multiple: false, required: false
+			input "zone5", "string", title: "Zone 5 Time", description: "minutes", multiple: false, required: false
+			input "zone6", "string", title: "Zone 6 Time", description: "minutes", multiple: false, required: false
+			input "zone7", "string", title: "Zone 7 Time", description: "minutes", multiple: false, required: false
+			input "zone8", "string", title: "Zone 8 Time", description: "minutes", multiple: false, required: false
 		}
 	}
 	
@@ -86,7 +85,6 @@ preferences {
 def installed() {
 	log.debug "Installed: $settings"
 	scheduling()
-	schedule(waterTime, scheduleCheck)
 }
 
 def updated() {

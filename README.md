@@ -88,6 +88,7 @@ The “Refresh” tile can be pressed to refresh the status of all the zones.  T
 
 The “Preferences” tile allows you to enter the run times for each station.  Just enter the times in minutes.  If you are using less than 8 zones, just enter zero minutes for zones not in use.
 
+
 Irrigation Controller Smart App
 
 This is where the brains in the system are buried.  
@@ -103,3 +104,9 @@ After totaling up the precip, the App checks the threshold that you set as a pre
 Irrigation Virtual Scheduler Switch:
 
 This is an optional utility that allows you to put your system on extended hold or in other states.  
+
+Misc. Notes:
+
+After installing the Device Type or the Smart App, be sure to both Save AND Publish (for me) both apps.  If you do not publish, they will not be able to communicate with the hub and you are more likely to have IDE issues.
+
+After powering off the Arduino or switching from USB power to 9V power, you may notice that the SmartShield LED oges dark.  The Arduino LEDs should both be on at all times.  The SmartShield LED will relit at the first activity.

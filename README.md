@@ -1,4 +1,5 @@
 Hello, Smarter Lawn
+
 A project by Stan Dotson (stan@dotson.info) and Matthew Nichols (matt@nichols.name)
 
 Background

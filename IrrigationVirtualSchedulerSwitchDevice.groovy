@@ -24,6 +24,7 @@ metadata {
         command "delay"
         command "expedite"
         command "onHold"
+        command "rainDelayed"
         attribute "effect", "string"
         }
 
@@ -33,6 +34,7 @@ metadata {
             state("delay", label: "delay", action: "expedite", icon: "st.Health & Wellness.health7", backgroundColor: "#c0a353")
             state("expedite", label: "expedite", action: "onHold", icon: "st.Health & Wellness.health7", backgroundColor: "#53a7c0")
             state("onHold", label: "on hold", action: "noEffect", icon: "st.Health & Wellness.health7", backgroundColor: "#bc2323")
+            state("rainDelayed", label: "Rain Delay", action: "noEffect", icon: "st.Weather.weather10", backgroundColor: "#fff000")
         }
 
         main(["scheduleEffect"])
@@ -42,6 +44,12 @@ metadata {
 
 def	delay() {
     def evt = createEvent(name: "effect", value: "delay", displayed: true)
+    log.debug("Sending: $evt")
+    sendEvent(evt)
+}
+
+def	rainDelayed() {
+    def evt = createEvent(name: "effect", value: "rainDelayed", displayed: true)
     log.debug("Sending: $evt")
     sendEvent(evt)
 }

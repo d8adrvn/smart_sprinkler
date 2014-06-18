@@ -173,12 +173,16 @@ def daysSince() {
 
 def isRainDelay() { 
     if(wasWetYesterday() || isWet() || isStormy()) {
-    if('rainDelay' in switches.supportedCommands.collect { it.name }) {
-    switches.rainDelay()
-    }
-    if('rainDelay' in schedulerVirtualDevice.supportedCommands.collect { it.name }) {
-        switches.rainDelay()
-    }
+        log.trace "Watering is rain delayed"
+        sendPush("Skipping watering today due to precipitation.")
+        for(s in switches) {
+            if("rainDelayed" in s.supportedCommands.collect { it.name }) {
+                s.rainDelayed()
+            }
+        }
+        if("rainDelayed" in schedulerVirtualDevice?.supportedCommands.collect { it.name }) {
+            schedulerVirtualDevice.rainDelayed()
+        }
         return true
     }
     return false

@@ -33,7 +33,6 @@ preferences {
 metadata {
     definition (name: "Irrigation Controller v2.5", version: "2.5", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") {
         capability "Switch"
-        capability "Polling"
         capability "Refresh"
         command "OnWithZoneTimes"
         command "RelayOn1"
@@ -355,11 +354,6 @@ def update() {
     zigbee.smartShield(text: "update").format()
 }
 def refresh() {
-    log.debug "Executing polling"
-    update()
-}
-
-def poll() {
     log.debug "Executing polling"
     update()
 }

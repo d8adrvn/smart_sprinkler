@@ -75,7 +75,7 @@ preferences {
             input "zipcode", "text", title: "Zipcode?", required: false
         }
         section("Skip watering if more than... (default 0.5)") {
-            input "wetThreshold", "number", title: "Inches?", required: false
+            input "wetThreshold", "string", title: "Inches?", required: false
         }
     }
 }

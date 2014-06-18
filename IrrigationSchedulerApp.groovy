@@ -188,12 +188,17 @@ def isRainDelay() {
     return false
 }
 
+def safeToFloat(value) {
+    if(value && value.isFloat()) return value.toFloat()
+    return 0.0
+}
+
 def wasWetYesterday() {
     if (!zipcode) return false
 
     def yesterdaysWeather = getWeatherFeature("yesterday", zipcode)
     def yesterdaysPrecip=yesterdaysWeather.history.dailysummary.precipi.toArray()
-    def yesterdaysInches=yesterdaysPrecip[0].toFloat()
+    def yesterdaysInches=safeToFloat(yesterdaysPrecip[0])
     log.info("Checking yesterdays percipitation for $zipcode: $yesterdaysInches in")
 
     if (yesterdaysInches > (wetThreshold?.toFloat() ?: 0.5)) {
@@ -207,7 +212,7 @@ def isWet() {
     if (!zipcode) return false
 
     def todaysWeather = getWeatherFeature("conditions", zipcode)
-    def todaysInches = todaysWeather.current_observation.precip_today_in.toFloat()
+    def todaysInches = safeToFloat(todaysWeather.current_observation.precip_today_in)
     log.info("Checking percipitation for $zipcode: $todaysInches in")
     if (todaysInches > (wetThreshold?.toFloat() ?: 0.5)) {
         return true  // rain gauge is full
@@ -222,7 +227,7 @@ def isStormy() {
 
     def forecastWeather = getWeatherFeature("forecast", zipcode)
     def forecastPrecip=forecastWeather.forecast.simpleforecast.forecastday.qpf_allday.in.toArray()
-    def forecastInches=forecastPrecip[0]?.toFloat() ?: 0.0
+    def forecastInches=safeToFloat(forecastPrecip[0])
     log.info("Checking forecast percipitation for $zipcode: $forecastInches in")
     if (forecastInches > (wetThreshold?.toFloat() ?: 0.5)) {
         return true  // rain guage is forecasted to be full

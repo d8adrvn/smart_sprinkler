@@ -1,7 +1,7 @@
 
 /**
  ****************************************************************************************************************************
- * Irrigation Controller v2.3
+ * Irrigation Controller v2.4
  * Simple, elegant irrigation controller that takes advantage of the cloud and SmartThings ecosystem
  * Arduino UNO with SmartThings Shield  and an 8 Relay Module
  * Works by receiving irrigation run times from the Cloud and then builds a queue to execute
@@ -169,7 +169,7 @@ void messageCallout(String message)
     inValue [i] = strtok(NULL, delimiters); //remove remaining substrings as incoming values
     i++;
   }
-  if (strcmp(inValue[0],"on")==0) {   // add new station to queue
+  if (strcmp(inValue[0],"on")==0 && strcmp(inValue[2],"0")==1) {   // add new station to queue
     int addStation=atoi(inValue[1]);
     queue[addStation]=1;
     stationTime[addStation]=atol(inValue[2])*60L*1000L;
@@ -190,7 +190,7 @@ void messageCallout(String message)
   if (strcmp(inValue[0],"allOn")==0) {
     int i=1;
     while (i<stations+1) {
-      if (i != trafficCop) {
+      if (i != trafficCop && (strcmp(inValue[i],"0")==1)) {
         queue[i]=1;
       }
       stationTime[i]=atoi(inValue[i])*60L*1000L;

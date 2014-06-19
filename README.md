@@ -6,6 +6,21 @@ A project by Stan Dotson (stan@dotson.info) and Matthew Nichols (matt@nichols.na
 
 Why would you build a lawn sprinkler system controller when you can just buy one?  But you can’t just buy one... at least not the sprinkler system we were thinking about!!  Let’s start by first making the controller connected.  And of course, we will need iPhone controls.  Then we need to make it smart.  Smart like it knows when it has rained, is raining or will rain!   And then what if we could add cognition so that it actually learns how to water your lawn!  Not that would be really smart!!!
 
+# High Level Project Steps
+
+1) Order the hardware
+2) Add SmartThings hub to your home network, download app to your iPhone
+3) Obtain a Maker/Developer account for SmartThings (graph.api.smartthings.com)
+3) Set up Ardunino controller, ThingShield and wire to 8 Channel Relay.  Load Arduino code to the Arduino
+4) Add Arduino to your SmartThings hub using your iPhone app
+5) Go to graph.api.smartthings.com
+  5a) On My Device Types, create a new device type and paste in the device type code.  Save & Publish
+  5b) On My SmartApps, create a new Smart App and paste in the smart app code. Save & Publish
+6) Go to My Devices, select the Arduino and edit the Device Type and select the Irrigation Controller device type (5a)
+7) Test out system 
+8) Wire the Arduino to your irrigation system
+9) You now have a smarter lawn!
+
 
 # The Hardware
 
@@ -32,10 +47,16 @@ Finally, for the project housing, we just ripped out the guts of our existing co
 
 
 ## Wiring the Project
+# Wiring The Arduino Controller
+TBD....
+Using a short jumper cable (male to male) we daisy chained the COMMON contact positions together across all 8 relays.
 
-The wiring of the project was straight forward.  The irrigation values used standard irrigation wire bundle which has multiple colored wires (one per valve + extras) and a white wire as a common ground.   We connected “ground” wire from the transformer to the common ground (white) wire in the irrigation wire bundle.
 
-To connect the wires running to each valve, we used the Normally Open positions on the relay.  Each colored wire for each valve was connected to one of the NO positions on a relay.  One valve per relay.   Up to 8 are possible with this hardware, however, you do not need to use all 8.  We then connected the “hot” wire from the transformer to connect to the COMMON position (middle contact) on the relay.  Using a short jumper cable (male to male) we daisy chained the COMMON contact positions together across all 8 relays.
+
+# Wiring The Controller To The Irrigation System
+The final wiring of the project to your irrigation system is straight forward.  Irrigation sytems use a standard irrigation wire bundle which has multiple colored wires (one per valve + extras) and a white wire as a common ground.   We connected “ground” wire from the 24V transformer to the common ground (white) wire in the irrigation wire bundle.
+
+To connect the wires running to each valve, we used the Normally Open positions on the relay.  Each colored wire for each valve was connected to one of the NO positions on a relay.  One valve per relay.   Up to 8 are possible with this hardware, however, you do not need to use all 8.  We then connected the “hot” wire from the transformer to connect to the COMMON position (middle contact) on one of the relays.  This provides power to all realys since they are daisy chained together (see Arduino wiring above)  
 
 
 # The Software

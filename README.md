@@ -8,18 +8,18 @@ Why would you build a lawn sprinkler system controller when you can just buy one
 
 # High Level Project Steps
 
-1) Order the hardware
-2) Add SmartThings hub to your home network, download app to your iPhone
-3) Obtain a Maker/Developer account for SmartThings (graph.api.smartthings.com)
-3) Assemble the Ardunino controller, ThingShield and 8 Channel Relay.  Load Arduino code to the Arduino
-4) Add Arduino to your SmartThings hub using your iPhone app
-5) Go to graph.api.smartthings.com
-  5a) On My Device Types, create a new device type and paste in the device type code.  Save & Publish
-  5b) On My SmartApps, create a new Smart App and paste in the smart app code. Save & Publish
-6) Go to My Devices, select the Arduino and edit the Device Type and select the Irrigation Controller device type (5a)
-7) Test out system 
-8) Wire the Arduino to your irrigation system
-9) You now have a smarter lawn!
+1. Order the hardware
+2. Add SmartThings hub to your home network, download app to your iPhone
+3. Obtain a Maker/Developer account for SmartThings (graph.api.smartthings.com)
+4. Assemble the Ardunino controller, ThingShield and 8 Channel Relay.  Load Arduino code to the Arduino
+5. Add Arduino to your SmartThings hub using your iPhone app
+6. Go to graph.api.smartthings.com
+  6a. On My Device Types, create a new device type and paste in the device type code.  Save & Publish
+  6b. On My SmartApps, create a new Smart App and paste in the smart app code. Save & Publish
+7.  Go to My Devices, select the Arduino and edit the Device Type and select the Irrigation Controller device type (5a)
+8.  Test out system 
+9.  Wire the Arduino to your irrigation system
+10. You now have a smarter lawn!
 
 
 # The Hardware
@@ -48,12 +48,17 @@ Finally, for the project housing, we just ripped out the guts of our existing co
 
 ## Wiring the Project
 # Wiring The Arduino Controller
-Stack the SmartThing ThingShield on top of the Arduino Uno.  Connect a ground wire from the GND pin on ThingShield to the GND pin on the SainSmart 8 Channel relay.  Connect another jumper wire from the +5V on the ThingShield to the VCC pin on the Relay.  Make sure the jumper on the relay board bridges VCC to JD-VCC.  Use 8 wires from your ribbon cable to connect pins 12-5 on ThingShield to pins 1 to 8 on the relay board.  Note, the ThingShield pins are not labeled.  So you can either identify the pins using labels on the Arduino or refer to a diagram.  Here is a diagram for Arduino Uno V2 from Flikr:   https://www.flickr.com/photos/28521811@N04/8520970405/  Finally, using seven short jumper cable (male to male) we daisy chained the COMMON contact positions together across all 8 relays.
+1. Stack the SmartThing ThingShield on top of the Arduino Uno.  
+2. Connect a ground wire from the GND pin on ThingShield to the GND pin on the SainSmart 8 Channel relay.  
+3. Connect another jumper wire from the +5V on the ThingShield to the VCC pin on the Relay.  
+4. Make sure the jumper on the relay board bridges VCC to JD-VCC.  
+5. Use 8 wires from your ribbon cable to connect pins 12-5 on ThingShield to pins 1 to 8 on the relay board.    
+6. Finally, using seven short jumper cable (male to male) we daisy chained the COMMON contact positions together across all 8 relays.
 
-
+Note, the ThingShield pins are not labeled.  So you can either identify the pins using labels on the Arduino or refer to a diagram.  Here is a diagram for Arduino Uno V2 from Flikr:   https://www.flickr.com/photos/28521811@N04/8520970405/
 
 # Wiring The Controller To The Irrigation System
-The final wiring of the project to your irrigation system is straight forward.  Irrigation sytems use a standard irrigation wire bundle which has multiple colored wires (one per valve + extras) and a white wire as a common ground.   We connected “ground” wire from the 24V transformer to the common ground (white) wire in the irrigation wire bundle.
+The final wiring of the project to your irrigation system is straight forward.  Irrigation sytems use a standard irrigation wire bundle which has multiple colored wires (one per valve + extras) and a white wire as a common ground.  We connected “ground” wire from the 24V transformer to the common ground (white) wire in the irrigation wire bundle.
 
 To connect the wires running to each valve, we used the Normally Open positions on the relay.  Each colored wire for each valve was connected to one of the NO positions on a relay.  One valve per relay.   Up to 8 are possible with this hardware, however, you do not need to use all 8.  We then connected the “hot” wire from the transformer to connect to the COMMON position (middle contact) on one of the relays.  This provides power to all realys since they are daisy chained together (see Arduino wiring above)  
 

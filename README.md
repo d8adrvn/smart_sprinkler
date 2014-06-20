@@ -47,7 +47,7 @@ Finally, for the project housing, we just ripped out the guts of our existing co
 
 
 ## Wiring the Project
-# Wiring The Arduino Controller
+### Wiring The Arduino Controller
 1. Stack the SmartThing ThingShield on top of the Arduino Uno.  
 2. Connect a ground wire from the GND pin on ThingShield to the GND pin on the SainSmart 8 Channel relay.  
 3. Connect another jumper wire from the +5V on the ThingShield to the VCC pin on the Relay.  
@@ -57,7 +57,7 @@ Finally, for the project housing, we just ripped out the guts of our existing co
 
 Note, the ThingShield pins are not labeled.  So you can either identify the pins using labels on the Arduino or refer to a diagram.  Here is a diagram for Arduino Uno V2 from Flikr:   https://www.flickr.com/photos/28521811@N04/8520970405/
 
-# Wiring The Controller To The Irrigation System
+### Wiring The Controller To The Irrigation System
 The final wiring of the project to your irrigation system is straight forward.  Irrigation sytems use a standard irrigation wire bundle which has multiple colored wires (one per valve + extras) and a white wire as a common ground.  We connected “ground” wire from the 24V transformer to the common ground (white) wire in the irrigation wire bundle.
 
 To connect the wires running to each valve, we used the Normally Open positions on the relay.  Each colored wire for each valve was connected to one of the NO positions on a relay.  One valve per relay.   Up to 8 are possible with this hardware, however, you do not need to use all 8.  We then connected the “hot” wire from the transformer to connect to the COMMON position (middle contact) on one of the relays.  This provides power to all realys since they are daisy chained together (see Arduino wiring above)  

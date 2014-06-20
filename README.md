@@ -11,7 +11,7 @@ Why would you build a lawn sprinkler system controller when you can just buy one
 1) Order the hardware
 2) Add SmartThings hub to your home network, download app to your iPhone
 3) Obtain a Maker/Developer account for SmartThings (graph.api.smartthings.com)
-3) Set up Ardunino controller, ThingShield and wire to 8 Channel Relay.  Load Arduino code to the Arduino
+3) Assemble the Ardunino controller, ThingShield and 8 Channel Relay.  Load Arduino code to the Arduino
 4) Add Arduino to your SmartThings hub using your iPhone app
 5) Go to graph.api.smartthings.com
   5a) On My Device Types, create a new device type and paste in the device type code.  Save & Publish
@@ -48,8 +48,7 @@ Finally, for the project housing, we just ripped out the guts of our existing co
 
 ## Wiring the Project
 # Wiring The Arduino Controller
-TBD....
-Using a short jumper cable (male to male) we daisy chained the COMMON contact positions together across all 8 relays.
+Stack the SmartThing ThingShield on top of the Arduino Uno.  Connect a ground wire from the GND pin on ThingShield to the GND pin on the SainSmart 8 Channel relay.  Connect another jumper wire from the +5V on the ThingShield to the VCC pin on the Relay.  Make sure the jumper on the relay board bridges VCC to JD-VCC.  Use 8 wires from your ribbon cable to connect pins 12-5 on ThingShield to pins 1 to 8 on the relay board.  Note, the ThingShield pins are not labeled.  So you can either identify the pins using labels on the Arduino or refer to a diagram.  Here is a diagram for Arduino Uno V2 from Flikr:   https://www.flickr.com/photos/28521811@N04/8520970405/  Finally, using seven short jumper cable (male to male) we daisy chained the COMMON contact positions together across all 8 relays.
 
 
 

@@ -169,10 +169,12 @@ void messageCallout(String message)
     inValue [i] = strtok(NULL, delimiters); //remove remaining substrings as incoming values
     i++;
   }
-  if (strcmp(inValue[0],"on")==0 && strcmp(inValue[2],"0")!=0) {   // add new station to queue
-    int addStation=atoi(inValue[1]);
-    queue[addStation]=1;
-    stationTime[addStation]=atol(inValue[2])*60L*1000L;
+  if (strcmp(inValue[0],"on")==0)  {   // add new station to queue
+    if (strcmp(inValue[2],"0")!=0 && strcmp(inValue[2],"null")!=0) {  //do not add to queue if zero time
+      int addStation=atoi(inValue[1]);
+      queue[addStation]=1;
+      stationTime[addStation]=atol(inValue[2])*60L*1000L;
+    }
     scheduleUpdate();
   }
   if (strcmp(inValue[0],"off")==0) {
@@ -190,8 +192,10 @@ void messageCallout(String message)
   if (strcmp(inValue[0],"allOn")==0) {
     int i=1;
     while (i<stations+1) {
-      if (i != trafficCop && (strcmp(inValue[i],"0")!=0)) {
-        queue[i]=1;
+      if (i != trafficCop) {
+        if (strcmp(inValue[i],"0")!=0 && strcmp(inValue[i],"null")!=0) {  //do not add to queue if zero time
+          queue[i]=1;
+        }
       }
       stationTime[i]=atoi(inValue[i])*60L*1000L;
       i++;

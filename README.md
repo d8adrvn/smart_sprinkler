@@ -1,34 +1,34 @@
-Hello, Smarter Lawn
+# Hello, Smarter Lawn
 
-A project by Stan Dotson (stan@dotson.info) and Matthew Nichols (matt@nichols.name)
+### **A project by Stan Dotson (stan@dotson.info) and Matthew Nichols (matt@nichols.name)**
 
-# Background
+##Background
 
 Why would you build a lawn sprinkler system controller when you can just buy one?  But you can’t just buy one... at least not the sprinkler system we were thinking about!!  Let’s start by first making the controller connected.  And of course, we will need iPhone controls.  Then we need to make it smart.  Smart like it knows when it has rained, is raining or will rain!   And then what if we could add cognition so that it actually learns how to water your lawn!  Not that would be really smart!!!
 
-# High Level Project Steps
+##High Level Project Steps
 
 1. Order the hardware
 2. Add SmartThings hub to your home network, download app to your iPhone
 3. Obtain a Maker/Developer account for SmartThings (graph.api.smartthings.com)
-4. Assemble the Ardunino controller, ThingShield and 8 Channel Relay.  Load Arduino code to the Arduino
+4. Assemble the Arduino controller, ThingShield and 8 Channel Relay.  Load Arduino code to the Arduino
 5. Add Arduino to your SmartThings hub using your iPhone app
 6. Go to graph.api.smartthings.com
-  6a. On My Device Types, create a new device type and paste in the device type code.  Save & Publish
-  6b. On My SmartApps, create a new Smart App and paste in the smart app code. Save & Publish
+  1. On My Device Types, create a new device type and paste in the device type code.  Save & Publish
+  2. On My SmartApps, create a new Smart App and paste in the smart app code. Save & Publish
 7.  Go to My Devices, select the Arduino and edit the Device Type and select the Irrigation Controller device type (5a)
 8.  Test out system 
 9.  Wire the Arduino to your irrigation system
 10. You now have a smarter lawn!
 
 
-# The Hardware
+##The Hardware
 
-## Project Materials
+All items from this project were easily obtained from Amazon and mostly available via Amazon Prime
 
-### An Arduino with SmartThing Shield
+###An Arduino with SmartThing Shield
 
-All items from this project were easily obtained via Amazon Prime.  An **Arduino Uno** was used as the controller and was stacked with the SmartThings ThingShield.  *Note, set the DIP switch to D2/D3 if not already*.
+An **Arduino Uno* was used as the controller and was stacked with the SmartThings ThingShield.  *Note, set the DIP switch to D2/D3 if not already*.
 
 
 ### 8-Channel Relay
@@ -63,13 +63,15 @@ The final wiring of the project to your irrigation system is straight forward.  
 To connect the wires running to each valve, we used the Normally Open positions on the relay.  Each colored wire for each valve was connected to one of the NO positions on a relay.  One valve per relay.   Up to 8 are possible with this hardware, however, you do not need to use all 8.  We then connected the “hot” wire from the transformer to connect to the COMMON position (middle contact) on one of the relays.  This provides power to all realys since they are daisy chained together (see Arduino wiring above)  
 
 
-# The Software
+## The Software
 
 The code for this project is in a few files which are posted on github:
 
 https://github.com/d8adrvn/smart_sprinkler.git
 
-## Arduino Code (ArduinoSmartShieldIrrigationController.ino):
+### Arduino Code 
+
+(ArduinoSmartShieldIrrigationController.ino):
 
 In its most basic form, our controller manages a queue and turns on/off switches. That’s it. Nothing else. All other features are in the cloud!
 
@@ -111,7 +113,9 @@ SmartThings app by hitting the “+” icon in the desired location, and then pr
 To unpair the shield, press and hold the Switch button for 6 seconds and release. The shield will now be unpaired from your SmartThings Hub.”
 
 
-## Device Type Code (IrrigationControllerDeviceType.groovy):
+### Device Type Code 
+
+**(IrrigationControllerDeviceType.groovy):**
 
 The device type code allows you to control the Arduino via the SmartThings physical graph.  The Irrigation controller device type code has the following features:
 
@@ -125,9 +129,11 @@ The “Refresh” tile can be pressed to refresh the status of all the zones.  T
 The “Preferences” tile allows you to enter the run times for each station.  Just enter the times in minutes.  If you are using less than 8 zones, just enter zero minutes for zones not in use.
 
 
-## Irrigation Controller Smart App (IrrigationSchedulerApp.groovy)
+### Irrigation Controller Smart App 
 
-This is where the brains in the system are buried.
+**(IrrigationSchedulerApp.groovy)**
+
+This is where we put the brains in the system.
 
 This app provides flexibility to schedule by days and/or by interval.  If you use both days and interval, you can take advantage of interval watering and avoid certain days, such as mowing days or days banned by your local ordinances.  The app also allows up to three watering times per day.
 
@@ -138,7 +144,9 @@ The App will also ask for a zipcode.  We use the zipcode to look up your hyperlo
 After totaling up the precip, the App checks the threshold that you set as a preference.  If the precip exceeds the threshold, the App skips that watering.  Automagic!
 
 
-## Irrigation Virtual Scheduler Switch (IrrigationVirtualSchedulerSwitchDevice.groovy)
+### Irrigation Virtual Scheduler Switch 
+
+**(IrrigationVirtualSchedulerSwitchDevice.groovy)**
 
 This is an optional utility that allows you to put your system on extended hold or in other states. To install:
 
@@ -152,6 +160,8 @@ This is an optional utility that allows you to put your system on extended hold 
 
 ## Misc. Notes:
 
-After installing the Device Type or the Smart App, be sure to both Save AND Publish (for me).  If you do not publish, they will not be able to communicate with the hub and you are more likely to have IDE issues.
+* After installing the Device Type or the Smart App, be sure to both Save AND Publish (for me).  If you do not publish, they will not be able to communicate with the hub and you are more likely to have IDE issues.
 
-After powering off the Arduino or switching from USB power to 9V power, you may notice that the SmartShield LED oges dark.  The Arduino LEDs should both be on at all times.  The SmartShield LED will relit at the first activity.
+* After powering off the Arduino or switching from USB power to 9V power, you may notice that the SmartShield LED oges dark.  The Arduino LEDs should both be on at all times.  The SmartShield LED will relit at the first activity.
+
+* We modified our Device Type command set to be compatible with the Virtual Switch capability by Jonathan (jwsf on github).  This allows you to virtualize each of the 8 zones giving enhanced ecosystem capabilities.  In essence, this gives each zone its own “switch” capability.  So you use other smart apps to connect your sprinkler to turn on or off based on other devices.  For example, connect zone to your motion detector and trigger the sprinkler every time deer or intruder enters your yard!

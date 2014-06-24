@@ -227,7 +227,7 @@ def isStormy() {
 
     def forecastWeather = getWeatherFeature("forecast", zipcode)
     def forecastPrecip=forecastWeather.forecast.simpleforecast.forecastday.qpf_allday.in.toArray()
-    def forecastInches=safeToFloat(forecastPrecip[0])
+    def forecastInches=forecastPrecip[0]
     log.info("Checking forecast percipitation for $zipcode: $forecastInches in")
     if (forecastInches > (wetThreshold?.toFloat() ?: 0.5)) {
         return true  // rain guage is forecasted to be full

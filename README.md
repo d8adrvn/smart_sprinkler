@@ -190,12 +190,14 @@ This is an optional utility that allows you to put your system on extended hold 
 * You must select it in the Irrigation Scheduler app
 
 
+## Bonus Feature:
 
+We modified our Device Type command set to be compatible with the Virtual Switch capability by Jonathan (jwsf on github).  This allows you to virtualize each of the 8 zones giving enhanced ecosystem capabilities.  In essence, this gives each zone its own “switch” capability, so you use other smart apps to connect your sprinkler to turn on or off based on other devices.  
 
-## Misc. Notes:
+For example, connect zone to your motion detector and trigger the sprinkler every time deer or intruder enters your yard!
+
+## FAQs
 
 * After installing the Device Type or the Smart App, be sure to both Save AND Publish (for me).  If you do not publish, they will not be able to communicate with the hub and you are more likely to have IDE issues.
 
-* After powering off the Arduino or switching from USB power to 9V power, you may notice that the SmartShield LED oges dark.  The Arduino LEDs should both be on at all times.  The SmartShield LED will relit at the first activity.
-
-* We modified our Device Type command set to be compatible with the Virtual Switch capability by Jonathan (jwsf on github).  This allows you to virtualize each of the 8 zones giving enhanced ecosystem capabilities.  In essence, this gives each zone its own “switch” capability.  So you use other smart apps to connect your sprinkler to turn on or off based on other devices.  For example, connect zone to your motion detector and trigger the sprinkler every time deer or intruder enters your yard!
+* After powering off the Arduino or switching from USB power to 9V power, you may notice that the SmartShield LED goes dark.  The SmartShield LED will relight at the first activity and then function normally after that.  The Arduino LEDs should both be on at all times.  

@@ -171,6 +171,10 @@ The App will also ask for a zipcode.  We use the zipcode to look up your hyperlo
 
 After totaling up the precip, the App checks the threshold that you set as a preference.  If the precip exceeds the threshold, the App skips that watering.  Automagic!
 
+<img src="https://cloud.githubusercontent.com/assets/5625006/3353742/3480941e-fa8b-11e3-935b-c485a2c88461.jpg" width="200px"  />
+
+<img src="https://cloud.githubusercontent.com/assets/5625006/3353744/361a6372-fa8b-11e3-8fe5-1f1081f49fc2.jpg" width="200px"  />
+
 
 ### Irrigation Virtual Scheduler Switch 
 
@@ -185,9 +189,7 @@ This is an optional utility that allows you to put your system on extended hold 
 * The device should now show up on your smartphone SmartThings app
 * You must select it in the Irrigation Scheduler app
 
-<img src="https://cloud.githubusercontent.com/assets/5625006/3353742/3480941e-fa8b-11e3-935b-c485a2c88461.jpg" width="200px"  />
 
-<img src="https://cloud.githubusercontent.com/assets/5625006/3353744/361a6372-fa8b-11e3-8fe5-1f1081f49fc2.jpg" width="200px"  />
 
 
 ## Misc. Notes:

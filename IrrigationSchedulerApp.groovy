@@ -19,18 +19,21 @@
 **/
 
 definition(
-    name: "Irrigation Scheduler",
+    name: "Irrigation Scheduler 2.6",
     namespace: "d8adrvn/smart_sprinkler",
     author: "matt@nichols.name",
     description: "Schedule sprinklers run unless there is rain.",
     category: "Green Living",
-    version: "2.5",
+    version: "2.6",
     iconUrl: "https://s3.amazonaws.com/smartapp-icons/Meta/water_moisture.png",
     iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Meta/water_moisture@2x.png"
 )
 
 preferences {
     page(name: "schedulePage", title: "Schedule", nextPage: "sprinklerPage", uninstall: true) {
+      	section("App configruation...") {
+        	label title: "Choose an title for App", required: true, defaultValue: "Irrigation Scheduler"
+        }
         section {
             input (
             name: "wateringDays",
@@ -50,10 +53,6 @@ preferences {
             input name: "waterTimeOne",  type: "time", required: true, title: "Turn them on at..."
             input name: "waterTimeTwo",  type: "time", required: false, title: "and again at..."
             input name: "waterTimeThree",  type: "time", required: false, title: "and again at..."
-        }
-
-        section("Use this virtual scheduler device...") {
-            input "schedulerVirtualDevice", "capability.actuator", required: false
         }
     }
 
@@ -75,7 +74,10 @@ preferences {
             input "zipcode", "text", title: "Zipcode?", required: false
         }
         section("Skip watering if more than... (default 0.5)") {
-            input "wetThreshold", "string", title: "Inches?", required: false
+            input "wetThreshold", "decimal", title: "Inches?", required: false
+        }
+        section("Optional: Use this virtual scheduler device...") {
+            input "schedulerVirtualDevice", "capability.actuator", required: false
         }
     }
 }
@@ -172,7 +174,9 @@ def daysSince() {
 }
 
 def isRainDelay() { 
-    if(wasWetYesterday() || isWet() || isStormy()) {
+    def rainGauge = wasWetYesterday()+isWet()+isStormy()
+    log.info ("Rain gauge reads $rainGauge in")
+    if (rainGauge > (wetThreshold?.toFloat() ?: 0.5)) {
         log.trace "Watering is rain delayed"
         sendPush("Skipping watering today due to precipitation.")
         for(s in switches) {
@@ -200,13 +204,9 @@ def wasWetYesterday() {
     def yesterdaysPrecip=yesterdaysWeather.history.dailysummary.precipi.toArray()
     def yesterdaysInches=safeToFloat(yesterdaysPrecip[0])
     log.info("Checking yesterdays percipitation for $zipcode: $yesterdaysInches in")
-
-    if (yesterdaysInches > (wetThreshold?.toFloat() ?: 0.5)) {
-        return true  // rainGuage is full
-    } else {
-        return false // rainGuage is empty or below the line
-    }
+	return yesterdaysInches
 }
+
 
 def isWet() {
     if (!zipcode) return false
@@ -214,12 +214,7 @@ def isWet() {
     def todaysWeather = getWeatherFeature("conditions", zipcode)
     def todaysInches = safeToFloat(todaysWeather.current_observation.precip_today_in)
     log.info("Checking percipitation for $zipcode: $todaysInches in")
-    if (todaysInches > (wetThreshold?.toFloat() ?: 0.5)) {
-        return true  // rain gauge is full
-    }
-    else {
-        return false
-    }
+    return todaysInches
 }
 
 def isStormy() {
@@ -229,12 +224,7 @@ def isStormy() {
     def forecastPrecip=forecastWeather.forecast.simpleforecast.forecastday.qpf_allday.in.toArray()
     def forecastInches=forecastPrecip[0]
     log.info("Checking forecast percipitation for $zipcode: $forecastInches in")
-    if (forecastInches > (wetThreshold?.toFloat() ?: 0.5)) {
-        return true  // rain guage is forecasted to be full
-    }
-    else {
-        return false
-    }
+    return forecastInches
 }
 
 def water() {

@@ -1,12 +1,12 @@
-# Hello, Smarter Lawn
+## **Hello, Smarter Lawn**
 
 ### **A project by Stan Dotson (stan@dotson.info) and Matthew Nichols (matt@nichols.name)**
 
-##Background
+## Background
 
 Why would you build a lawn sprinkler system controller when you can just buy one?  But you can’t just buy one... at least not the sprinkler system we were thinking about!!  Let’s start by first making the controller connected.  And of course, we will need iPhone controls.  Then we need to make it smart.  Smart like it knows when it has rained, is raining or will rain!   And then what if we could add cognition so that it actually learns how to water your lawn!  Not that would be really smart!!!
 
-##High Level Project Steps
+## High Level Project Steps
 
 1. Order the hardware
 2. Add SmartThings hub to your home network, download app to your iPhone
@@ -16,28 +16,38 @@ Why would you build a lawn sprinkler system controller when you can just buy one
 6. Go to graph.api.smartthings.com
   1. On My Device Types, create a new device type and paste in the device type code.  Save & Publish
   2. On My SmartApps, create a new Smart App and paste in the smart app code. Save & Publish
-7.  Go to My Devices, select the Arduino and edit the Device Type and select the Irrigation Controller device type (5a)
+7.  Go to My Devices, select the Arduino and edit the Device Type and select the Irrigation Controller device type (6.i.)
 8.  Test out system 
 9.  Wire the Arduino to your irrigation system
 10. You now have a smarter lawn!
 
 
-##The Hardware
+## The Hardware
 
 All items from this project were easily obtained from Amazon and mostly available via Amazon Prime
 
-###An Arduino with SmartThing Shield
+### An Arduino with SmartThing Shield
 
 An **Arduino Uno* was used as the controller and was stacked with the SmartThings ThingShield.  *Note, set the DIP switch to D2/D3 if not already*.
 
+<img src="https://cloud.githubusercontent.com/assets/5625006/3353572/56b840aa-fa85-11e3-980c-6c8cd8c8b156.jpg" width="200px"  />
+
+<img src="https://cloud.githubusercontent.com/assets/5625006/3353577/8256ee78-fa85-11e3-93c8-866ef2ca9967.jpg" width="200px"  />
 
 ### 8-Channel Relay
 
 To control the sprinkler valves, we used a **Sain Smart 8 channel relay**.
 
+
+<img src="https://cloud.githubusercontent.com/assets/5625006/3353578/86de7d94-fa85-11e3-86b9-b3b08601987f.jpg" width="200px"  />
+
 ### Wiring
 
 For the wiring, we ordered a **20 cm dupont cable male to female** (Phantom YoYo 40P dupont cable 200mm male to female or similar from Amazon).  We liked this cable since the wires are organized as a ribbon cable which keeps the project neat.  We also used individual male to male jumper cables to wire the “COMMON” contacts together in parallel (see below).  We found these at Amazon such as **Male to Male Solderless Flexible Breadboard Jumper Cable Wires 65Pcs for Arduino by Sunkee**.
+
+<img src="https://cloud.githubusercontent.com/assets/5625006/3353583/b426908e-fa85-11e3-81de-3c7b55a1db92.jpg" width="200px"  />
+
+<img src="https://cloud.githubusercontent.com/assets/5625006/3353586/c2ceb562-fa85-11e3-9a2a-df5ed5e429cb.jpg" width="200px"  />
 
 ### Power Supplies
 For a power supply to power up the relay and run the irrigation valves, we re-used the 24V power supply from our existing controller.   We could have also used either a **Rain Bird UT1 Sprinkler System Timer Electric Transformer Plug** or the **Orbit Sprinkler System Power Source Transformer 57040**, both of which are available from Amazon Prime.  We  also needed a 9V power supply to run the Arduino+ThingShield+Relay.  The **Wall Adapter Power Supply - 9V DC 650mA Sold by Karnotech**  worked and is available on Amazon.
@@ -52,8 +62,18 @@ Finally, for the project housing, we just ripped out the guts of our existing co
 2. Connect a ground wire from the GND pin on ThingShield to the GND pin on the SainSmart 8 Channel relay.  
 3. Connect another jumper wire from the +5V on the ThingShield to the VCC pin on the Relay.  
 4. Make sure the jumper on the relay board bridges VCC to JD-VCC.  
-5. Use 8 wires from your ribbon cable to connect pins 12-5 on ThingShield to pins 1 to 8 on the relay board.    
+5. Use 8 wires from your ribbon cable to connect pins 12-5 on ThingShield to pins 1 to 8 on the relay board.   
+
+<img src="https://cloud.githubusercontent.com/assets/5625006/3385379/81cfd7d6-fc69-11e3-8f89-9cb25b10bb7e.jpg" width="200px"  />
+
+
+<img src="https://cloud.githubusercontent.com/assets/5625006/3353588/e52e942e-fa85-11e3-9513-89809a182c9c.jpg" width="200px"  />
+
+<img src="https://cloud.githubusercontent.com/assets/5625006/3353589/e9610928-fa85-11e3-949f-5f8b6d63ccda.jpg" width="200px"  />
+ 
 6. Finally, using seven short jumper cable (male to male) we daisy chained the COMMON contact positions together across all 8 relays.
+
+<img src="https://cloud.githubusercontent.com/assets/5625006/3353593/f3f9b8f8-fa85-11e3-877c-f05b27e22214.jpg" width="200px"  />
 
 Note, the ThingShield pins are not labeled.  So you can either identify the pins using labels on the Arduino or refer to a diagram.  Here is a diagram for Arduino Uno V2 from Flikr:   https://www.flickr.com/photos/28521811@N04/8520970405/
 
@@ -62,6 +82,10 @@ The final wiring of the project to your irrigation system is straight forward.  
 
 To connect the wires running to each valve, we used the Normally Open positions on the relay.  Each colored wire for each valve was connected to one of the NO positions on a relay.  One valve per relay.   Up to 8 are possible with this hardware, however, you do not need to use all 8.  We then connected the “hot” wire from the transformer to connect to the COMMON position (middle contact) on one of the relays.  This provides power to all realys since they are daisy chained together (see Arduino wiring above)  
 
+
+<img src="https://cloud.githubusercontent.com/assets/5625006/3353611/6b78fc9a-fa86-11e3-9557-424b4a2bf896.jpg" width="200px"  />
+
+<img src="https://cloud.githubusercontent.com/assets/5625006/3353626/d163cc06-fa86-11e3-8aaf-c4a65fc64b5e.jpg" width="200px"  />
 
 ## The Software
 
@@ -117,6 +141,8 @@ To unpair the shield, press and hold the Switch button for 6 seconds and release
 
 **(IrrigationControllerDeviceType.groovy):**
 
+
+
 The device type code allows you to control the Arduino via the SmartThings physical graph.  The Irrigation controller device type code has the following features:
 
 The All On tile is the main tile and links to the “switch” capability to turn on or off all 8 zones of the sprinkler by pressing one button.  By using the “switch” capability, you to use any of the SmartThings apps that includes a switch capability to run the sprinkler system!  There is also an “switch off” capability that turns off all zones. There is not tile for it, however, its there for Smart Apps to use, if needed.
@@ -128,6 +154,8 @@ The “Refresh” tile can be pressed to refresh the status of all the zones.  T
 
 The “Preferences” tile allows you to enter the run times for each station.  Just enter the times in minutes.  If you are using less than 8 zones, just enter zero minutes for zones not in use.
 
+
+<img src="https://cloud.githubusercontent.com/assets/5625006/3353741/2cdbb0ea-fa8b-11e3-9e13-81c3b004f902.jpg" width="200px"  />
 
 ### Irrigation Controller Smart App 
 
@@ -156,6 +184,10 @@ This is an optional utility that allows you to put your system on extended hold 
 * Create a new device and select the device type you just created
 * The device should now show up on your smartphone SmartThings app
 * You must select it in the Irrigation Scheduler app
+
+<img src="https://cloud.githubusercontent.com/assets/5625006/3353742/3480941e-fa8b-11e3-935b-c485a2c88461.jpg" width="200px"  />
+
+<img src="https://cloud.githubusercontent.com/assets/5625006/3353744/361a6372-fa8b-11e3-8fe5-1f1081f49fc2.jpg" width="200px"  />
 
 
 ## Misc. Notes:

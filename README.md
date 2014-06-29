@@ -28,7 +28,7 @@ All items from this project were easily obtained from Amazon and mostly availabl
 
 ### An Arduino with SmartThing Shield
 
-An **Arduino Uno* was used as the controller and was stacked with the SmartThings ThingShield.  *Note, set the DIP switch to D2/D3 if not already*.
+An **Arduino Uno* was used as the controller and was stacked with the SmartThings ThingShield.  *Note, set the DIP switch on the ThingShield to D2/D3 if not already*.
 
 <img src="https://cloud.githubusercontent.com/assets/5625006/3353572/56b840aa-fa85-11e3-980c-6c8cd8c8b156.jpg" width="200px"  />
 
@@ -189,15 +189,16 @@ This is an optional utility that allows you to put your system on extended hold 
 * The device should now show up on your smartphone SmartThings app
 * You must select it in the Irrigation Scheduler app
 
+Example uses for this accessory app include putting the system on hold for the winter, during yard construction projects, after applying weed killer to the yard, and so on.  
 
 ## Bonus Feature:
 
-We modified our Device Type command set to be compatible with the Virtual Switch capability by Jonathan (jwsf on github).  This allows you to virtualize each of the 8 zones giving enhanced ecosystem capabilities.  In essence, this gives each zone its own “switch” capability, so you use other smart apps to connect your sprinkler to turn on or off based on other devices.  
+We modified our Device Type command set to be compatible with the Virtual Switch capability by Jonathan (jwsf on github or badgermanus on SmartThings).  This allows you to virtualize just one or each of the 8 zones giving enhanced ecosystem capabilities.  Virtualizing gives each zone its own “switch” capability that can be recognized within SmartThings ecosystem. Then you can start using all the SmartApps that link switches to other devices.  
 
-For example, connect zone to your motion detector and trigger the sprinkler every time deer or intruder enters your yard!
+For example, you can use the "Turn on when there is motion" SmartApp to connect an irrigation zone to a motion detector and trigger the sprinkler every time deer or intruder enters that zone!
 
 ## FAQs
 
-* After installing the Device Type or the Smart App, be sure to both Save AND Publish (for me).  If you do not publish, they will not be able to communicate with the hub and you are more likely to have IDE issues.
+* After installing the Device Type or the Smart App, be sure to both Save AND Publish (for me).  If you do not publish, they will not be able to communicate with the hub.  If you make changes to either code, Publish early and often to avoid IDE issues.
 
-* After powering off the Arduino or switching from USB power to 9V power, you may notice that the SmartShield LED goes dark.  The SmartShield LED will relight at the first activity and then function normally after that.  The Arduino LEDs should both be on at all times.  
+* After powering off the Arduino or switching from USB power to 9V power, you may notice that the SmartShield LED goes dark.  The SmartShield LED will relight at the first activity and then function normally after that.  The Arduino LEDs should both be on at all times when power is supplied to the hardware 

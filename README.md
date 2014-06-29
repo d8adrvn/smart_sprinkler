@@ -28,7 +28,7 @@ All items from this project were easily obtained from Amazon and mostly availabl
 
 ### An Arduino with SmartThing Shield
 
-An **Arduino Uno* was used as the controller and was stacked with the SmartThings ThingShield.  *Note, set the DIP switch on the ThingShield to D2/D3 if not already*.
+An **Arduino Uno* was used as the controller and was stacked with the SmartThings ThingShield.  Note, set the DIP switch on the ThingShield to D2/D3, if not already
 
 <img src="https://cloud.githubusercontent.com/assets/5625006/3353572/56b840aa-fa85-11e3-980c-6c8cd8c8b156.jpg" width="200px"  />
 
@@ -120,7 +120,7 @@ Creates a queue to turn on or off a specific zone or all zones
 * Works with up to 8 zones, although you can use less
 * Allows zone times to be communicated as a string, which is parsed into an array
 * Once a zone is turned on, the Arduino knows when to turn it off (no additional communication needed)
-* Utilizes a timer function to maintain communication between Arduino and SmartThings while a zone is running
+* Utilizes a timer function to run the zones.  This keeps the CPU free to manage communication between Arduino and SmartThings while a zone is running
 * When wired correctly, the system turns off when power goes off and stays off until new commands are sent from SmartThings
 
 To load the code onto the Arduino, you will need the Arduino developer environment:
@@ -145,15 +145,13 @@ To unpair the shield, press and hold the Switch button for 6 seconds and release
 
 The device type code allows you to control the Arduino via the SmartThings physical graph.  The Irrigation controller device type code has the following features:
 
-The All On tile is the main tile and links to the “switch” capability to turn on or off all 8 zones of the sprinkler by pressing one button.  By using the “switch” capability, you to use any of the SmartThings apps that includes a switch capability to run the sprinkler system!  There is also an “switch off” capability that turns off all zones. There is not tile for it, however, its there for Smart Apps to use, if needed.
+The Main Tile is an all on or all off tile and links to the “switch” capability to turn on or off all 8 zones of the sprinkler by pressing one button.  By using the “switch” capability, you to use any of the SmartThings apps that includes a switch capability to run the sprinkler system!  There is also an “switch off” capability that turns off all zones. The Main Tile can also receive a message when the system is on Rain Delay mode.
 
 Each sprinkler zone additionally has its own tile.  When the zone is off, the tile is white.  If the zone is in the queue and waiting its turn, the tile is gold.  When the zone is running, the tile is blue.
 
+The “Refresh” tile can be pressed to refresh the status of all the zones.  There are a number of situations that the tiles become out of synch.  If you press too many individual tiles to fast, the communication may not be captured by the Arduino.  If you try to add or delete a zone from the queue while “refresh” is running (it takes 8 sec to refresh), the communication may not be captured by the Arduino.  And there are times the SmartThings hub just doesn’t seem to capture the message from the Arduino or at least is slow to respond.  If in doubt, press the “Refresh”.   As an additional "escape" feature, any tile that seems to be out of synch can be pressed again to trigger the zone to turn off.  
 
-The “Refresh” tile can be pressed to refresh the status of all the zones.  There are a number of situations that the tiles become out of synch.  If you press too many individual tiles to fast, the communication may not be captured by the Arduino.  If you try to add or delete a zone from the queue while “refresh” is running (it takes 8 sec to refresh), the communication may not be captured by the Arduino.  And there are times the SmartThings hub just doesn’t seem to capture the message from the Arduino or at least is slow to respond.  If in doubt, press the “Refresh”.
-
-The “Preferences” tile allows you to enter the run times for each station.  Just enter the times in minutes.  If you are using less than 8 zones, just enter zero minutes for zones not in use.
-
+The “Preferences” tile allows you to enter the run times for each station.  Just enter the times in minutes.  If you are using less than 8 zones, just enter zero minutes for zones not in use.  These time Preferences are used when you run the sprinkler manually from within the Irrigation Controller Device Type app.  If you are using the SmartApp Irrigation Scheduler App to automatically run the system and have entered times via that app, the Scheduler supplied times are used.
 
 <img src="https://cloud.githubusercontent.com/assets/5625006/3353741/2cdbb0ea-fa8b-11e3-9e13-81c3b004f902.jpg" width="200px"  />
 
@@ -201,4 +199,6 @@ For example, you can use the "Turn on when there is motion" SmartApp to connect 
 
 * After installing the Device Type or the Smart App, be sure to both Save AND Publish (for me).  If you do not publish, they will not be able to communicate with the hub.  If you make changes to either code, Publish early and often to avoid IDE issues.
 
-* After powering off the Arduino or switching from USB power to 9V power, you may notice that the SmartShield LED goes dark.  The SmartShield LED will relight at the first activity and then function normally after that.  The Arduino LEDs should both be on at all times when power is supplied to the hardware 
+* After powering off the Arduino or switching from USB power to 9V power, you may notice that the SmartShield LED goes dark.  The SmartShield LED will relight at the first activity and then function normally after that.  The Arduino LEDs should both be on at all times when power is supplied to the hardware
+
+*What if you want to run your lawn irrigation on a different schedule than your drip irrigation?  No problems.  Just install the Irrigation Scheduler App for your lawn (rename it something like Lawn Irrigation Scheduler) and install the app a second time for the drip irrigation (rename it something like Drip Irrigation Scheduler).  

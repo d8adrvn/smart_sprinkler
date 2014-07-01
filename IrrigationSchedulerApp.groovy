@@ -86,13 +86,16 @@ def installed() {
     log.debug "Installed: $settings"
     scheduling()
     state.daysSinceLastWatering = [0,0,0]
+    subscribe(app, appTouch)
 }
 
 def updated() {
     log.debug "Updated: $settings"
+    unsubscribe()
     unschedule()
     scheduling()
     state.daysSinceLastWatering = [0,0,0]
+    subscribe(app, appTouch)
 }
 
 // Scheduling
@@ -247,4 +250,9 @@ def water() {
 
 def anyZoneTimes() {
     return zone1 || zone2 || zone3 || zone4 || zone5 || zone6 || zone7 || zone8
+}
+
+def appTouch(evt) {
+    log.debug "appTouch: $evt"
+    water()
 }

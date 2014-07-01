@@ -31,8 +31,8 @@ definition(
 
 preferences {
     page(name: "schedulePage", title: "Schedule", nextPage: "sprinklerPage", uninstall: true) {
-      	section("App configruation...") {
-        	label title: "Choose an title for App", required: true, defaultValue: "Irrigation Scheduler"
+      	section("App configuration...") {
+        	label title: "Choose a title for App", required: true, defaultValue: "Irrigation Scheduler"
         }
         section {
             input (

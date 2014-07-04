@@ -11,15 +11,17 @@ Why would you build a lawn sprinkler system controller when you can just buy one
 1. Order the hardware
 2. Add SmartThings hub to your home network, download app to your iPhone
 3. Obtain a Maker/Developer account for SmartThings (graph.api.smartthings.com)
-4. Assemble the Arduino controller, ThingShield and 8 Channel Relay.  Load Arduino code to the Arduino
-5. Add Arduino to your SmartThings hub using your iPhone app
-6. Go to graph.api.smartthings.com
+4. Assemble the Arduino controller, ThingShield and 8 Channel Relay.  
+5. Download the Arduino developer environment and import the irrigation controller sketch as well as the required libraries for SmartThings and the Timer library.  
+6. Add Arduino to your SmartThings hub using your iPhone app
+7. Go to graph.api.smartthings.com
   1. On My Device Types, create a new device type and paste in the device type code.  Save & Publish
   2. On My SmartApps, create a new Smart App and paste in the smart app code. Save & Publish
-7.  Go to My Devices, select the Arduino and edit the Device Type and select the Irrigation Controller device type (6.i.)
-8.  Test out system 
-9.  Wire the Arduino to your irrigation system
-10. You now have a smarter lawn!
+8.  Go to My Devices, select the Arduino and edit the Device Type and select the Irrigation Controller device type (7.i.)
+9.  Test out system 
+10.  Wire the Arduino to your irrigation system
+
+You now have a smarter lawn!
 
 
 ## The Hardware
@@ -28,7 +30,7 @@ All items from this project were easily obtained from Amazon and mostly availabl
 
 ### An Arduino with SmartThing Shield
 
-An **Arduino Uno* was used as the controller and was stacked with the SmartThings ThingShield.  Note, set the DIP switch on the ThingShield to D2/D3, if not already
+An **Arduino Uno* was used as the controller and was stacked with the SmartThings ThingShield.  *Note, set the DIP switch to D2/D3 if not already*.
 
 <img src="https://cloud.githubusercontent.com/assets/5625006/3353572/56b840aa-fa85-11e3-980c-6c8cd8c8b156.jpg" width="200px"  />
 
@@ -127,7 +129,16 @@ To load the code onto the Arduino, you will need the Arduino developer environme
 
 http://arduino.cc/en/main/software
 
-Once the software is installed, you can connect the Arduino Uno to your computer, create a new sketch, paste the code from github into the Arduino IDE and then upload to the Arduino.
+Once the software is installed, the first thing to do is obtain the required libraries.  
+
+* Timer library was created by Simon Monk as modified by JChristensen  https://github.com/JChristensen/Timer
+The KNOWN LIBRARY BUG (timer.cpp) - identified by mattnichols 5/20/14 - has no known affect on the code.  Also, the Timer library release downloads as "Timer-master-2".  Before loading into the Arduino IDE, change the name to "Timer"
+* SmartThings library available from https://www.dropbox.com/s/8hon320qmuio8fz/Shield%20Library.zip
+* SoftwareSerial library was default library provided with Arduino IDE
+ 
+Once you have the zip files downloaded and you have changed the name for the Timer zip file, you can import them within the Arduino IDE. Go to the Sketch:Import Library;Add Library drop down menu. Once you have added the libraries, they will show up under Sketch:Add Library:Contributed as "Timer" and "SmartThings".  Be sure the Timer library is installed as "Timer"
+
+ you can connect the Arduino Uno to your computer, create a new sketch, paste the code from github into the Arduino IDE and
 
 Pairing instructions for the Arduino to the SmartThings hub can be found at SmartThings.com and are copied here:
 
@@ -201,4 +212,4 @@ For example, you can use the "Turn on when there is motion" SmartApp to connect 
 
 * After powering off the Arduino or switching from USB power to 9V power, you may notice that the SmartShield LED goes dark.  The SmartShield LED will relight at the first activity and then function normally after that.  The Arduino LEDs should both be on at all times when power is supplied to the hardware
 
-*What if you want to run your lawn irrigation on a different schedule than your drip irrigation?  No problems.  Just install the Irrigation Scheduler App for your lawn (rename it something like Lawn Irrigation Scheduler) and install the app a second time for the drip irrigation (rename it something like Drip Irrigation Scheduler).  
+* What if you want to run your lawn irrigation on a different schedule than your drip irrigation?  No problems.  Just install the Irrigation Scheduler App for your lawn (rename it something like Lawn Irrigation Scheduler) and install the app a second time for the drip irrigation (rename it something like Drip Irrigation Scheduler).  

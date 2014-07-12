@@ -31,9 +31,9 @@ preferences {
 }
 
 metadata {
-    definition (name: "Irrigation Controller v2.5", version: "2.5", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") {
+    definition (name: "Irrigation Controller v2.6", version: "2.6", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") {
         capability "Switch"
-        capability "Refresh"
+ //       capability "Refresh"
         command "OnWithZoneTimes"
         command "RelayOn1"
         command "RelayOn1For"
@@ -61,6 +61,8 @@ metadata {
         command "RelayOff8"
         command "rainDelayed"
         command "update" 
+        command "enablePump"
+        command "disablePump"
     }
 
     simulator {
@@ -68,6 +70,9 @@ metadata {
         status "turn_all_on" : "catchall: 0104 0000 01 01 0140 00 D919 00 00 0000 0A 00 0A6F6B2C6F6E312C71322C71332C71342C71352C71362C71372C71382C"
     }
 
+
+
+    
     tiles {
         standardTile("allZonesTile", "device.switch", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
             state "off", label: 'Start', action: "switch.on", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "starting"
@@ -131,12 +136,21 @@ metadata {
             state "q8", label: 'Eight', action: "RelayOff8",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "sending8"
             state "on8", label: 'Eight', action: "RelayOff8",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "sending8"
             state "sendingOff8", label: 'sending', action: "RelayOff8", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
+            state "havePump", label: 'Eight', action: "disablePump", icon: "st.custom.buttons.subtract-icon", backgroundColor: "#ffffff"
+
         }
+        standardTile("pumpTile", "device.pump", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
+            state "noPump", label: 'Pump', action: "enablePump", icon: "st.custom.buttons.subtract-icon", backgroundColor: "#ffffff",nextState: "enablingPump"
+         	state "havePump", label: 'Pump', action: "disablePump", icon: "st.custom.buttons.add-icon", backgroundColor: "#ffffff", nextState: "disablingPump"
+           	state "enablingPump", label: 'sending', action: "disablePump", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
+            state "disablingPump", label: 'sending', action: "disablePump", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
+        }
+        	
         standardTile("refreshTile", "device.refresh", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true, decoration: "flat") {
             state "ok", label: "", action: "update", icon: "st.secondary.refresh", backgroundColor: "#ffffff"
         }
         main "allZonesTile"
-        details(["zoneOneTile","zoneTwoTile","zoneThreeTile","zoneFourTile","zoneFiveTile","zoneSixTile","zoneSevenTile","zoneEightTile","refreshTile"])
+        details(["zoneOneTile","zoneTwoTile","zoneThreeTile","zoneFourTile","zoneFiveTile","zoneSixTile","zoneSevenTile","zoneEightTile", "pumpTile","refreshTile"])
     }
 }
 
@@ -144,9 +158,10 @@ metadata {
 def parse(String description) {
     log.debug "Parsing '${description}'"
     log.debug "Parsed: ${zigbee.parse(description)}"
-
+  
+    
     def value = zigbee.parse(description)?.text
-    if (value != null && value != " " && value != '"') {
+    if (value != null && value != " " && value != '"' && value != "havePump" && value != "noPump") {
         String delims = ","
         String[] tokens = value.split(delims)
         for (int x=0; x<tokens.length; x++) {
@@ -168,10 +183,18 @@ def parse(String description) {
             // It seems like this should work. When a state change is made due to a nextState parameter, the value is not changed.
             // if(currentVal) stateChange = currentVal != tokens[x]
 
-            def result = createEvent(name: name, value: tokens[x], displayed: displayed, isStateChange: stateChange)
+            def result = createEvent(name: name, value: tokens[x], displayed: true, isStateChange: true, isPhysical: true)
             log.debug "Parse returned ${result?.descriptionText}"
             sendEvent(result)
         }
+    }
+    if (value == "pumpAdded") {
+    	sendEvent (name:"zoneEight", value:"havePump", displayed: true, isStateChange: true, isPhysical: true)
+        sendEvent (name:"pump", value:"havePump", displayed: true, isStateChange: true, isPhysical: true)
+    }
+    if (value == "pumpRemoved") {
+    	sendEvent (name:"pump", value:"noPump", displayed: true, isStateChange: true, isPhysical: true)
+        sendEvent (name:"zoneEight", value:"off8", displayed: display, isStateChange: true, isPhysical: true)
     }
 
     if(anyZoneOn()) {
@@ -353,14 +376,23 @@ def update() {
     log.info "Execting refresh"
     zigbee.smartShield(text: "update").format()
 }
-def refresh() {
-    log.debug "Executing polling"
-    update()
-}
+//def refresh() {
+//    log.debug "Executing polling"
+//    update()
+//}
 
 def rainDelayed() {
     log.debug "rain delayed"
     if(device.currentValue("switch") != "on") {
         sendEvent (name:"switch", value:"rainDelayed", displayed: true)
     }
+}
+
+def enablePump() {
+		log.info "Pump Enabled"
+        zigbee.smartShield(text: "pump,1").format()
+}
+def disablePump() {
+		log.info "Pump Disabled"
+        zigbee.smartShield(text: "pump,0").format()
 }

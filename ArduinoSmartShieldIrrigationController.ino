@@ -1,13 +1,16 @@
 
 /**
+* 
  ****************************************************************************************************************************
- * Irrigation Controller v2.4
+ * Irrigation Controller v2.5 
  * Simple, elegant irrigation controller that takes advantage of the cloud and SmartThings ecosystem
  * Arduino UNO with SmartThings Shield  and an 8 Relay Module
  * Works by receiving irrigation run times from the Cloud and then builds a queue to execute
  * Will automatically shut off if power goes out and/or the queue finishes execution
  * Updates the Cloud if a station is queued and as each station turns on or off. 
  * By using the timer library, the CPU remains ready to process any change requests to the queue
+ * Provides option to add additional single relay to run a master valve or pump
+ * Provides software switchable option to configure relay 8 as an irrigation zone or a master valve or pump 
  *
  ****************************************************************************************************************************
  * Libraries:
@@ -35,14 +38,14 @@
  * This code works with "Active HIGH" relays, such as SeeedUino v2 relays.  
  * To use with "Acitve LOW" relays, such as SainSmart, set isActiveHigh to false
  ****************************************************************************************************************************
-/// @note Arduino Pin Configuration
+/// Arduino Pin Configuration
 ///               ______________
 ///               |              |
 ///               |         SW[] |
 ///               |[]RST         |
 ///               |         AREF |--
 ///               |          GND |--
-///               |           13 |--X LED
+///               |           13 |--Optional Pump/Master Valve (
 ///               |           12 |--Relay Signal Zone 1
 ///               |           11 |--Relay Signal Zone 2
 ///             --| 3.3V      10 |--Relay Signal Zone 3
@@ -51,7 +54,7 @@
 ///             --| GND          |
 ///             --| Vin        7 |--Relay Signal Zone 6
 ///               |            6 |--Relay Signal Zone 7
-///             --| A0         5 |--Relay Signal Zone 8
+///             --| A0         5 |--Relay Signal Zone 8 /Software Configurable Pump/Master Valve
 ///             --| A1    ( )  4 |--
 ///             --| A2         3 |--X THING_RX
 ///             --| A3  ____   2 |--X THING_TX
@@ -61,7 +64,7 @@
 ///                    |____|
 ///
 //*****************************************************************************
-/// @note typical relay configuration and hook up to valves
+/// @note typical relay with normally open (NO) and normally closed (NC) options
 ///              ---------------
 ///              |              |
 ///              |              |___
@@ -77,6 +80,135 @@
 ///
 ///              note: the ground from 24V transformer is connected to common ground running to sprinkler valves
 /// ****************************************************************************************************************************
+/// Typical finished wiring diagram for 8 zones with option to add an additional single relay to activate a master valve or pump
+///
+/// Warning: Connecting a Pump Start Relay is potentially dangerous 
+/// Warning: Pumps run on 120V or 220V power and incorrect wiring could result in lethal shock or fire hazard!
+/// Warning: Work is best done by licensed electrician following local codes.
+///
+/// Common terminals are daisy chained together.
+/// Sprinkler load wires are connected to NO of respective relays
+/// Ground from Sprinkler power supply is tied to the Common Ground Wire from Irrigation Wire Bundle
+/// Relay 8 is used as irrigation zone
+/// If optional single relay is used to control pump, Arduino sketch must be modifed to: isPin13Pump = true
+///
+///
+///         wire [ --from 14V Sprinkler Power Supply (-)
+///         nut  [ --Common Ground wire from Irrigation Wire Bundle (-)
+///              ---------------    
+///              |           NC |   
+///              |   1      CMN |===|---from 24V Sprinkler Power Supply (+)
+///              |           NO |---]---to valve 1
+///              ---------------    |
+///              ---------------    |
+///              |           NC |   |
+///              |   2      CMN |---|
+///              |           NO |---]---to valve 2
+///              ---------------    |
+////              ---------------   |
+///              |           NC |   |
+///              |   3      CMN |---|
+///              |           NO |---]---to valve 3
+///              ---------------    |
+///              ---------------    |
+///              |           NC |   |
+///              |   4      CMN |---|
+///              |           NO |---]---to valve 4
+///              ---------------    |
+///              ---------------    |
+///              |           NC |   |
+///              |   5      CMN |---|
+///              |           NO |---]---to valve 5
+///              ---------------    |
+///              ---------------    |
+///              |           NC |   |
+///              |   6      CMN |---|
+///              |           NO |---]---to valve 6
+///              ---------------    |
+///              ---------------    |
+///              |           NC |   |
+///              |   7      CMN |---|
+///              |           NO |---]---to valve 7
+///              ---------------    |
+///              ---------------    |
+///              |           NC |   |
+///              |   8      CMN |---|
+///              |           NO | --]---to valve 8   
+///              ---------------    |
+///                                 |
+///             //////////////////  |
+///                                 |
+///      Optional: Single Relay for |
+///                Master Valve     |
+///              ---------------    |
+///    pin13  ++ | VCC       NC |   |
+///  Arduino     |          CMN | --| 
+///     GND   -- | GND       NO | --- to Master Valve Pump Relay (low voltage only!!!!)
+///              ---------------
+///    **Set isPin13Pump = true to activate optional single Master Valve Pump Relay
+///
+/// ****************************************************************************************************************************
+/// Example finished wiring diagram for 7 Zones and Software Enabled Pump or Master Valve 
+///
+/// Warning: Connecting a Pump Start Relay is potentiall dangerous 
+/// Warning: Pumps run on 120V or 220V power and incorrect wiring could result in lethal shock or fire hazard!
+/// Warning: Work is best done by licensed electrician following local codes.
+///
+/// After wiring the optional master valve or pump to zone 8, you must configure the device type to recognize the pump/master valve
+/// In the device type, activate the pump tile which will deactivate irrigation zone 8 tile.
+/// Common terminals are daisy chained together.
+/// Sprinkler load wires are connected to NO of respective relays
+/// Ground from Sprinkler power supply is tied to the Common Ground Wire from Irrigation Wire Bundle
+/// Software switchable pump/master valve is wired to relay 8.   
+///
+///
+///         wire {--from 14V Sprinkler Power Supply (-)
+///          nut {--Common Ground wire from Irrigation Wire Bundle (-)
+///     together {--Common from Pump Start Relay or Master Vavle 
+///
+///              ---------------    
+///              |           NC |   
+///              |   1      CMN |===|---from 24V Sprinkler Power Supply (+)
+///              |           NO |---]---to valve 1
+///              ---------------    |
+///              ---------------    |
+///              |           NC |   |
+///              |   2      CMN |---|
+///              |           NO |---]---to valve 2
+///              ---------------    |
+////              ---------------   |
+///              |           NC |   |
+///              |   3      CMN |---|
+///              |           NO |---]---to valve 3
+///              ---------------    |
+///              ---------------    |
+///              |           NC |   |
+///              |   4      CMN |---|
+///              |           NO |---]---to valve 4
+///              ---------------    |
+///              ---------------    |
+///              |           NC |   |
+///              |   5      CMN |---|
+///              |           NO |---]---to valve 5
+///              ---------------    |
+///              ---------------    |
+///              |           NC |   |
+///              |   6      CMN |---|
+///              |           NO |---]---to valve 6
+///              ---------------    |
+///              ---------------    |
+///              |           NC |   |
+///              |   7      CMN |---|
+///              |           NO |---]-to valve 7
+///              ---------------    |
+///              ---------------    |  
+///              |           NC |   | 
+///              |   8      CMN |---|
+///              |           NO |--- to Pump Start Relay or Master Vavle  (low voltage only!!!)
+///              ---------------    
+///              **In the device type, activate the pump tile which will automagically deactivate irrigation zone 8 tile.
+///
+/// ****************************************************************************************************************************
 */
 
 #include <SoftwareSerial.h>   
@@ -89,22 +221,31 @@
 SmartThingsCallout_t messageCallout;    // call out function forward decalaration
 SmartThings smartthing(PIN_THING_RX, PIN_THING_TX, messageCallout);  // constructor
 
+//user configurable global variables to set before loading to Arduino
+int relays = 8;  //set up before loading to Arduino (max = 8 with current code)
+boolean isActiveHigh=false; //set to true if using "active high" relay, set to false if using "active low" relay
+boolean isDebugEnabled=true;    // enable or disable debug in this example
+boolean isPin13Pump =false;  //set to true if you add an additional relay to pin13 and use as pump or master valve.  
 
 //set global variables
-
 Timer t;
 int trafficCop =0;  //tracks which station has the right of way (is on)
-boolean isDebugEnabled=true;    // enable or disable debug in this example
-int stations=8; //number of stations or relays
-boolean isActiveHigh=false; //set to true if using "active high" relay, set to false if using "active low" relay
+int stations=relays; //sets number of stations = number of relays. This is software configurable in device type
 int relayOn = HIGH;
 int relayOff = LOW;
-// initialize arrays; for readability, zone values store [1]-[8] and [0] is not used
+// initialize irrigation zone variables; for readability, zone values store [1]-[8] and [0] is not used
 long stationTime[] = {0,0,0,0,0,0,0,0,0};
 int8_t stationTimer[] = {0,0,0,0,0,0,0,0,0}; 
 int queue[]={0,0,0,0,0,0,0,0,0};  // off: 0, queued: 1, running: 2
-int relay[9];  
+int relay[9];
+
+//initialize pump related variables. 
+int pin13Relay = 13;  //pin13 reserved for optional additional relay to control a pump or master valve
+boolean isConfigPump = false; // if true, relay8 is used as the pump/master valve switch.  Can be toggled by device tye v2.7 and later
+char* configPumpStatus = "off";
+char* pin13PumpStatus= "off";
 boolean doUpdate = false;
+boolean doPumpUpdate = false;
 
 void setup()
 {
@@ -118,20 +259,28 @@ void setup()
   smartthing.shieldSetLED(0, 0, 1); // set to blue to start
   
   // setup timed actions 
+  t.every(3*60L*1000L, queueManager);// double check queue to see if there is work to do
   t.every(10L*60L*1000L, timeToUpdate); //send update to smartThings hub every 10 min
-  t.every(10L*60L*1000L, queueManager);// check queue to see if there is work to do
+ 
   
   //set up relays to control irrigation valves
   if (!isActiveHigh) {
     relayOn=LOW;
     relayOff=HIGH;
   }
+  
   int i=1;
   while (i<9) {
     relay[i]= 13-i;
     pinMode(relay[i], OUTPUT); 
     digitalWrite(relay[i], relayOff);
     i++;
+  }
+
+  // set up optional hardware configured pump to pin13 on Arduino
+  if (isPin13Pump) {
+  pinMode(pin13Relay, OUTPUT);
+  digitalWrite(pin13Relay, relayOff);
   }
 }
 
@@ -143,6 +292,10 @@ void loop() {
   if (doUpdate) {
     sendUpdate("ok,");
     doUpdate = false;
+  }
+  if (doPumpUpdate) {
+    sendPumpUpdate();
+    doPumpUpdate = false;
   }
  
   //run smartthing logic
@@ -205,11 +358,25 @@ void messageCallout(String message)
   if (strcmp(inValue[0],"allOff")==0) {
     allOff();
   }
+  if (strcmp(inValue[0],"pump")==0) {
+    if (strcmp(inValue[1],"1")==0) {
+      isConfigPump = true;
+      stations = relays - 1;
+    }
+    if (strcmp(inValue[1],"0")==0) {
+      isConfigPump = false;
+      stations = relays;
+    }
+    schedulePumpUpdate();
+  }
   queueManager();
 }
 
 void scheduleUpdate() {
   doUpdate = true; 
+}
+void schedulePumpUpdate() {
+  doPumpUpdate = true;
 }
 //run through queue to check to see if there is work to do
 void queueManager() 
@@ -224,9 +391,18 @@ void queueManager()
     i++;
   }
 }
+
 void toggleOn() {
   queue[trafficCop]=2;
   smartthing.shieldSetLED(83, 1, 0); //Orange for relay one
+  if (isConfigPump) {
+    digitalWrite(relay[8], relayOn);
+    configPumpStatus = "on";
+  }
+  if (isPin13Pump) {
+    digitalWrite(pin13Relay, relayOn);
+    pin13PumpStatus = "on";
+  }
   digitalWrite(relay[trafficCop], relayOn);
   t.stop(stationTimer[trafficCop]); // Kill any previously started timers.
   stationTimer[trafficCop] = t.after (stationTime[trafficCop],toggleOff);
@@ -236,7 +412,18 @@ void toggleOff() {
   digitalWrite(relay[trafficCop], relayOff);
   smartthing.shieldSetLED(0, 0, 1);
   queue[trafficCop]=0; //remove relay from from queue
-  
+  if (isConfigPump== true) {
+    if (maxvalue() ==0) {
+      digitalWrite(relay[8], relayOff);
+      configPumpStatus = "off";
+    }
+  }
+  if (isPin13Pump) {
+    if (maxvalue() ==0) {
+      digitalWrite(pin13Relay, relayOff);
+      pin13PumpStatus = "off";
+    }
+  }  
   trafficCop=0; //ready to check queue or watch for new commmonds
   scheduleUpdate();
 }
@@ -249,15 +436,34 @@ void allOff() {
     digitalWrite(relay[i], relayOff);
     i++;
   }
+   if (isConfigPump) {
+     digitalWrite(relay[8], relayOff);
+     configPumpStatus="off";
+  } 
+  
+  if (isPin13Pump) {
+    digitalWrite(pin13Relay, relayOff);
+    pin13PumpStatus="off";
+  }
   smartthing.shieldSetLED(0, 0, 1);
   trafficCop=0;
   scheduleUpdate();
 }
-
+  
 void timeToUpdate() {
   scheduleUpdate();
 }
 
+int maxvalue () {
+  int mxm = 0;
+  int i=1;
+  for (i=1; i<stations+1; i++) {
+  if (queue[i]>mxm) {
+  mxm = queue[i];
+  }
+}
+return mxm;
+};
 void sendUpdate(String statusUpdate) {
   // builds a status update to send to SmartThings hub
   String action="";
@@ -276,4 +482,12 @@ void sendUpdate(String statusUpdate) {
   }
   smartthing.send(statusUpdate);
   statusUpdate = "";
+}
+void sendPumpUpdate() {
+  if (isConfigPump) {
+    smartthing.send("pumpAdded");
+  }
+  if (!isConfigPump) {
+    smartthing.send("pumpRemoved");
+  }
 }

@@ -52,7 +52,7 @@ For the wiring, we ordered a **20 cm dupont cable male to female** (Phantom YoYo
 <img src="https://cloud.githubusercontent.com/assets/5625006/3353586/c2ceb562-fa85-11e3-9a2a-df5ed5e429cb.jpg" width="200px"  />
 
 ### Power Supplies
-For a power supply to power up the relay and run the irrigation valves, we re-used the 24V power supply from our existing controller.   We could have also used either a **Rain Bird UT1 Sprinkler System Timer Electric Transformer Plug** or the **Orbit Sprinkler System Power Source Transformer 57040**, both of which are available from Amazon Prime.  We  also needed a 9V power supply to run the Arduino+ThingShield+Relay.  The **Wall Adapter Power Supply - 9V DC 650mA Sold by Karnotech**  worked and is available on Amazon.
+For a power supply to power up the relay and run the irrigation valves, we re-used the 24V power supply from our existing controller.   We could have also used either a **Rain Bird UT1 Sprinkler System Timer Electric Transformer Plug** or the **Orbit Sprinkler System Power Source Transformer 57040**, both of which are available from Amazon Prime.  We  also needed a 9V power supply to run the Arduino+ThingShield+Relay.  This can be purchased at Amazon as well by searching for "Arduino Power Supply".  CAUTION: There are 9V power supplies availble on Amazon that do not work for the Arduino (they are made for musical instrament controllers) and some that perform very poorly on Arduino.  Be sure to read the reviews!  
 
 ### Project Housing
 Finally, for the project housing, we just ripped out the guts of our existing controller and used the box to house our final project. Another option is the **Arington EB0708** electronic equipment enclosure.
@@ -78,9 +78,15 @@ Finally, for the project housing, we just ripped out the guts of our existing co
 <img src="https://cloud.githubusercontent.com/assets/5625006/3353593/f3f9b8f8-fa85-11e3-877c-f05b27e22214.jpg" width="200px"  />
 
 Note, the ThingShield pins are not labeled.  So you can either identify the pins using labels on the Arduino or refer to a diagram.  Here is a diagram for Arduino Uno V2 from Flikr:   https://www.flickr.com/photos/28521811@N04/8520970405/
+7. Connect the Arduino to USB power or to a 9V power supply using the appropriate ports.  
+8. When not using the USB power supply, place a piece of black electrical tape over the USB port to prevent accidental shorting
 
 ### Wiring The Controller To The Irrigation System
-The final wiring of the project to your irrigation system is straight forward.  Irrigation sytems use a standard irrigation wire bundle which has multiple colored wires (one per valve + extras) and a white wire as a common ground.  We connected “ground” wire from the 24V transformer to the common ground (white) wire in the irrigation wire bundle.
+The final wiring of the project to your irrigation system is straight forward.  Irrigation sytems use a standard irrigation wire bundle which has multiple colored wires (one per valve + extras) and a white wire as a common ground. They typically run on 24V power.  
+
+* Be sure power is disconnected before attempting to wire. Avoid being shocked or creating a fire hazard!  
+
+We connected “ground” wire from the 24V transformer to the common ground (white) wire in the irrigation wire bundle.
 
 To connect the wires running to each valve, we used the Normally Open positions on the relay.  Each colored wire for each valve was connected to one of the NO positions on a relay.  One valve per relay.   Up to 8 are possible with this hardware, however, you do not need to use all 8.  We then connected the “hot” wire from the transformer to connect to the COMMON position (middle contact) on one of the relays.  This provides power to all realys since they are daisy chained together (see Arduino wiring above)  
 
@@ -200,11 +206,13 @@ This is an optional utility that allows you to put your system on extended hold 
 
 Example uses for this accessory app include putting the system on hold for the winter, during yard construction projects, after applying weed killer to the yard, and so on.  
 
-## Bonus Feature:
+## Take Your Controller to the Next Level:
 
-We modified our Device Type command set to be compatible with the Virtual Switch capability by Jonathan (jwsf on github or badgermanus on SmartThings).  This allows you to virtualize just one or each of the 8 zones giving enhanced ecosystem capabilities.  Virtualizing gives each zone its own “switch” capability that can be recognized within SmartThings ecosystem. Then you can start using all the SmartApps that link switches to other devices.  
+We modified our Device Type command set to be compatible with the Virtual Switch capability by Jonathan (jwsf on github or badgermanus on SmartThings).  This allows you to virtualize each of the 8 zones giving enhanced ecosystem capabilities.  Virtualizing gives each zone its own “switch” capability that can be recognized within SmartThings ecosystem. Then you can start linking irrigatoin zones to all the SmartApps that link switches to other devices.  
 
 For example, you can use the "Turn on when there is motion" SmartApp to connect an irrigation zone to a motion detector and trigger the sprinkler every time deer or intruder enters that zone!
+
+As another example, you can use the Aeon Labs MiniMote to wirelessly turn on and then off individual zones.  This is great if you do not have your iPhone or if you have a repair person working on your system.  The repair person just needs the MiniMote to switch the zones.  No running back and forth to the garage to advance the system!!!!!!!
 
 ## FAQs
 
@@ -213,3 +221,9 @@ For example, you can use the "Turn on when there is motion" SmartApp to connect 
 * After powering off the Arduino or switching from USB power to 9V power, you may notice that the SmartShield LED goes dark.  The SmartShield LED will relight at the first activity and then function normally after that.  The Arduino LEDs should both be on at all times when power is supplied to the hardware
 
 * What if you want to run your lawn irrigation on a different schedule than your drip irrigation?  No problems.  Just install the Irrigation Scheduler App for your lawn (rename it something like Lawn Irrigation Scheduler) and install the app a second time for the drip irrigation (rename it something like Drip Irrigation Scheduler).  
+
+* The Arduino runs on 9V power.  The sprinkler valves run on 24V power which is connected and daisy chained through the relays.  Be sure to keep them straight.  
+
+* The Arduino 9V power supply (transformer) can be purchased at Amazon by searching for "Arduino Power Supply".  CAUTION: There are 9V power supplies availble on Amazon that do not work for the Arduino (they are made for musical instrament controllers) and some that perform very poorly on Arduino.  Be sure to read the reviews!  
+
+

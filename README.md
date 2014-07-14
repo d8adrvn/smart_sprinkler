@@ -52,13 +52,17 @@ For the wiring, we ordered a **20 cm dupont cable male to female** (Phantom YoYo
 <img src="https://cloud.githubusercontent.com/assets/5625006/3353586/c2ceb562-fa85-11e3-9a2a-df5ed5e429cb.jpg" width="200px"  />
 
 ### Power Supplies
-For a power supply to power up the relay and run the irrigation valves, we re-used the 24V power supply from our existing controller.   We could have also used either a **Rain Bird UT1 Sprinkler System Timer Electric Transformer Plug** or the **Orbit Sprinkler System Power Source Transformer 57040**, both of which are available from Amazon Prime.  We  also needed a 9V power supply to run the Arduino+ThingShield+Relay.  This can be purchased at Amazon as well by searching for "Arduino Power Supply".  CAUTION: There are 9V power supplies availble on Amazon that do not work for the Arduino (they are made for musical instrament controllers) and some that perform very poorly on Arduino.  Be sure to read the reviews!  
+For a power supply to power up the relay and run the irrigation valves, we re-used the 24V power supply from our existing controller.   We could have also used either a **Rain Bird UT1 Sprinkler System Timer Electric Transformer Plug** or the **Orbit Sprinkler System Power Source Transformer 57040**, both of which are available from Amazon Prime.  We  also needed a 9V power supply to run the Arduino+ThingShield+Relay.  This can be purchased at Amazon as well by searching for "Arduino Power Supply".  Right now, I am using the Super Power Supply® AC / DC Adapter Charger Cord Plug - 9V 650mA compatible with Arduino Freeduino Duemilanove Uno Mega Hobby Electronics, which was available by Amazon Prime.   CAUTION: There are 9V power supplies availble on Amazon that do not work for the Arduino (they are made for musical instrament controllers) and some that perform very poorly on Arduino.  Be sure to read the reviews!  
 
 ### Project Housing
 Finally, for the project housing, we just ripped out the guts of our existing controller and used the box to house our final project. Another option is the **Arington EB0708** electronic equipment enclosure.
 
 
 ## Wiring the Project
+
+* Wiring diagrams are included in the header of the Arduino sketch.
+
+
 ### Wiring The Arduino Controller
 1. Stack the SmartThing ThingShield on top of the Arduino Uno.  
 2. Connect a ground wire from the GND pin on ThingShield to the GND pin on the SainSmart 8 Channel relay.  
@@ -81,10 +85,12 @@ Note, the ThingShield pins are not labeled.  So you can either identify the pins
 7. Connect the Arduino to USB power or to a 9V power supply using the appropriate ports.  
 8. When not using the USB power supply, place a piece of black electrical tape over the USB port to prevent accidental shorting
 
+
 ### Wiring The Controller To The Irrigation System
 The final wiring of the project to your irrigation system is straight forward.  Irrigation sytems use a standard irrigation wire bundle which has multiple colored wires (one per valve + extras) and a white wire as a common ground. They typically run on 24V power.  
 
 * Be sure power is disconnected before attempting to wire. Avoid being shocked or creating a fire hazard!  
+
 
 We connected “ground” wire from the 24V transformer to the common ground (white) wire in the irrigation wire bundle.
 
@@ -94,6 +100,27 @@ To connect the wires running to each valve, we used the Normally Open positions 
 <img src="https://cloud.githubusercontent.com/assets/5625006/3353611/6b78fc9a-fa86-11e3-9557-424b4a2bf896.jpg" width="200px"  />
 
 <img src="https://cloud.githubusercontent.com/assets/5625006/3353626/d163cc06-fa86-11e3-8aaf-c4a65fc64b5e.jpg" width="200px"  />
+
+###OPTIONAL: Connect additional relay to activate a master valve or pump
+
+If your irrigation system requires a pump to be turned on or a master valve to be opened, then there are two options for you.  A) you can wire the master valve or connect the pumps relay connector to the 8th relay on the 8-relay board.  B) you can purchase a single relay (find on Amazone) and add it to your controller.  
+
+To add an additional single relay:
+1. Connect the ground (GND) of the additional relay to one of the additional GND terminals on the Arduino.  There is one right next to the GND pin used to wire the 8-channel relay.
+2. You will need to splice your 5V jumper (create a Y connection using a wire nut or slice connector) so that you can feed 5V both to your 8-channel relay and your single relay.  There is only one 5V pin on the Arduino
+3. Go ahead and daisy chain the common port on the relay with the common port on the 8th relay on the 8-channel relay
+4. In the Arduino sketch, set isPin13Pump = true to activate optional single Master Valve Pump Start Relay
+
+Wiring the master valve or the pump relay:
+
+Warning: Connecting a Pump Start Relay is potentially dangerous 
+Warning: Pumps run on 120V or 220V power and incorrect wiring could result in lethal shock or fire hazard!
+Warning: Work is best done by licensed electrician following local codes.
+
+1. You should only be wiring the Pump Start Relay which uses 24V current.  Do not connect the 120V/240V wires!
+2. Wire the ground wire to the  ground wire bundle that contains the ground wire from the 24V irrigation transformer/power supply and the common ground that runs to the irrigation valves.
+3. Attach the load wire from the Pump Start Relay to Relay 8 or to the single relay that you added to the system, depending if you set up A) or B) above.
+4. In scenario A), where you use relay 8 to control your pump, you need to switch the use of the relay in the device type by tapping the pump tile.  See above to activate scenario B) by modifying the Arduino sketch. 
 
 ## The Software
 
@@ -144,7 +171,7 @@ The KNOWN LIBRARY BUG (timer.cpp) - identified by mattnichols 5/20/14 - has no k
  
 Once you have the zip files downloaded and you have changed the name for the Timer zip file, you can import them within the Arduino IDE. Go to the Sketch:Import Library;Add Library drop down menu. Once you have added the libraries, they will show up under Sketch:Add Library:Contributed as "Timer" and "SmartThings".  Be sure the Timer library is installed as "Timer"
 
- you can connect the Arduino Uno to your computer, create a new sketch, paste the code from github into the Arduino IDE and
+You can connect the Arduino Uno to your computer via an USB cable, create a new sketch, paste the code from github into the Arduino IDE and then transfer to tehe Arduino.
 
 Pairing instructions for the Arduino to the SmartThings hub can be found at SmartThings.com and are copied here:
 
@@ -153,6 +180,9 @@ SmartThings app by hitting the “+” icon in the desired location, and then pr
 
 To unpair the shield, press and hold the Switch button for 6 seconds and release. The shield will now be unpaired from your SmartThings Hub.”
 
+Once you have finished transfering the code to the Arduino, you can remove the USB and power the Arduino using a 9V transformer.
+
+Its more than a good idea to put a piece of electrical tape over the USB port to prevent accidental grounding of the port!
 
 ### Device Type Code 
 
@@ -213,6 +243,31 @@ We modified our Device Type command set to be compatible with the Virtual Switch
 For example, you can use the "Turn on when there is motion" SmartApp to connect an irrigation zone to a motion detector and trigger the sprinkler every time deer or intruder enters that zone!
 
 As another example, you can use the Aeon Labs MiniMote to wirelessly turn on and then off individual zones.  This is great if you do not have your iPhone or if you have a repair person working on your system.  The repair person just needs the MiniMote to switch the zones.  No running back and forth to the garage to advance the system!!!!!!!
+
+Here is how to virtualize your switches:
+
+1. Log into graph.api.smartthings.com
+2. Go to "My Device Types"
+3. Create a new SmartDevice, filling out the required info to create the device
+4. Paste in the VirtualSwitch.groovy code from jwsf:  https://github.com/d8adrvn/device-type.arduino-8-way-relay/blob/master/VirtualSwitch.groovy
+5. Save and Publish (for me)
+6. Go to My SmartApps and create a new SmartApp
+7. Paste in the code for the VirtualSwitchParent.groovy that has been modified to recoginize our Irrigation Controller.  The modified code can be found at:   https://github.com/d8adrvn/device-type.arduino-8-way-relay/blob/master/VirtualSwitchParent.groovy
+8. Save and Publish (for me)
+9. Go to My Devices and create a new Device.
+10. Give it a 'name' and a 'label' such as "Virtual Irrigation Zone #1"
+11. Under 'type', select "virtual switch", which is the device type you created in #4 above
+12. For 'version', select "published"
+13. Now repeat this 7 more times for each of your zones!
+
+The above is a bit tedious.  As soon as SmartThings supports child devices, I imagine we will update our code and can do away with the need to create virtual switches.  
+
+Now for the cool part.  To control your system with the Aeon MiniMote:
+1. Add the MiniMote to the sytem using Aeon's instructions "Becoming a Secondary/Inclusion Controller to Another Z-Wave Controller or Gateway in an Existing Z-Wave Network
+2. When it asks you to configure 'button 1': add Virtual Irrigation Zone 1  as the switch under 'Pushed' and Virtual Irrigation Zone 2 as the switch under 'Held'
+3. Repeat for buttons 2,3,4 using zones 3-8
+
+Now when you 'push' or 'hold' a MiniMote button, the corresponding zone will activate.  If you push again, it will turn off.   If you do not turn off the sytem, it will run for as long as the zone ran, the last time it was activated from the device type or the smart app.   Tip: you can tell push and hold apart.  When you push, a solid blue led comes on.  When you have 'held' the button, the blue led starts flashing.  
 
 ## FAQs
 

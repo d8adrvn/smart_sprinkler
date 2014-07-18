@@ -31,7 +31,7 @@ preferences {
 }
 
 metadata {
-    definition (name: "Irrigation Controller v2.6", version: "2.6", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") {
+    definition (name: "Irrigation Controller v2.61", version: "2.61", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") {
         capability "Switch"
  //       capability "Refresh"
         command "OnWithZoneTimes"
@@ -63,6 +63,8 @@ metadata {
         command "update" 
         command "enablePump"
         command "disablePump"
+        command "onPump"
+        command "offPump"
     }
 
     simulator {
@@ -141,9 +143,11 @@ metadata {
         }
         standardTile("pumpTile", "device.pump", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
             state "noPump", label: 'Pump', action: "enablePump", icon: "st.custom.buttons.subtract-icon", backgroundColor: "#ffffff",nextState: "enablingPump"
-         	state "havePump", label: 'Pump', action: "disablePump", icon: "st.custom.buttons.add-icon", backgroundColor: "#ffffff", nextState: "disablingPump"
+         	state "offPump", label: 'Pump', action: "onPump", icon: "st.valves.water.closed", backgroundColor: "#ffffff", nextState: "sendingPump"
            	state "enablingPump", label: 'sending', action: "disablePump", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
             state "disablingPump", label: 'sending', action: "disablePump", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
+            state "onPump", label: 'Pump', action: "offPump",icon: "st.valves.water.open", backgroundColor: "#53a7c0", nextState: "sendingPump"
+            state "sendingPump", label: 'sending', action: "offPump", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
         }
         	
         standardTile("refreshTile", "device.refresh", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true, decoration: "flat") {
@@ -175,6 +179,7 @@ def parse(String description) {
             : tokens[x] in ["on6", "q6", "off6"] ? "zoneSix"
             : tokens[x] in ["on7", "q7", "off7"] ? "zoneSeven"
             : tokens[x] in ["on8", "q8", "off8"] ? "zoneEight"
+            : tokens[x] in ["onPump"] ? "pump"
             : tokens[x] in ["ok"] ? "refresh" : null
 
             def currentVal = device.currentValue(name)
@@ -188,9 +193,9 @@ def parse(String description) {
             sendEvent(result)
         }
     }
-    if (value == "pumpAdded") {
+    if (value == "offPump") {
     	sendEvent (name:"zoneEight", value:"havePump", displayed: true, isStateChange: true, isPhysical: true)
-        sendEvent (name:"pump", value:"havePump", displayed: true, isStateChange: true, isPhysical: true)
+        sendEvent (name:"pump", value:"offPump", displayed: true, isStateChange: true, isPhysical: true)
     }
     if (value == "pumpRemoved") {
     	sendEvent (name:"pump", value:"noPump", displayed: true, isStateChange: true, isPhysical: true)
@@ -390,9 +395,19 @@ def rainDelayed() {
 
 def enablePump() {
 		log.info "Pump Enabled"
-        zigbee.smartShield(text: "pump,1").format()
+        zigbee.smartShield(text: "pump,1").format()  //pump is queued and ready to turn on when zone is activated
 }
 def disablePump() {
 		log.info "Pump Disabled"
-        zigbee.smartShield(text: "pump,0").format()
+        zigbee.smartShield(text: "pump,0").format()  //remove pump from system, reactivate Zone8
 }
+def onPump() {
+	log.info "Pump On"
+    zigbee.smartShield(text: "pump,2").format()
+    }
+
+def offPump() {
+		log.info "Pump Enabled"
+        zigbee.smartShield(text: "pump,1").format()  //pump returned to queue state to turn on when zone turns on
+        }
+

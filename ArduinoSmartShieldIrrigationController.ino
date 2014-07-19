@@ -413,6 +413,7 @@ void toggleOn() {
   t.stop(stationTimer[trafficCop]); // Kill any previously started timers.
   stationTimer[trafficCop] = t.after (stationTime[trafficCop],toggleOff);
   scheduleUpdate();
+  schedulePumpUpdate();
 }
 void toggleOff() {
   digitalWrite(relay[trafficCop], relayOff);
@@ -432,6 +433,7 @@ void toggleOff() {
   }  
   trafficCop=0; //ready to check queue or watch for new commmonds
   scheduleUpdate();
+  schedulePumpUpdate();
 }
 
 //added allOff as requirement of SmartThings switch capability.  
@@ -454,10 +456,12 @@ void allOff() {
   smartthing.shieldSetLED(0, 0, 1);
   trafficCop=0;
   scheduleUpdate();
+  schedulePumpUpdate();
 }
   
 void timeToUpdate() {
   scheduleUpdate();
+  schedulePumpUpdate();
 }
 
 int maxvalue () {

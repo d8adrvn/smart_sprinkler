@@ -2,7 +2,7 @@
 /**
 * 
  ****************************************************************************************************************************
- * Irrigation Controller v2.51
+ * Irrigation Controller v2.53
  * Simple, elegant irrigation controller that takes advantage of the cloud and SmartThings ecosystem
  * Arduino UNO with SmartThings Shield  and an 8 Relay Module
  * Works by receiving irrigation run times from the Cloud and then builds a queue to execute
@@ -225,7 +225,7 @@ SmartThings smartthing(PIN_THING_RX, PIN_THING_TX, messageCallout);  // construc
 int relays = 8;  //set up before loading to Arduino (max = 8 with current code)
 boolean isActiveHigh=false; //set to true if using "active high" relay, set to false if using "active low" relay
 boolean isDebugEnabled=true;    // enable or disable debug in this example
-boolean isPin13Pump =true;  //set to true if you add an additional relay to pin13 and use as pump or master valve.  
+boolean isPin13Pump =false;  //set to true if you add an additional relay to pin13 and use as pump or master valve.  
 
 //set global variables
 Timer t;
@@ -359,19 +359,21 @@ void messageCallout(String message)
     allOff();
   }
   if (strcmp(inValue[0],"pump")==0) {
-    if (strcmp(inValue[1],"1")==0) {
-      isConfigPump = true;
-       digitalWrite(relay[8], relayOff);
-       configPumpStatus = "off";
-      stations = relays - 1;
-    }
     if (strcmp(inValue[1],"0")==0) {
       isConfigPump = false;
       stations = relays;
     }
-    if (strcmp(inValue[1],"2")==0 && isConfigPump) {
-       digitalWrite(relay[8], relayOn);
-       configPumpStatus = "on";
+    if (strcmp(inValue[1],"1")==0) {
+      pumpOff();
+    }
+    if (strcmp(inValue[1],"2")==0) {
+       pumpOn();
+    }
+    if (strcmp(inValue[1],"3")==0) {
+      isConfigPump = true;
+      digitalWrite(relay[8], relayOff); 
+      configPumpStatus = "enabled";
+      stations = relays - 1;
     }
     schedulePumpUpdate();
   }
@@ -458,7 +460,29 @@ void allOff() {
   scheduleUpdate();
   schedulePumpUpdate();
 }
-  
+
+void pumpOff() {
+  if (isConfigPump) { 
+      digitalWrite(relay[8], relayOff); 
+      configPumpStatus = "off";
+  }
+  if (isPin13Pump) {
+      digitalWrite(pin13Relay, relayOff);
+      pin13PumpStatus="off";
+  }
+}
+
+void pumpOn() {
+  if (isConfigPump) { 
+      digitalWrite(relay[8], relayOn); 
+      configPumpStatus = "on";
+  }
+  if (isPin13Pump) {
+      digitalWrite(pin13Relay, relayOn);
+      pin13PumpStatus = "on";
+  }
+}
+
 void timeToUpdate() {
   scheduleUpdate();
   schedulePumpUpdate();
@@ -495,13 +519,19 @@ void sendUpdate(String statusUpdate) {
 }
 
 void sendPumpUpdate() {
-  if (!isConfigPump) {
+  if (isConfigPump && configPumpStatus == "enabled") {
+    smartthing.send("pumpAdded");
+  }
+  if (!isConfigPump && !isPin13Pump) {
     smartthing.send("pumpRemoved");
   }
-  if (configPumpStatus == "on") {
+  if (configPumpStatus == "on" || pin13PumpStatus == "on") {
     smartthing.send("onPump");
   }
   if (configPumpStatus =="off" && isConfigPump) {
+    smartthing.send("offPump");
+  }
+  if (pin13PumpStatus =="off" && isPin13Pump) {
     smartthing.send("offPump");
   }
 }

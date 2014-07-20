@@ -2,7 +2,7 @@
 /**
 * 
  ****************************************************************************************************************************
- * Irrigation Controller v2.53
+ * Irrigation Controller v2.54
  * Simple, elegant irrigation controller that takes advantage of the cloud and SmartThings ecosystem
  * Arduino UNO with SmartThings Shield  and an 8 Relay Module
  * Works by receiving irrigation run times from the Cloud and then builds a queue to execute
@@ -90,7 +90,7 @@
 /// Sprinkler load wires are connected to NO of respective relays
 /// Ground from Sprinkler power supply is tied to the Common Ground Wire from Irrigation Wire Bundle
 /// Relay 8 is used as irrigation zone
-/// If optional single relay is used to control pump, Arduino sketch must be modifed to: isPin13Pump = true
+/// If optional single relay is used to control pump, Arduino sketch must be modifed to: isPin4Pump = true
 ///
 ///
 ///         wire [ --from 14V Sprinkler Power Supply (-)
@@ -141,11 +141,11 @@
 ///      Optional: Single Relay for |
 ///                Master Valve     |
 ///              ---------------    |
-///    pin13  ++ | VCC       NC |   |
+///    pin4  ++ | VCC       NC |   |
 ///  Arduino     |          CMN | --| 
 ///     GND   -- | GND       NO | --- to Master Valve Pump Relay (low voltage only!!!!)
 ///              ---------------
-///    **Set isPin13Pump = true to activate optional single Master Valve Pump Relay
+///    **Set isPin4Pump = true to activate optional single Master Valve Pump Relay
 ///
 /// ****************************************************************************************************************************
 /// Example finished wiring diagram for 7 Zones and Software Enabled Pump or Master Valve 
@@ -225,7 +225,7 @@ SmartThings smartthing(PIN_THING_RX, PIN_THING_TX, messageCallout);  // construc
 int relays = 8;  //set up before loading to Arduino (max = 8 with current code)
 boolean isActiveHigh=false; //set to true if using "active high" relay, set to false if using "active low" relay
 boolean isDebugEnabled=true;    // enable or disable debug in this example
-boolean isPin13Pump =false;  //set to true if you add an additional relay to pin13 and use as pump or master valve.  
+boolean isPin4Pump =false;  //set to true if you add an additional relay to pin4 and use as pump or master valve.  
 
 //set global variables
 Timer t;
@@ -240,10 +240,10 @@ int queue[]={0,0,0,0,0,0,0,0,0};  // off: 0, queued: 1, running: 2
 int relay[9];
 
 //initialize pump related variables. 
-int pin13Relay = 13;  //pin13 reserved for optional additional relay to control a pump or master valve
+int pin4Relay = 4;  //pin4 reserved for optional additional relay to control a pump or master valve
 boolean isConfigPump = false; // if true, relay8 is used as the pump/master valve switch.  Can be toggled by device tye v2.7 and later
 char* configPumpStatus = "off";
-char* pin13PumpStatus= "off";
+char* pin4PumpStatus= "off";
 boolean doUpdate = false;
 boolean doPumpUpdate = false;
 
@@ -277,10 +277,10 @@ void setup()
     i++;
   }
 
-  // set up optional hardware configured pump to pin13 on Arduino
-  if (isPin13Pump) {
-  pinMode(pin13Relay, OUTPUT);
-  digitalWrite(pin13Relay, relayOff);
+  // set up optional hardware configured pump to pin4 on Arduino
+  if (isPin4Pump) {
+    pinMode(pin4Relay, OUTPUT);
+    digitalWrite(pin4Relay, relayOff);
   }
 }
 
@@ -407,9 +407,9 @@ void toggleOn() {
     digitalWrite(relay[8], relayOn);
     configPumpStatus = "on";
   }
-  if (isPin13Pump) {
-    digitalWrite(pin13Relay, relayOn);
-    pin13PumpStatus = "on";
+  if (isPin4Pump) {
+    digitalWrite(pin4Relay, relayOn);
+    pin4PumpStatus = "on";
   }
   digitalWrite(relay[trafficCop], relayOn);
   t.stop(stationTimer[trafficCop]); // Kill any previously started timers.
@@ -427,10 +427,10 @@ void toggleOff() {
       configPumpStatus = "off";
     }
   }
-  if (isPin13Pump) {
+  if (isPin4Pump) {
     if (maxvalue() ==0) {
-      digitalWrite(pin13Relay, relayOff);
-      pin13PumpStatus = "off";
+      digitalWrite(pin4Relay, relayOff);
+      pin4PumpStatus = "off";
     }
   }  
   trafficCop=0; //ready to check queue or watch for new commmonds
@@ -451,9 +451,9 @@ void allOff() {
      configPumpStatus="off";
   } 
   
-  if (isPin13Pump) {
-    digitalWrite(pin13Relay, relayOff);
-    pin13PumpStatus="off";
+  if (isPin4Pump) {
+    digitalWrite(pin4Relay, relayOff);
+    pin4PumpStatus="off";
   }
   smartthing.shieldSetLED(0, 0, 1);
   trafficCop=0;
@@ -466,9 +466,9 @@ void pumpOff() {
       digitalWrite(relay[8], relayOff); 
       configPumpStatus = "off";
   }
-  if (isPin13Pump) {
-      digitalWrite(pin13Relay, relayOff);
-      pin13PumpStatus="off";
+  if (isPin4Pump) {
+      digitalWrite(pin4Relay, relayOff);
+      pin4PumpStatus="off";
   }
 }
 
@@ -477,9 +477,9 @@ void pumpOn() {
       digitalWrite(relay[8], relayOn); 
       configPumpStatus = "on";
   }
-  if (isPin13Pump) {
-      digitalWrite(pin13Relay, relayOn);
-      pin13PumpStatus = "on";
+  if (isPin4Pump) {
+      digitalWrite(pin4Relay, relayOn);
+      pin4PumpStatus = "on";
   }
 }
 
@@ -522,16 +522,16 @@ void sendPumpUpdate() {
   if (isConfigPump && configPumpStatus == "enabled") {
     smartthing.send("pumpAdded");
   }
-  if (!isConfigPump && !isPin13Pump) {
+  if (!isConfigPump && !isPin4Pump) {
     smartthing.send("pumpRemoved");
   }
-  if (configPumpStatus == "on" || pin13PumpStatus == "on") {
+  if (configPumpStatus == "on" || pin4PumpStatus == "on") {
     smartthing.send("onPump");
   }
   if (configPumpStatus =="off" && isConfigPump) {
     smartthing.send("offPump");
   }
-  if (pin13PumpStatus =="off" && isPin13Pump) {
+  if (pin4PumpStatus =="off" && isPin4Pump) {
     smartthing.send("offPump");
   }
 }

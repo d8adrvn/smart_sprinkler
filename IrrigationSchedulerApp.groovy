@@ -1,4 +1,6 @@
 /**
+*  
+* 
 *  Irrigation Scheduler App
 *
 *  Author: Stan Dotson (stan@dotson.info) and Matthew Nichols (matt@nichols.name)
@@ -19,20 +21,20 @@
 **/
 
 definition(
-    name: "Irrigation Scheduler 2.6",
+    name: "Irrigation Scheduler 2.7",
     namespace: "d8adrvn/smart_sprinkler",
-    author: "matt@nichols.name",
-    description: "Schedule sprinklers run unless there is rain.",
+    author: "matt@nichols.name and stan@dotson.info",
+    description: "Schedule sprinklers to run unless there is rain.",
     category: "Green Living",
-    version: "2.6",
+    version: "2.7",
     iconUrl: "https://s3.amazonaws.com/smartapp-icons/Meta/water_moisture.png",
     iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Meta/water_moisture@2x.png"
 )
 
 preferences {
-    page(name: "schedulePage", title: "Schedule", nextPage: "sprinklerPage", uninstall: true) {
-      	section("App configuration...") {
-        	label title: "Choose a title for App", required: true, defaultValue: "Irrigation Scheduler"
+	page(name: "schedulePage", title: "Schedule", nextPage: "sprinklerPage", uninstall: true) {
+      	section("App configruation...") {
+        	label title: "Choose an title for App", required: true, defaultValue: "Irrigation Scheduler"
         }
         section {
             input (
@@ -70,15 +72,27 @@ preferences {
             input "zone7", "string", title: "Zone 7 Time", description: "minutes", multiple: false, required: false
             input "zone8", "string", title: "Zone 8 Time", description: "minutes", multiple: false, required: false
         }
-        section("Zip code to check weather...") {
-            input "zipcode", "text", title: "Zipcode?", required: false
-        }
-        section("Skip watering if more than... (default 0.5)") {
-            input "wetThreshold", "decimal", title: "Inches?", required: false
-        }
         section("Optional: Use this virtual scheduler device...") {
             input "schedulerVirtualDevice", "capability.actuator", required: false
         }
+ //	}
+    
+//	page (name: "virtualRainGuage", title: "Virtual Rain Guage Setup", install: true) {
+		
+        section("Zip code to check weather...") {
+            input "zipcode", "text", title: "Zipcode?", required: false
+        }
+        
+        section("Select which rain to add to guage...") {
+        	input "isYesterdaysRainEnabled", "boolean", title: "Yesterday's Rain", description: "Include?", defaultValue: "true", required: false
+        	input "isTodaysRainEnabled", "boolean", title: "Today's Rain", description: "Include?", defaultValue: "true", required: false
+        	input "isForecastRainEnabled", "boolean", title: "Today's Forecasted Rain", description: "Include?", defaultValue: "false", required: false
+        }
+       
+       section("Skip watering if more than... (default 0.5)") {
+            input "wetThreshold", "decimal", title: "Inches?", required: false
+        }
+        
     }
 }
 
@@ -86,16 +100,13 @@ def installed() {
     log.debug "Installed: $settings"
     scheduling()
     state.daysSinceLastWatering = [0,0,0]
-    subscribe(app, appTouch)
 }
 
 def updated() {
     log.debug "Updated: $settings"
-    unsubscribe()
     unschedule()
     scheduling()
     state.daysSinceLastWatering = [0,0,0]
-    subscribe(app, appTouch)
 }
 
 // Scheduling
@@ -123,7 +134,6 @@ def waterTimeThreeStart() {
 }
 
 def scheduleCheck() {
-    log.debug("Schedule check")
 
     def schedulerState = "noEffect"
     if (schedulerVirtualDevice) {
@@ -147,7 +157,7 @@ def scheduleCheck() {
     log.debug("Schedule effect $schedulerState. Days since last watering ${daysSince()}. Is watering day? ${isWateringDay()}. Enought time? ${enoughTimeElapsed(schedulerState)} ")
 
     if ((isWateringDay() && enoughTimeElapsed(schedulerState) && schedulerState != "delay") || schedulerState == "expedite") {
-        sendPush("Watering now!")
+        sendPush("$label Is Watering Now!")
         state.daysSinceLastWatering[state.currentTimerIx] = 0
         water()
         // Assuming that sprinklers will turn themselves off. Should add a delayed off?
@@ -158,7 +168,6 @@ def isWateringDay() {
     if(!wateringDays) return true
 
     def today = new Date().format("EEEE", location.timeZone)
-    log.debug "today: ${today}, days: ${days}"
     if (wateringDays.contains(today)) {
         return true
     }
@@ -177,7 +186,21 @@ def daysSince() {
 }
 
 def isRainDelay() { 
-    def rainGauge = wasWetYesterday()+isWet()+isStormy()
+
+	def rainGauge = 0
+    
+    if (isYesterdaysRainEnabled.equals("true")) {        
+    	rainGauge = rainGauge + wasWetYesterday()
+   	}
+    
+    if (isTodaysRainEnabled.equals("true")) {
+    	rainGauge = rainGauge + isWet()
+    }
+    
+    if (isForecastRainEnabled.equals("true")) {
+    	rainGauge = rainGauge + isStormy()
+  	}
+    
     log.info ("Rain gauge reads $rainGauge in")
     if (rainGauge > (wetThreshold?.toFloat() ?: 0.5)) {
         log.trace "Watering is rain delayed"
@@ -206,7 +229,7 @@ def wasWetYesterday() {
     def yesterdaysWeather = getWeatherFeature("yesterday", zipcode)
     def yesterdaysPrecip=yesterdaysWeather.history.dailysummary.precipi.toArray()
     def yesterdaysInches=safeToFloat(yesterdaysPrecip[0])
-    log.info("Checking yesterdays percipitation for $zipcode: $yesterdaysInches in")
+    log.info("Checking yesterday's percipitation for $zipcode: $yesterdaysInches in")
 	return yesterdaysInches
 }
 
@@ -216,7 +239,7 @@ def isWet() {
 
     def todaysWeather = getWeatherFeature("conditions", zipcode)
     def todaysInches = safeToFloat(todaysWeather.current_observation.precip_today_in)
-    log.info("Checking percipitation for $zipcode: $todaysInches in")
+    log.info("Checking today's percipitation for $zipcode: $todaysInches in")
     return todaysInches
 }
 
@@ -250,9 +273,4 @@ def water() {
 
 def anyZoneTimes() {
     return zone1 || zone2 || zone3 || zone4 || zone5 || zone6 || zone7 || zone8
-}
-
-def appTouch(evt) {
-    log.debug "appTouch: $evt"
-    water()
 }

@@ -1,5 +1,5 @@
 /**
- *  Irrigation Controller
+ *  Irrigation Controller -23 Zones + Pump v0.5
  *  This SmartThings Device Type Code Works With Arduino Irrigation Controller also available at this site
  *  
  *

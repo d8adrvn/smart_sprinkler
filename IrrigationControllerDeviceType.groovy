@@ -32,6 +32,9 @@ preferences {
 
 metadata {
     definition (name: "Irrigation Controller v2.63", version: "2.63", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") {
+        
+        fingerprint profileId: "0104", deviceId: "0138", inClusters: "0000"
+        
         capability "Switch"
  //       capability "Refresh"
         command "OnWithZoneTimes"
@@ -138,13 +141,118 @@ metadata {
             state "q8", label: 'Eight', action: "RelayOff8",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "sending8"
             state "on8", label: 'Eight', action: "RelayOff8",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "sending8"
             state "sendingOff8", label: 'sending', action: "RelayOff8", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
-            state "havePump", label: 'Eight', action: "disablePump", icon: "st.custom.buttons.subtract-icon", backgroundColor: "#ffffff"
-
         }
+        standardTile("zoneNineTile", "device.zoneNine", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
+            state "off9", label: 'Nine', action: "RelayOn9", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "sending9"
+            state "sending9", label: 'sending', action: "RelayOff9", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
+            state "q9", label: 'Nine', action: "RelayOff9",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "sending9"
+            state "on9", label: 'Nine', action: "RelayOff9",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "sending9"
+            state "sendingOff9", label: 'sending', action: "RelayOff9", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
+        }       
+        standardTile("zoneTenTile", "device.zoneTen", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
+            state "off10", label: 'Ten', action: "RelayOn10", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "sending10"
+            state "sending10", label: 'sending', action: "RelayOff19", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
+            state "q10", label: 'Ten', action: "RelayOff10",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "sending10"
+            state "on10", label: 'Ten', action: "RelayOff10",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "sending10"
+            state "sendingOff10", label: 'sending', action: "RelayOff10", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
+        } 
+        standardTile("zoneElevenTile", "device.zoneEleven", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
+            state "off11", label: 'Eleven', action: "RelayOn11", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "sending11"
+            state "sending11", label: 'sending', action: "RelayOff11", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
+            state "q11", label: 'Eleven', action: "RelayOff11",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "sending11"
+            state "on11", label: 'Eleven', action: "RelayOff11",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "sending11"
+            state "sendingOff11", label: 'sending', action: "RelayOff11", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
+        } 
+        standardTile("zoneTwelveTile", "device.zoneTwelve", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
+            state "off12", label: 'Twelve', action: "RelayOn12", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "sending12"
+            state "sending12", label: 'sending', action: "RelayOff12", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
+            state "q12", label: 'Twelve', action: "RelayOff12",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "sending12"
+            state "on12", label: 'Twelve', action: "RelayOff12",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "sending12"
+            state "sendingOff12", label: 'sending', action: "RelayOff12", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
+        } 
+        standardTile("zoneThirteenTile", "device.zoneThirteen", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
+            state "off13", label: 'Thirteen', action: "RelayOn13", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "sending13"
+            state "sending13", label: 'sending', action: "RelayOff13", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
+            state "q13", label: 'Thirteen', action: "RelayOff13",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "sending13"
+            state "on13", label: 'Thirteen', action: "RelayOff13",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "sending13"
+            state "sendingOff13", label: 'sending', action: "RelayOff13", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
+        } 
+        standardTile("zoneFourteenTile", "device.zoneFourteen", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
+            state "off14", label: 'Fourteen', action: "RelayOn14", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "sending14"
+            state "sending14", label: 'sending', action: "RelayOff14", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
+            state "q14", label: 'Fourteen', action: "RelayOff14",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "sending14"
+            state "on14", label: 'Fourteen', action: "RelayOff14",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "sending14"
+            state "sendingOff14", label: 'sending', action: "RelayOff14", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
+        }
+
+        standardTile("zoneFifteenTile", "device.zoneFifteen", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
+            state "off15", label: 'Fifteen', action: "RelayOn15", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "sending15"
+            state "sending15", label: 'sending', action: "RelayOff15", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
+            state "q15", label: 'Fifteen', action: "RelayOff15",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "sending15"
+            state "on15", label: 'Fifteen', action: "RelayOf15",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "sending15"
+            state "sendingOff15", label: 'sending', action: "RelayOff15", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
+        } 
+        standardTile("zoneSixteenTile", "device.zoneSixteen", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
+            state "off16", label: 'Sixteen', action: "RelayOn16", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "sending16"
+            state "sending16", label: 'sending', action: "RelayOff16", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
+            state "q16", label: 'Sixteen', action: "RelayOff16",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "sending16"
+            state "on16", label: 'Sixteen', action: "RelayOff16",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "sending16"
+            state "sendingOff16", label: 'sending', action: "RelayOff16", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
+        } 
+        standardTile("zoneSeventeenTile", "device.zoneSeventeen", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
+            state "off17", label: 'Seventeen', action: "RelayOn17", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "sending17"
+            state "sending17", label: 'sending', action: "RelayOff17", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
+            state "q17", label: 'Seventeen', action: "RelayOff17",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "sending17"
+            state "on17", label: 'Seventeen', action: "RelayOff17",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "sending17"
+            state "sendingOff17", label: 'sending', action: "RelayOff17", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
+        } 
+        standardTile("zoneEighteenTile", "device.zoneEighteen", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
+            state "off18", label: 'Eighteen', action: "RelayOn18", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "sending18"
+            state "sending18", label: 'sending', action: "RelayOff18", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
+            state "q18", label: 'Eighteen', action: "RelayOff18",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "sending18"
+            state "on18", label: 'Eighteen', action: "RelayOff18",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "sending18"
+            state "sendingOff18", label: 'sending', action: "RelayOff18", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
+        } 
+        standardTile("zoneNineteenTile", "device.zoneNineteen", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
+            state "off19", label: 'Nineteen', action: "RelayOn19", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "sending19"
+            state "sending19", label: 'sending', action: "RelayOff19", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
+            state "q19", label: 'Nineteen', action: "RelayOff19",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "sending19"
+            state "on19", label: 'Nineteen', action: "RelayOff19",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "sending19"
+            state "sendingOff19", label: 'sending', action: "RelayOff19", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
+        } 
+        standardTile("zoneTwentyTile", "device.zoneTwenty", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
+            state "off20", label: 'Twenty', action: "RelayOn20", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "sending20"
+            state "sending20", label: 'sending', action: "RelayOff20", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
+            state "q20", label: 'Twenty', action: "RelayOff20",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "sending20"
+            state "on20", label: 'Twenty', action: "RelayOff20",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "sending20"
+            state "sendingOff20", label: 'sending', action: "RelayOff20", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
+        }
+        standardTile("zoneTwentyoneTile", "device.zoneTwentyone", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
+            state "off21", label: 'Twentyone', action: "RelayOn21", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff",nextState: "sending21"
+            state "sending21", label: 'sending', action: "RelayOff21", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
+            state "q21", label: 'Twentyone', action: "RelayOff21",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "sending21"
+            state "on21", label: 'Twentyone', action: "RelayOff21",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "sending21"
+            state "sendingOff21", label: 'sending', action: "RelayOff21", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
+        }
+        standardTile("zoneTwentytwoTile", "device.zoneTwentytwo", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
+            state "off22", label: 'Twentytwo', action: "RelayOn22", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "sending22"
+            state "sending22", label: 'sending', action: "RelayOff22", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
+            state "q22", label: 'Twentytwo', action: "RelayOff22",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "sending22"
+            state "on22", label: 'Twentytwo', action: "RelayOff22",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "sending22"
+            state "sendingOff22", label: 'sending', action: "RelayOff2", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
+        }
+        standardTile("zoneTwentythreeTile", "device.zoneTwentythree", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
+            state "off23", label: 'Twentythree', action: "RelayOn23", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "sending23"
+            state "sending23", label: 'sending', action: "RelayOff23", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
+            state "q23", label: 'Twentythree', action: "RelayOff23",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "sending23"
+            state "on23", label: 'Twentythree', action: "RelayOff23",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "sending23"
+            state "sendingOff23", label: 'sending', action: "RelayOff23", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
+        }
+        // pump uses relay 24
         standardTile("pumpTile", "device.pump", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
             state "noPump", label: 'Pump', action: "enablePump", icon: "st.custom.buttons.subtract-icon", backgroundColor: "#ffffff",nextState: "enablingPump"
-         	state "offPump", label: 'Pump', action: "onPump", icon: "st.valves.water.closed", backgroundColor: "#ffffff", nextState: "sendingPump"
-           	state "enablingPump", label: 'sending', action: "disablePump", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
+            state "offPump", label: 'Pump', action: "onPump", icon: "st.valves.water.closed", backgroundColor: "#ffffff", nextState: "sendingPump"
+            state "enablingPump", label: 'sending', action: "disablePump", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
             state "disablingPump", label: 'sending', action: "disablePump", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
             state "onPump", label: 'Pump', action: "offPump",icon: "st.valves.water.open", backgroundColor: "#53a7c0", nextState: "sendingPump"
             state "sendingPump", label: 'sending', action: "offPump", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
@@ -154,7 +262,7 @@ metadata {
             state "ok", label: "", action: "update", icon: "st.secondary.refresh", backgroundColor: "#ffffff"
         }
         main "allZonesTile"
-        details(["zoneOneTile","zoneTwoTile","zoneThreeTile","zoneFourTile","zoneFiveTile","zoneSixTile","zoneSevenTile","zoneEightTile", "pumpTile","refreshTile"])
+        details(["zoneOneTile","zoneTwoTile","zoneThreeTile","zoneFourTile","zoneFiveTile","zoneSixTile","zoneSevenTile","zoneEightTile", "zoneNineTile", "zoneTenTile", "zoneElevenTile", "zoneTwelveTile", "zoneThirteenTile", "zoneFourteenTile", "zoneFifteenTile", "zoneSixteenTile", "zoneSeventeenTile", "zoneEighteenTile", "zoneNineteenTile", "zoneTwentyTile", "zoneTwentyoneTile", "zoneTwentytwoTile", "zoneTwentythreeTile", "pumpTile","refreshTile"])
     }
 }
 
@@ -179,6 +287,21 @@ def parse(String description) {
             : tokens[x] in ["on6", "q6", "off6"] ? "zoneSix"
             : tokens[x] in ["on7", "q7", "off7"] ? "zoneSeven"
             : tokens[x] in ["on8", "q8", "off8"] ? "zoneEight"
+            : tokens[x] in ["on9", "q9", "off9"] ? "zoneNine"
+            : tokens[x] in ["on10", "q10", "off10"] ? "zoneTen"
+            : tokens[x] in ["on11", "q11", "off11"] ? "zoneEleven"
+            : tokens[x] in ["on12", "q12", "off12"] ? "zoneTwelve"
+            : tokens[x] in ["on13", "q13", "off13"] ? "zoneThirteen"
+            : tokens[x] in ["on14", "q14", "off14"] ? "zoneFourteen"
+            : tokens[x] in ["on15", "q15", "off15"] ? "zoneFifteen"
+            : tokens[x] in ["on16", "q16", "off16"] ? "zoneSixteen"
+            : tokens[x] in ["on17", "q17", "off17"] ? "zoneSeventeen"
+            : tokens[x] in ["on18", "q18", "off18"] ? "zoneEightteen"
+            : tokens[x] in ["on19", "q19", "off19"] ? "zoneNineteen"
+            : tokens[x] in ["on20", "q20", "off20"] ? "zoneTwenty"
+            : tokens[x] in ["on21", "q21", "off21"] ? "zoneTwentyone"
+            : tokens[x] in ["on22", "q22", "off22"] ? "zoneTwentytwo"
+            : tokens[x] in ["on23", "q23", "off23"] ? "zoneTwentythree"
             : tokens[x] in ["onPump", "offPump"] ? "pump"
             : tokens[x] in ["ok"] ? "refresh" : null
 
@@ -194,12 +317,10 @@ def parse(String description) {
         }
     }
     if (value == "pumpAdded") {
-    	sendEvent (name:"zoneEight", value:"havePump", displayed: true, isStateChange: true, isPhysical: true)
         sendEvent (name:"pump", value:"offPump", displayed: true, isStateChange: true, isPhysical: true)
     }
     if (value == "pumpRemoved") {
     	sendEvent (name:"pump", value:"noPump", displayed: true, isStateChange: true, isPhysical: true)
-        sendEvent (name:"zoneEight", value:"off8", displayed: display, isStateChange: true, isPhysical: true)
     }
 
     if(anyZoneOn()) {
@@ -218,6 +339,22 @@ def anyZoneOn() {
     if(device.currentValue("zoneSix") in ["on6","q6"]) return true;
     if(device.currentValue("zoneSeven") in ["on7","q7"]) return true;
     if(device.currentValue("zoneEight") in ["on8","q8"]) return true;
+    if(device.currentValue("zoneNine") in ["on9","q9"]) return true;
+    if(device.currentValue("zoneTen") in ["on10","q10"]) return true;
+    if(device.currentValue("zoneEleven") in ["on11","q11"]) return true;
+    if(device.currentValue("zoneTwelve") in ["on12","q12"]) return true;
+    if(device.currentValue("zoneThirteen") in ["on13","q13"]) return true;
+    if(device.currentValue("zoneFourteen") in ["on14","q14"]) return true;
+    if(device.currentValue("zoneFifteen") in ["on15","q15"]) return true;
+    if(device.currentValue("zoneSixteen") in ["on16","q16"]) return true;
+    if(device.currentValue("zoneSeventeen") in ["on17","q17"]) return true;
+    if(device.currentValue("zoneEightteen") in ["on18","q18"]) return true;
+    if(device.currentValue("zoneNineteen") in ["on19","q19"]) return true;
+    if(device.currentValue("zoneTwenty") in ["on20","q20"]) return true;
+    if(device.currentValue("zoneTwentyone") in ["on21","q21"]) return true;
+    if(device.currentValue("zoneTwentytwo") in ["on22","q22"]) return true;
+    if(device.currentValue("zoneTwentythree") in ["on23","q23"]) return true;
+    
 
     false;
 }
@@ -351,9 +488,250 @@ def RelayOff8() {
     zigbee.smartShield(text: "off,8").format()
 }
 
+def RelayOn9() {
+    log.info "Executing 'on,9'"
+    zigbee.smartShield(text: "on,9,${eightTimer}").format()
+}
+
+def RelayOn9For(value) {
+    value = checkTime(value)
+    log.info "Executing 'on,9,$value'"
+    zigbee.smartShield(text: "on,9,${value}").format()
+}
+
+def RelayOff9() {
+    log.info "Executing 'off,9'"
+    zigbee.smartShield(text: "off,9").format()
+}
+
+def RelayOn10() {
+    log.info "Executing 'on,10'"
+    zigbee.smartShield(text: "on,10,${eightTimer}").format()
+}
+
+def RelayOn10For(value) {
+    value = checkTime(value)
+    log.info "Executing 'on,10,$value'"
+    zigbee.smartShield(text: "on,10,${value}").format()
+}
+
+def RelayOff10() {
+    log.info "Executing 'off,10'"
+    zigbee.smartShield(text: "off,10").format()
+}
+
+def RelayOn11() {
+    log.info "Executing 'on,11'"
+    zigbee.smartShield(text: "on,11,${oneTimer}").format()
+}
+
+def RelayOn11For(value) {
+    value = checkTime(value)
+    log.info "Executing 'on,11,$value'"
+    zigbee.smartShield(text: "on,11,${value}").format()
+}
+
+def RelayOff11() {
+    log.info "Executing 'off,11'"
+    zigbee.smartShield(text: "off,11").format()
+}
+
+def RelayOn12() {
+    log.info "Executing 'on,12'"
+    zigbee.smartShield(text: "on,12,${twoTimer}").format()
+}
+
+def RelayOn12For(value) {
+    value = checkTime(value)
+    log.info "Executing 'on,12,$value'"
+    zigbee.smartShield(text: "on,12,${value}").format()
+}
+
+def RelayOff12() {
+    log.info "Executing 'off,12'"
+    zigbee.smartShield(text: "off,12").format()
+}
+
+def RelayOn13() {
+    log.info "Executing 'on,13'"
+    zigbee.smartShield(text: "on,13,${threeTimer}").format()
+}
+
+def RelayOn13For(value) {
+    value = checkTime(value)
+    log.info "Executing 'on,13,$value'"
+    zigbee.smartShield(text: "on,13,${value}").format()
+}
+
+def RelayOff13() {
+    log.info "Executing 'off,13'"
+    zigbee.smartShield(text: "off,13").format()
+}
+
+def RelayOn4() {
+    log.info "Executing 'on,4'"
+    zigbee.smartShield(text: "on,4,${fourTimer}").format()
+}
+
+def RelayOn14For(value) {
+    value = checkTime(value)
+    log.info "Executing 'on,14,$value'"
+    zigbee.smartShield(text: "on,14,${value}").format()
+}
+
+def RelayOff14() {
+    log.info "Executing 'off,14'"
+    zigbee.smartShield(text: "off,14").format()
+}
+
+def RelayOn15() {
+    log.info "Executing 'on,15'"
+    zigbee.smartShield(text: "on,15,${fiveTimer}").format()
+}
+
+def RelayOn15For(value) {
+    value = checkTime(value)
+    log.info "Executing 'on,15,$value'"
+    zigbee.smartShield(text: "on,15,${value}").format()
+}
+
+def RelayOff15() {
+    log.info "Executing 'off,15'"
+    zigbee.smartShield(text: "off,15").format()
+}
+
+def RelayOn6() {
+    log.info "Executing 'on,6'"
+    zigbee.smartShield(text: "on,6,${sixTimer}").format()
+}
+
+def RelayOn16For(value) {
+    value = checkTime(value)
+    log.info "Executing 'on,16,$value'"
+    zigbee.smartShield(text: "on,16,${value}").format()
+}
+
+def RelayOff16() {
+    log.info "Executing 'off,16'"
+    zigbee.smartShield(text: "off,16").format()
+}
+
+def RelayOn17() {
+    log.info "Executing 'on,17'"
+    zigbee.smartShield(text: "on,17,${sevenTimer}").format()
+}
+
+def RelayOn17For(value) {
+    value = checkTime(value)
+    log.info "Executing 'on,17,$value'"
+    zigbee.smartShield(text: "on,17,${value}").format()
+}
+
+def RelayOff17() {
+    log.info "Executing 'off,17'"
+    zigbee.smartShield(text: "off,17").format()
+}
+
+def RelayOn18() {
+    log.info "Executing 'on,18'"
+    zigbee.smartShield(text: "on,18,${eightTimer}").format()
+}
+
+def RelayOn18For(value) {
+    value = checkTime(value)
+    log.info "Executing 'on,18,$value'"
+    zigbee.smartShield(text: "on,18,${value}").format()
+}
+
+def RelayOff18() {
+    log.info "Executing 'off,18'"
+    zigbee.smartShield(text: "off,18").format()
+}
+
+def RelayOn19() {
+    log.info "Executing 'on,19'"
+    zigbee.smartShield(text: "on,19,${eightTimer}").format()
+}
+
+def RelayOn19For(value) {
+    value = checkTime(value)
+    log.info "Executing 'on,19,$value'"
+    zigbee.smartShield(text: "on,19,${value}").format()
+}
+
+def RelayOff19() {
+    log.info "Executing 'off,19'"
+    zigbee.smartShield(text: "off,19").format()
+}
+
+def RelayOn10() {
+    log.info "Executing 'on,10'"
+    zigbee.smartShield(text: "on,10,${eightTimer}").format()
+}
+
+def RelayOn20For(value) {
+    value = checkTime(value)
+    log.info "Executing 'on,20,$value'"
+    zigbee.smartShield(text: "on,20,${value}").format()
+}
+
+def RelayOff20() {
+    log.info "Executing 'off,20'"
+    zigbee.smartShield(text: "off,20").format()
+}
+
+def RelayOn21() {
+    log.info "Executing 'on,21'"
+    zigbee.smartShield(text: "on,21,${oneTimer}").format()
+}
+
+def RelayOn21For(value) {
+    value = checkTime(value)
+    log.info "Executing 'on,21,$value'"
+    zigbee.smartShield(text: "on,21,${value}").format()
+}
+
+def RelayOff21() {
+    log.info "Executing 'off,21'"
+    zigbee.smartShield(text: "off,21").format()
+}
+
+def RelayOn22() {
+    log.info "Executing 'on,22'"
+    zigbee.smartShield(text: "on,22,${twoTimer}").format()
+}
+
+def RelayOn22For(value) {
+    value = checkTime(value)
+    log.info "Executing 'on,22,$value'"
+    zigbee.smartShield(text: "on,22,${value}").format()
+}
+
+def RelayOff22() {
+    log.info "Executing 'off,22'"
+    zigbee.smartShield(text: "off,22").format()
+}
+
+def RelayOn23() {
+    log.info "Executing 'on,23'"
+    zigbee.smartShield(text: "on,23,${threeTimer}").format()
+}
+
+def RelayOn23For(value) {
+    value = checkTime(value)
+    log.info "Executing 'on,23,$value'"
+    zigbee.smartShield(text: "on,23,${value}").format()
+}
+
+def RelayOff23() {
+    log.info "Executing 'off,23'"
+    zigbee.smartShield(text: "off,23").format()
+}
+
+
 def on() {
     log.info "Executing 'allOn'"
-    zigbee.smartShield(text: "allOn,${oneTimer ?: 0},${twoTimer ?: 0},${threeTimer ?: 0},${fourTimer ?: 0},${fiveTimer ?: 0},${sixTimer ?: 0},${sevenTimer ?: 0},${eightTimer ?: 0}").format()
+    zigbee.smartShield(text: "allOn,${oneTimer ?: 0},${twoTimer ?: 0},${threeTimer ?: 0},${fourTimer ?: 0},${fiveTimer ?: 0},${sixTimer ?: 0},${sevenTimer ?: 0},${eightTimer ?: 0},${nineTimer ?: 0},${tenTimer ?: 0},$(elevenTimer ?: 0},$(twelveTimer ?: 0},${thirteenTimer ?: 0},${fourteenTimer ?: 0},${fifteenTimer ?: 0},${sixteenTimer ?: 0},${seventeenTimer ?: 0},${eightteenTimer ?: 0},${nineteenTimer ?: 0},${twentyTimer ?: 0},${twentyoneTimer ?: 0},${twentytwoTimer ?: 0},${twentythreeTimer ?: 0}").format()
 }
 
 def OnWithZoneTimes(value) {
@@ -364,7 +742,7 @@ def OnWithZoneTimes(value) {
         zoneTimes[parts[0].toInteger()] = parts[1]
         log.info("Zone ${parts[0].toInteger()} on for ${parts[1]} minutes")
     }
-    zigbee.smartShield(text: "allOn,${checkTime(zoneTimes[1]) ?: 0},${checkTime(zoneTimes[2]) ?: 0},${checkTime(zoneTimes[3]) ?: 0},${checkTime(zoneTimes[4]) ?: 0},${checkTime(zoneTimes[5]) ?: 0},${checkTime(zoneTimes[6]) ?: 0},${checkTime(zoneTimes[7]) ?: 0},${checkTime(zoneTimes[8]) ?: 0}").format()
+    zigbee.smartShield(text: "allOn,${checkTime(zoneTimes[1]) ?: 0},${checkTime(zoneTimes[2]) ?: 0},${checkTime(zoneTimes[3]) ?: 0},${checkTime(zoneTimes[4]) ?: 0},${checkTime(zoneTimes[5]) ?: 0},${checkTime(zoneTimes[6]) ?: 0},${checkTime(zoneTimes[7]) ?: 0},${checkTime(zoneTimes[8]) ?: 0},${checkTime(zoneTimes[9]) ?: 0},${checkTime(zoneTimes[10]) ?: 0},${checkTime(zoneTimes[11]) ?: 0},${checkTime(zoneTimes[12]) ?: 0},${checkTime(zoneTimes[13]) ?: 0},${checkTime(zoneTimes[14]) ?: 0},${checkTime(zoneTimes[15]) ?: 0},${checkTime(zoneTimes[16]) ?: 0},${checkTime(zoneTimes[17]) ?: 0},${checkTime(zoneTimes[18]) ?: 0},${checkTime(zoneTimes[19]) ?: 0},${checkTime(zoneTimes[20]) ?: 0},${checkTime(zoneTimes[21]) ?: 0},${checkTime(zoneTimes[22]) ?: 0},${checkTime(zoneTimes[23]) ?: 0}").format()
 }
 
 def off() {
@@ -394,11 +772,11 @@ def rainDelayed() {
 }
 
 def enablePump() {
-		log.info "Pump Enabled"
+	log.info "Pump Enabled"
         zigbee.smartShield(text: "pump,3").format()  //pump is queued and ready to turn on when zone is activated
 }
 def disablePump() {
-		log.info "Pump Disabled"
+	log.info "Pump Disabled"
         zigbee.smartShield(text: "pump,0").format()  //remove pump from system, reactivate Zone8
 }
 def onPump() {
@@ -407,7 +785,7 @@ def onPump() {
     }
 
 def offPump() {
-		log.info "Pump Enabled"
+	log.info "Pump Enabled"
         zigbee.smartShield(text: "pump,1").format()  //pump returned to queue state to turn on when zone turns on
         }
 

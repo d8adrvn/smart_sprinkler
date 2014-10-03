@@ -28,6 +28,22 @@ preferences {
     input("sixTimer", "text", title: "Zone Six", description: "Zone Six Time", required: false)
     input("sevenTimer", "text", title: "Zone Seven", description: "Zone Seven Time", required: false)
     input("eightTimer", "text", title: "Zone Eight", description: "Zone Eight Time", required: false)
+    input("nineTimer", "text", title: "Zone Nine", description: "Zone Nine Time", required: false)
+    input("tenTimer", "text", title: "Zone Ten", description: "Zone Ten Time", required: false)
+    input("elevenTimer", "text", title: "Zone Eleven", description: "Zone Eleven Time", required: false)
+    input("twelveTimer", "text", title: "Zone Twelve", description: "Zone Twelve Time", required: false)
+    input("thirteenTimer", "text", title: "Zone Thirteen", description: "Zone Thirteen Time", required: false)
+    input("fourteenTimer", "text", title: "Zone Fourteen", description: "Zone Fourteen Time", required: false)
+    input("fifteenTimer", "text", title: "Zone Fifteen", description: "Zone Fifteen Time", required: false)
+    input("sixteenTimer", "text", title: "Zone Sixteen", description: "Zone Sixteen Time", required: false)
+    input("seventeenTimer", "text", title: "Zone Seventeen", description: "Zone Seventeen Time", required: false)
+    input("eightteenTimer", "text", title: "Zone Eighteen", description: "Zone Eighteen Time", required: false)
+    input("nineteenTimer", "text", title: "Zone Nineteen", description: "Zone Nineteen Time", required: false)
+    input("twentyTimer", "text", title: "Zone Twenty", description: "Zone Twenty Time", required: false)
+    input("twentyoneTimer", "text", title: "Zone Twentyone", description: "Zone Twentyone Time", required: false)
+    input("twentytwoTimer", "text", title: "Zone Twentytwo", description: "Zone Twentytwo Time", required: false)
+    input("twentytheeTimer", "text", title: "Zone Twentythree", description: "Zone Twentythree Time", required: false)
+    
 }
 
 metadata {
@@ -62,6 +78,51 @@ metadata {
         command "RelayOn8"
         command "RelayOn8For"
         command "RelayOff8"
+        command "RelayOn9"
+        command "RelayOn9For"
+        command "RelayOff9"
+        command "RelayOn10"
+        command "RelayOn10For"
+        command "RelayOff10"
+        command "RelayOn11"
+        command "RelayOn11For"
+        command "RelayOff11"
+        command "RelayOn12"
+        command "RelayOn12For"
+        command "RelayOff12"
+        command "RelayOn13"
+        command "RelayOn13For"
+        command "RelayOff13"
+        command "RelayOn14"
+        command "RelayOn14For"
+        command "RelayOff14"
+        command "RelayOn15"
+        command "RelayOn15For"
+        command "RelayOff15"
+        command "RelayOn16"
+        command "RelayOn16For"
+        command "RelayOff16"
+        command "RelayOn17"
+        command "RelayOn17For"
+        command "RelayOff17"
+        command "RelayOn18"
+        command "RelayOn18For"
+        command "RelayOff18"
+        command "RelayOn19"
+        command "RelayOn19For"
+        command "RelayOff19"
+        command "RelayOn10"
+        command "RelayOn10For"
+        command "RelayOff10"
+        command "RelayOn11"
+        command "RelayOn11For"
+        command "RelayOff11"
+        command "RelayOn12"
+        command "RelayOn12For"
+        command "RelayOff12"
+        command "RelayOn13"
+        command "RelayOn13For"
+        command "RelayOff13"
         command "rainDelayed"
         command "update" 
         command "enablePump"

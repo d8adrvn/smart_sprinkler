@@ -1,7 +1,7 @@
 /**
 *  
 * 
-*  Irrigation Scheduler App
+*  Irrigation Scheduler SmartApp -23 Zones + Pump v0.5
 *
 *  Author: Stan Dotson (stan@dotson.info) and Matthew Nichols (matt@nichols.name)
 *  Date: 2014-06-16
@@ -21,7 +21,7 @@
 **/
 
 definition(
-    name: "Twenty Three Zone + Pump Irrigation Scheduler v0.5",
+    name: "Irrigation Scheduler -23 Zones + Pump v0.5",
     namespace: "d8adrvn/smart_sprinkler",
     author: "matt@nichols.name and stan@dotson.info",
     description: "Schedule sprinklers to run unless there is rain.",

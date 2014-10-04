@@ -1,7 +1,7 @@
 /**
 *  
 * 
-*  Irrigation Scheduler SmartApp -23 Zones + Pump v0.5
+*  Irrigation Scheduler SmartApp For 24 Zone Smarter Lawn Contoller
 *
 *  Author: Stan Dotson (stan@dotson.info) and Matthew Nichols (matt@nichols.name)
 *  Date: 2014-06-16
@@ -21,12 +21,12 @@
 **/
 
 definition(
-    name: "Irrigation Scheduler -23 Zones + Pump v0.5",
+    name: "Irrigation Scheduler 24 Zones v1.0",
     namespace: "d8adrvn/smart_sprinkler",
     author: "matt@nichols.name and stan@dotson.info",
     description: "Schedule sprinklers to run unless there is rain.",
     category: "Green Living",
-    version: "0.5",
+    version: "1.0",
     iconUrl: "https://s3.amazonaws.com/smartapp-icons/Meta/water_moisture.png",
     iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Meta/water_moisture@2x.png"
 )
@@ -86,6 +86,7 @@ preferences {
             input "zone21", "string", title: "Zone 21 Time", description: "minutes", multiple: false, required: false
             input "zone22", "string", title: "Zone 22 Time", description: "minutes", multiple: false, required: false
             input "zone23", "string", title: "Zone 23 Time", description: "minutes", multiple: false, required: false
+            input "zone24", "string", title: "Zone 24 Time", description: "minutes", multiple: false, required: false
         }
         section("Optional: Use this virtual scheduler device...") {
             input "schedulerVirtualDevice", "capability.actuator", required: false
@@ -216,7 +217,7 @@ def isRainDelay() {
     	rainGauge = rainGauge + isStormy()
   	}
     
-    log.info ("Rain gauge reads $rainGauge in")
+    log.info ("Virtual rain gauge reads $rainGauge in")
     if (rainGauge > (wetThreshold?.toFloat() ?: 0.5)) {
         log.trace "Watering is rain delayed"
         sendPush("Skipping watering today due to precipitation.")
@@ -272,7 +273,7 @@ def water() {
     state.triggered = true
     if(anyZoneTimes()) {
         def zoneTimes = []
-        for(int z = 1; z <= 23; z++) {
+        for(int z = 1; z <= 24; z++) {
             def zoneTime = settings["zone${z}"]
             if(zoneTime) {
             zoneTimes += "${z}:${zoneTime}"

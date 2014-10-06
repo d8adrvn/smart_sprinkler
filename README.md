@@ -16,7 +16,7 @@ This project contains code and instructions for how we built irrigation controll
 * 24 Zone Irrigation Controller
 * Two options to add master valves or master pumps. 
 
-Each project inlcudes:
+###Each project inlcudes:
 * Arduino sketch which transforms an Arduino and associated relays into an irrigation controller
 * Smart Device Type code to connect your Arduino irrigation controller to the SmartThings Physical Graph
 * Smart App that allows you to schedule your irrigation and integrate hyperlocal weather forecasts

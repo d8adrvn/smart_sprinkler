@@ -1,7 +1,7 @@
 /**
 *  
 * 
-*  Irrigation Scheduler App
+*  Irrigation Scheduler SmartApp For 24 Zone Smarter Lawn Contoller
 *
 *  Author: Stan Dotson (stan@dotson.info) and Matthew Nichols (matt@nichols.name)
 *  Date: 2014-06-16
@@ -21,12 +21,12 @@
 **/
 
 definition(
-    name: "Irrigation Scheduler 2.7",
+    name: "Irrigation Scheduler 24 Zones v1.0",
     namespace: "d8adrvn/smart_sprinkler",
     author: "matt@nichols.name and stan@dotson.info",
     description: "Schedule sprinklers to run unless there is rain.",
     category: "Green Living",
-    version: "2.7",
+    version: "1.0",
     iconUrl: "https://s3.amazonaws.com/smartapp-icons/Meta/water_moisture.png",
     iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Meta/water_moisture@2x.png"
 )
@@ -71,6 +71,22 @@ preferences {
             input "zone6", "string", title: "Zone 6 Time", description: "minutes", multiple: false, required: false
             input "zone7", "string", title: "Zone 7 Time", description: "minutes", multiple: false, required: false
             input "zone8", "string", title: "Zone 8 Time", description: "minutes", multiple: false, required: false
+            input "zone9", "string", title: "Zone 9 Time", description: "minutes", multiple: false, required: false
+            input "zone10", "string", title: "Zone 10 Time", description: "minutes", multiple: false, required: false
+            input "zone11", "string", title: "Zone 11 Time", description: "minutes", multiple: false, required: false
+            input "zone12", "string", title: "Zone 12 Time", description: "minutes", multiple: false, required: false
+            input "zone13", "string", title: "Zone 13 Time", description: "minutes", multiple: false, required: false
+            input "zone14", "string", title: "Zone 14 Time", description: "minutes", multiple: false, required: false
+            input "zone15", "string", title: "Zone 15 Time", description: "minutes", multiple: false, required: false
+            input "zone16", "string", title: "Zone 16 Time", description: "minutes", multiple: false, required: false
+            input "zone17", "string", title: "Zone 17 Time", description: "minutes", multiple: false, required: false
+            input "zone18", "string", title: "Zone 18 Time", description: "minutes", multiple: false, required: false
+            input "zone19", "string", title: "Zone 19 Time", description: "minutes", multiple: false, required: false
+            input "zone20", "string", title: "Zone 20 Time", description: "minutes", multiple: false, required: false
+            input "zone21", "string", title: "Zone 21 Time", description: "minutes", multiple: false, required: false
+            input "zone22", "string", title: "Zone 22 Time", description: "minutes", multiple: false, required: false
+            input "zone23", "string", title: "Zone 23 Time", description: "minutes", multiple: false, required: false
+            input "zone24", "string", title: "Zone 24 Time", description: "minutes", multiple: false, required: false
         }
         section("Optional: Use this virtual scheduler device...") {
             input "schedulerVirtualDevice", "capability.actuator", required: false
@@ -201,7 +217,7 @@ def isRainDelay() {
     	rainGauge = rainGauge + isStormy()
   	}
     
-    log.info ("Rain gauge reads $rainGauge in")
+    log.info ("Virtual rain gauge reads $rainGauge in")
     if (rainGauge > (wetThreshold?.toFloat() ?: 0.5)) {
         log.trace "Watering is rain delayed"
         sendPush("Skipping watering today due to precipitation.")
@@ -257,7 +273,7 @@ def water() {
     state.triggered = true
     if(anyZoneTimes()) {
         def zoneTimes = []
-        for(int z = 1; z <= 8; z++) {
+        for(int z = 1; z <= 24; z++) {
             def zoneTime = settings["zone${z}"]
             if(zoneTime) {
             zoneTimes += "${z}:${zoneTime}"
@@ -272,5 +288,5 @@ def water() {
 }
 
 def anyZoneTimes() {
-    return zone1 || zone2 || zone3 || zone4 || zone5 || zone6 || zone7 || zone8
+    return zone1 || zone2 || zone3 || zone4 || zone5 || zone6 || zone7 || zone8 || zone9 || zone10 || zone11 || zone12 || zone13 || zone14 || zone15 || zone16 || zone17 || zone18 || zone19 || zone20 || zone21 || zone22 || zone23
 }

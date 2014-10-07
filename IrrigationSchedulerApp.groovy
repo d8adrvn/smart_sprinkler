@@ -1,7 +1,8 @@
 /**
 *  
 * 
-*  Irrigation Scheduler SmartApp For 24 Zone Smarter Lawn Contoller
+*  Irrigation Scheduler SmartApp Smarter Lawn Contoller
+*  Compatible with up to 24 Zones
 *
 *  Author: Stan Dotson (stan@dotson.info) and Matthew Nichols (matt@nichols.name)
 *  Date: 2014-06-16
@@ -21,7 +22,7 @@
 **/
 
 definition(
-    name: "Irrigation Scheduler 24 Zones v1.0",
+    name: "Irrigation Scheduler v2.8",
     namespace: "d8adrvn/smart_sprinkler",
     author: "matt@nichols.name and stan@dotson.info",
     description: "Schedule sprinklers to run unless there is rain.",

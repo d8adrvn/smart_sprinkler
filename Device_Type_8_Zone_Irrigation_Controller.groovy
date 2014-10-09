@@ -33,6 +33,7 @@ preferences {
 metadata {
     definition (name: "Irrigation Controller v2.63", version: "2.63", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") {
         capability "Switch"
+        capability "Momentary"
  //       capability "Refresh"
         command "OnWithZoneTimes"
         command "RelayOn1"
@@ -394,20 +395,24 @@ def rainDelayed() {
 }
 
 def enablePump() {
-		log.info "Pump Enabled"
+	log.info "Pump Enabled"
         zigbee.smartShield(text: "pump,3").format()  //pump is queued and ready to turn on when zone is activated
 }
 def disablePump() {
-		log.info "Pump Disabled"
+	log.info "Pump Disabled"
         zigbee.smartShield(text: "pump,0").format()  //remove pump from system, reactivate Zone8
 }
 def onPump() {
 	log.info "Pump On"
-    zigbee.smartShield(text: "pump,2").format()
-    }
+    	zigbee.smartShield(text: "pump,2").format()
+}
 
 def offPump() {
-		log.info "Pump Enabled"
+	log.info "Pump Enabled"
         zigbee.smartShield(text: "pump,1").format()  //pump returned to queue state to turn on when zone turns on
-        }
+}
 
+def push() {
+	log.info "advance to next zone"
+    	zigbee.smartShield(text: "advance").format()  //turn off currently running zone and advance to next
+}

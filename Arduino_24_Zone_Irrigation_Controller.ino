@@ -352,6 +352,9 @@ void messageCallout(String message)
   if (strcmp(inValue[0],"allOff")==0) {
     allOff();
   }
+  if (strcmp(inValue[0],"advance")==0) {
+    toggleOff();
+  }
   if (strcmp(inValue[0],"pump")==0) {
     if (strcmp(inValue[1],"0")==0) {
       isConfigPump = false;

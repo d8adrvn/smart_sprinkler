@@ -53,6 +53,7 @@ metadata {
         fingerprint profileId: "0104", deviceId: "0138", inClusters: "0000"
         
         capability "Switch"
+        capability "Momentary"
  //       capability "Refresh"
         command "OnWithZoneTimes"
         command "RelayOn1"
@@ -885,3 +886,7 @@ def offPump() {
 	log.info "Pump Enabled"
         zigbee.smartShield(text: "pump,1").format()  //pump returned to queue state to turn on when zone turns on
         }
+def push() {
+	log.info "advance to next zone"
+    zigbee.smartShield(text: "advance").format()  //turn off currently running zone and advance to next
+    }

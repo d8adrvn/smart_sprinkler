@@ -33,7 +33,7 @@ An **Arduino Uno* was used as the controller and was stacked with the SmartThing
 
 ### 8-Channel Relay
 
-To control the sprinkler valves, we used a **Sain Smart 8 channel relay**.
+To control the sprinkler valves, we used a **SainSmart 8 channel relay**.
 
 
 <img src="https://cloud.githubusercontent.com/assets/5625006/3353578/86de7d94-fa85-11e3-86b9-b3b08601987f.jpg" width="200px"  />
@@ -50,7 +50,7 @@ For the wiring, we ordered a **20 cm dupont cable male to female** (Phantom YoYo
 For a power supply to power up the relay and run the irrigation valves, we re-used the 24V power supply from our existing controller.   We could have also used either a **Rain Bird UT1 Sprinkler System Timer Electric Transformer Plug** or the **Orbit Sprinkler System Power Source Transformer 57040**, both of which are available from Amazon Prime.  We  also needed a 9V power supply to run the Arduino+ThingShield+Relay.  This can be purchased at Amazon as well by searching for "Arduino Power Supply".  Right now, I am using the Super Power Supply® AC / DC Adapter Charger Cord Plug - 9V 650mA compatible with Arduino Freeduino Duemilanove Uno Mega Hobby Electronics, which was available by Amazon Prime.   CAUTION: There are 9V power supplies availble on Amazon that do not work for the Arduino (they are made for musical instrament controllers) and some that perform very poorly on Arduino.  Be sure to read the reviews!  
 
 ### Project Housing
-Finally, for the project housing, we just ripped out the guts of our existing controller and used the box to house our final project. Another option is the **Arington EB0708** electronic equipment enclosure.
+Finally, for the project housing, we just ripped out the guts of our existing controller and used the box to house our final project. Another option is the **Arington EB0708** electronic equipment enclosure. Or try the 9"x9"x3" OUTDOOR CABLETEK ENCLOSURE PLASTIC GRAY CASE UTILITY CABLE BOX CTE-S.  
 
 
 ## Wiring the Project
@@ -82,12 +82,12 @@ Note, the ThingShield pins are not labeled.  So you can either identify the pins
 
 
 ### Wiring The Controller To The Irrigation System
-The final wiring of the project to your irrigation system is straight forward.  Irrigation sytems use a standard irrigation wire bundle which has multiple colored wires (one per valve + extras) and a white wire as a common ground. They typically run on 24V power.  
+The final wiring of the project to your irrigation system is straight forward.  Irrigation sytems use a standard irrigation wire bundle which has multiple colored wires (one per valve + extras) and a white wire as a common ground. They typically run on 24V AC power.  
 
 * Be sure power is disconnected before attempting to wire. Avoid being shocked or creating a fire hazard!  
 
 
-We connected “ground” wire from the 24V transformer to the common ground (white) wire in the irrigation wire bundle.
+We connected “ground” wire from the 24V AC transformer to the common ground (white) wire in the irrigation wire bundle.
 
 To connect the wires running to each valve, we used the Normally Open positions on the relay.  Each colored wire for each valve was connected to one of the NO positions on a relay.  One valve per relay.   Up to 8 are possible with this hardware, however, you do not need to use all 8.  We then connected the “hot” wire from the transformer to connect to the COMMON position (middle contact) on one of the relays.  This provides power to all realys since they are daisy chained together (see Arduino wiring above)  
 
@@ -160,13 +160,15 @@ http://arduino.cc/en/main/software
 Once the software is installed, the first thing to do is obtain the required libraries.  
 
 * Timer library was created by Simon Monk as modified by JChristensen  https://github.com/JChristensen/Timer
-The KNOWN LIBRARY BUG (timer.cpp) - identified by mattnichols 5/20/14 - has no known affect on the code.  Also, the Timer library release downloads as "Timer-master-2".  Before loading into the Arduino IDE, change the name to "Timer"
+The KNOWN LIBRARY BUG (timer.cpp) - identified by mattnichols 5/20/14 - has no known affect on the code.  Also, the Timer library release downloads with the name: "Timer-master-2".  Before loading into the Arduino IDE, change the name to: "Timer"
 * SmartThings library available from https://www.dropbox.com/s/8hon320qmuio8fz/Shield%20Library.zip
 * SoftwareSerial library was default library provided with Arduino IDE
  
 Once you have the zip files downloaded and you have changed the name for the Timer zip file, you can import them within the Arduino IDE. Go to the Sketch:Import Library;Add Library drop down menu. Once you have added the libraries, they will show up under Sketch:Add Library:Contributed as "Timer" and "SmartThings".  Be sure the Timer library is installed as "Timer"
 
 You can connect the Arduino Uno to your computer via an USB cable, create a new sketch, paste the code from github into the Arduino IDE and then transfer to tehe Arduino.
+
+Be sure the Arduino IDE is set to an ArduinoUno.  Go to the menu: Tools>Board and select Arduino Uno
 
 Pairing instructions for the Arduino to the SmartThings hub can be found at SmartThings.com and are copied here:
 

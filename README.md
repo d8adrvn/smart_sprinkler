@@ -11,10 +11,20 @@ Why would you build a lawn sprinkler system controller when you can just buy one
 
 This project contains code and instructions for how we built irrigation controllers that work with SmartThings.  You can control your lawn irrigation directly from your smartphone via the SmartThings app.  Also, you can set up as many schedules as you like to precisely control your lawn irrigation.  Hyperlocal weather forecasts make sure you save water when it rains!!!
 
+###Project Features
+* Build your own irrigation controller for SmartThings
+* Flexibility to manage 1-24 irrigation zones
+* Directly control from your iPhone
+* Create one or more schedules to automatically run the irrigation system
+* Easily over-ride the schedule
+* Two options to control a master relay or pump
+* A virtual rain guage that uses local weather stations to measure recent and forecasted rain and skip irrigation when rain exceeds a threshhold
+* Easty to follow documentation
+
 ###There are two subprojects:
 * 8 Zone Irrigation Controller
 * 24 Zone Irrigation Controller
-* Two options to add master valves or master pumps. 
+
 
 ###Each project inlcudes:
 * Arduino sketch which transforms an Arduino and associated relays into an irrigation controller

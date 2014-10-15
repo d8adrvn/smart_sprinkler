@@ -31,7 +31,10 @@ preferences {
 }
 
 metadata {
-    definition (name: "Irrigation Controller v2.63", version: "2.63", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") {
+    definition (name: "Irrigation Controller v2.65", version: "2.65", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") {
+        
+        fingerprint profileId: "0104", deviceId: "0138", inClusters: "0000"
+        
         capability "Switch"
         capability "Momentary"
  //       capability "Refresh"
@@ -66,6 +69,11 @@ metadata {
         command "disablePump"
         command "onPump"
         command "offPump"
+        command "noEffect"
+        command "skip"
+        command "expedite"
+        command "onHold"
+        attribute "effect", "string"
     }
 
     simulator {
@@ -154,8 +162,15 @@ metadata {
         standardTile("refreshTile", "device.refresh", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true, decoration: "flat") {
             state "ok", label: "", action: "update", icon: "st.secondary.refresh", backgroundColor: "#ffffff"
         }
+        standardTile("scheduleEffect", "device.effect", width: 1, height: 1) {
+            state("noEffect", label: "--", action: "skip", icon: "st.Office.office7", backgroundColor: "#ffffff")
+            state("skip", label: "Skip", action: "expedite", icon: "st.Office.office7", backgroundColor: "#c0a353")
+            state("expedite", label: "Expedite", action: "onHold", icon: "st.Office.office7", backgroundColor: "#53a7c0")
+            state("onHold", label: "Pause", action: "noEffect", icon: "st.Office.office7", backgroundColor: "#bc2323")
+        }
+        
         main "allZonesTile"
-        details(["zoneOneTile","zoneTwoTile","zoneThreeTile","zoneFourTile","zoneFiveTile","zoneSixTile","zoneSevenTile","zoneEightTile", "pumpTile","refreshTile"])
+        details(["zoneOneTile","zoneTwoTile","zoneThreeTile","zoneFourTile","zoneFiveTile","zoneSixTile","zoneSevenTile","zoneEightTile", "pumpTile","scheduleEffect","refreshTile"])
     }
 }
 
@@ -396,23 +411,53 @@ def rainDelayed() {
 
 def enablePump() {
 	log.info "Pump Enabled"
-        zigbee.smartShield(text: "pump,3").format()  //pump is queued and ready to turn on when zone is activated
+    zigbee.smartShield(text: "pump,3").format()  //pump is queued and ready to turn on when zone is activated
 }
 def disablePump() {
 	log.info "Pump Disabled"
-        zigbee.smartShield(text: "pump,0").format()  //remove pump from system, reactivate Zone8
+    zigbee.smartShield(text: "pump,0").format()  //remove pump from system, reactivate Zone8
 }
 def onPump() {
 	log.info "Pump On"
-    	zigbee.smartShield(text: "pump,2").format()
-}
+    zigbee.smartShield(text: "pump,2").format()
+    }
 
 def offPump() {
 	log.info "Pump Enabled"
-        zigbee.smartShield(text: "pump,1").format()  //pump returned to queue state to turn on when zone turns on
-}
-
+    zigbee.smartShield(text: "pump,1").format()  //pump returned to queue state to turn on when zone turns on
+        }
 def push() {
 	log.info "advance to next zone"
-    	zigbee.smartShield(text: "advance").format()  //turn off currently running zone and advance to next
+    zigbee.smartShield(text: "advance").format()  //turn off currently running zone and advance to next
+    }
+
+// commands that over-ride the SmartApp
+
+// skip one scheduled watering
+def	skip() {
+    def evt = createEvent(name: "effect", value: "skip", displayed: true)
+    log.debug("Sending: $evt")
+    sendEvent(evt)
 }
+// over-ride rain delay and water even if it rains
+def	expedite() {
+    def evt = createEvent(name: "effect", value: "expedite", displayed: true)
+    log.debug("Sending: $evt")
+    sendEvent(evt)
+}
+
+// schedule operates normally
+def	noEffect() {
+    def evt = createEvent(name: "effect", value: "noEffect", displayed: true)
+    log.debug("Sending: $evt")
+    sendEvent(evt)
+}
+
+// turn schedule off indefinitely
+def	onHold() {
+    def evt = createEvent(name: "effect", value: "onHold", displayed: true)
+    log.debug("Sending: $evt")
+    sendEvent(evt)
+}
+
+

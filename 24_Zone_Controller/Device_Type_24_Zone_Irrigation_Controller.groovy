@@ -134,6 +134,11 @@ metadata {
         command "disablePump"
         command "onPump"
         command "offPump"
+        command "noEffect"
+        command "skip"
+        command "expedite"
+        command "onHold"
+        attribute "effect", "string"
     }
 
     simulator {
@@ -326,18 +331,25 @@ metadata {
            
         standardTile("pumpTile", "device.pump", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
             state "noPump", label: 'Pump', action: "enablePump", icon: "st.custom.buttons.subtract-icon", backgroundColor: "#ffffff",nextState: "enablingPump"
-         	state "offPump", label: 'Pump', action: "onPump", icon: "st.valves.water.closed", backgroundColor: "#ffffff", nextState: "sendingPump"
-           	state "enablingPump", label: 'sending', action: "disablePump", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
+            state "offPump", label: 'Pump', action: "onPump", icon: "st.valves.water.closed", backgroundColor: "#ffffff", nextState: "sendingPump"
+            state "enablingPump", label: 'sending', action: "disablePump", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
             state "disablingPump", label: 'sending', action: "disablePump", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
             state "onPump", label: 'Pump', action: "offPump",icon: "st.valves.water.open", backgroundColor: "#53a7c0", nextState: "sendingPump"
             state "sendingPump", label: 'sending', action: "offPump", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
         }
         	
+     	standardTile("scheduleEffect", "device.effect", width: 1, height: 1) {
+            state("noEffect", label: "--", action: "skip", icon: "st.Office.office7", backgroundColor: "#ffffff")
+            state("skip", label: "Skip", action: "expedite", icon: "st.Office.office7", backgroundColor: "#c0a353")
+            state("expedite", label: "Expedite", action: "onHold", icon: "st.Office.office7", backgroundColor: "#53a7c0")
+            state("onHold", label: "Pause", action: "noEffect", icon: "st.Office.office7", backgroundColor: "#bc2323")
+        }
+        
         standardTile("refreshTile", "device.refresh", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true, decoration: "flat") {
             state "ok", label: "", action: "update", icon: "st.secondary.refresh", backgroundColor: "#ffffff"
         }
         main "allZonesTile"
-        details(["zoneOneTile","zoneTwoTile","zoneThreeTile","zoneFourTile","zoneFiveTile","zoneSixTile","zoneSevenTile","zoneEightTile", "zoneNineTile", "zoneTenTile", "zoneElevenTile", "zoneTwelveTile", "zoneThirteenTile", "zoneFourteenTile", "zoneFifteenTile", "zoneSixteenTile", "zoneSeventeenTile", "zoneEighteenTile", "zoneNineteenTile", "zoneTwentyTile", "zoneTwentyoneTile", "zoneTwentytwoTile", "zoneTwentythreeTile", "zoneTwentyfourTile", "pumpTile","refreshTile"])
+        details(["zoneOneTile","zoneTwoTile","zoneThreeTile","zoneFourTile","zoneFiveTile","zoneSixTile","zoneSevenTile","zoneEightTile", "zoneNineTile", "zoneTenTile", "zoneElevenTile", "zoneTwelveTile", "zoneThirteenTile", "zoneFourteenTile", "zoneFifteenTile", "zoneSixteenTile", "zoneSeventeenTile", "zoneEighteenTile", "zoneNineteenTile", "zoneTwentyTile", "zoneTwentyoneTile", "zoneTwentytwoTile", "zoneTwentythreeTile", "zoneTwentyfourTile", "pumpTile", "scheduleEffect", "refreshTile"])
     }
 }
 
@@ -890,3 +902,34 @@ def push() {
 	log.info "advance to next zone"
     zigbee.smartShield(text: "advance").format()  //turn off currently running zone and advance to next
     }
+   
+// commands that over-ride the SmartApp
+
+// skip one scheduled watering
+def	skip() {
+    def evt = createEvent(name: "effect", value: "skip", displayed: true)
+    log.debug("Sending: $evt")
+    sendEvent(evt)
+}
+// over-ride rain delay and water even if it rains
+def	expedite() {
+    def evt = createEvent(name: "effect", value: "expedite", displayed: true)
+    log.debug("Sending: $evt")
+    sendEvent(evt)
+}
+
+// schedule operates normally
+def	noEffect() {
+    def evt = createEvent(name: "effect", value: "noEffect", displayed: true)
+    log.debug("Sending: $evt")
+    sendEvent(evt)
+}
+
+// turn schedule off indefinitely
+def	onHold() {
+    def evt = createEvent(name: "effect", value: "onHold", displayed: true)
+    log.debug("Sending: $evt")
+    sendEvent(evt)
+}
+
+

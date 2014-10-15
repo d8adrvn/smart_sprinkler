@@ -22,12 +22,12 @@
 **/
 
 definition(
-    name: "Irrigation Scheduler v2.8",
+    name: "Irrigation Scheduler v2.91",
     namespace: "d8adrvn/smart_sprinkler",
     author: "matt@nichols.name and stan@dotson.info",
     description: "Schedule sprinklers to run unless there is rain.",
     category: "Green Living",
-    version: "1.0",
+    version: "2.91",
     iconUrl: "https://s3.amazonaws.com/smartapp-icons/Meta/water_moisture.png",
     iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Meta/water_moisture@2x.png"
 )
@@ -61,7 +61,7 @@ preferences {
 
     page(name: "sprinklerPage", title: "Sprinkler Controller Setup", install: true) {
         section("Sprinkler switches...") {
-            input "switches", "capability.switch", multiple: true
+            input "switches", "capability.switch", multiple: false
         }
         section("Zone Times...") {
             input "zone1", "string", title: "Zone 1 Time", description: "minutes", multiple: false, required: false
@@ -89,9 +89,7 @@ preferences {
             input "zone23", "string", title: "Zone 23 Time", description: "minutes", multiple: false, required: false
             input "zone24", "string", title: "Zone 24 Time", description: "minutes", multiple: false, required: false
         }
-        section("Optional: Use this virtual scheduler device...") {
-            input "schedulerVirtualDevice", "capability.actuator", required: false
-        }
+
  //	}
     
 //	page (name: "virtualRainGuage", title: "Virtual Rain Guage Setup", install: true) {
@@ -111,7 +109,7 @@ preferences {
         }
         
     }
-}
+}		
 
 def installed() {
     log.debug "Installed: $settings"
@@ -152,32 +150,43 @@ def waterTimeThreeStart() {
 
 def scheduleCheck() {
 
-    def schedulerState = "noEffect"
-    if (schedulerVirtualDevice) {
-        schedulerState = schedulerVirtualDevice.latestValue("effect")
-    }
+    def schedulerState = switches?.latestValue("effect")?.toString() ?:"[noEffect]"
+	log.debug ("initial schedulerState is $schedulerState")
+        
 
     if (schedulerState == "onHold") {
         log.info("Sprinkler schedule on hold.")
         return
-    } else {
-        schedulerVirtualDevice?.noEffect()
-    }
-
-    // Change to rain delay if wet
-    schedulerState = isRainDelay() ? "delay" : schedulerState
+    } 
+    
+	if (schedulerState == "skip") { 
+    	// delay this watering and reset device.effect to noEffect
+    	log.debug ("changeing schedulerState from skip to delay")
+        schedulerState = "delay" 
+        for(s in switches) {
+            if("noEffect" in s.supportedCommands.collect { it.name }) {
+                s.noEffect()
+                log.debug ("sent noEffect() to ${s}")
+            }
+        }
+ 	}    
+    
+	if (schedulerState != "expedite") { 
+    	// Change to rain delay if wet
+    	schedulerState = isRainDelay() ? "delay" : schedulerState
+ 	}
 
     if (schedulerState != "delay") {
         state.daysSinceLastWatering[state.currentTimerIx] = daysSince() + 1
     }
 
-    log.debug("Schedule effect $schedulerState. Days since last watering ${daysSince()}. Is watering day? ${isWateringDay()}. Enought time? ${enoughTimeElapsed(schedulerState)} ")
+    log.info("Scheduler state: $schedulerState. Days since last watering: ${daysSince()}. Is watering day? ${isWateringDay()}. Enought time? ${enoughTimeElapsed(schedulerState)} ")
 
     if ((isWateringDay() && enoughTimeElapsed(schedulerState) && schedulerState != "delay") || schedulerState == "expedite") {
-        sendPush("$label Is Watering Now!")
+        sendPush("$switches[0] Is Watering Now!" ?: "null pointer on app name")
         state.daysSinceLastWatering[state.currentTimerIx] = 0
         water()
-        // Assuming that sprinklers will turn themselves off. Should add a delayed off?
+        // Assuming that sprinklers will turn themselves off. 
     }
 }
 
@@ -220,15 +229,12 @@ def isRainDelay() {
     
     log.info ("Virtual rain gauge reads $rainGauge in")
     if (rainGauge > (wetThreshold?.toFloat() ?: 0.5)) {
-        log.trace "Watering is rain delayed"
         sendPush("Skipping watering today due to precipitation.")
         for(s in switches) {
             if("rainDelayed" in s.supportedCommands.collect { it.name }) {
                 s.rainDelayed()
+                log.trace "Watering is rain delayed for $s"
             }
-        }
-        if("rainDelayed" in schedulerVirtualDevice?.supportedCommands.collect { it.name }) {
-            schedulerVirtualDevice.rainDelayed()
         }
         return true
     }

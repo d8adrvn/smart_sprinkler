@@ -32,15 +32,15 @@ All items from this project were easily obtained from Amazon and mostly availabl
 
 ### An Arduino with SmartThing Shield
 
-An **Arduino Uno* was used as the controller and was stacked with the SmartThings ThingShield.  *Note, set the DIP switch to D2/D3 if not already*.
+An **Arduino MEGA* was used as the controller and was stacked with the SmartThings ThingShield.  *Note, set the DIP switch to D2/D3 if not already*.
 
-<img src="https://cloud.githubusercontent.com/assets/5625006/3353572/56b840aa-fa85-11e3-980c-6c8cd8c8b156.jpg" width="200px"  />
+<img src="mega pic" width="200px"  />
 
 <img src="https://cloud.githubusercontent.com/assets/5625006/3353577/8256ee78-fa85-11e3-93c8-866ef2ca9967.jpg" width="200px"  />
 
-### 8-Channel Relay
+### Relays
 
-To control the sprinkler valves, we used a **Sain Smart 8 channel relay**.
+To control the sprinkler valves, we used a **16 Channel Relay Board and an 8 Channel Relay Board**.  In reality, you can use about any combination of channels, you will just have to wire them up in serial.  Also, there is nothing that requires you to have all 24 relays.  If you choose to use less than 24 relays AND plan to use the optional software activated master pump relay, just be sure that pin44 from the Arduino Mega is attached to the relay associated with the Master Pump Relay.
 
 
 <img src="https://cloud.githubusercontent.com/assets/5625006/3353578/86de7d94-fa85-11e3-86b9-b3b08601987f.jpg" width="200px"  />
@@ -54,10 +54,14 @@ For the wiring, we ordered a **20 cm dupont cable male to female** (Phantom YoYo
 <img src="https://cloud.githubusercontent.com/assets/5625006/3353586/c2ceb562-fa85-11e3-9a2a-df5ed5e429cb.jpg" width="200px"  />
 
 ### Power Supplies
-For a power supply to power up the relay and run the irrigation valves, we re-used the 24V power supply from our existing controller.   We could have also used either a **Rain Bird UT1 Sprinkler System Timer Electric Transformer Plug** or the **Orbit Sprinkler System Power Source Transformer 57040**, both of which are available from Amazon Prime.  We  also needed a 9V power supply to run the Arduino+ThingShield+Relay.  This can be purchased at Amazon as well by searching for "Arduino Power Supply".  Right now, I am using the Super Power Supply® AC / DC Adapter Charger Cord Plug - 9V 650mA compatible with Arduino Freeduino Duemilanove Uno Mega Hobby Electronics, which was available by Amazon Prime.   CAUTION: There are 9V power supplies availble on Amazon that do not work for the Arduino (they are made for musical instrament controllers) and some that perform very poorly on Arduino.  Be sure to read the reviews!  
+The project requires at least two power supplies.  One power supply is to run the sprinkler valves which are typically 24V AC.   The **Rain Bird UT1 Sprinkler System Timer Electric Transformer Plug** is a good choice from Amazon Prime.  We  also needed a 9V power supply to run the Arduino+ThingShield+Relay.  This can be purchased at Amazon as well by searching for "Arduino Power Supply".  Right now, I am using the Super Power Supply® AC / DC Adapter Charger Cord Plug - 9V 650mA compatible with Arduino Freeduino Duemilanove Uno Mega Hobby Electronics, which was available by Amazon Prime.   CAUTION: There are 9V power supplies availble on Amazon that do not work for the Arduino (they are made for musical instrament controllers) and some that perform very poorly on Arduino.  Be sure to read the reviews!  
+
+Depending on the volatage of the relays, you may also need a second DC power supply to power the relays.  If you use 5V relays, these can be driven from the Arduino 5v pin (you use a jumper to connect the 5V pin and the VCC pin on the relay board).  This works because at most 2 relays are on at once (one for the valve and the other for the optional pump).  However, if purchase a 12V DC or 24V DC relay board, you will need to purchase an additional power supply to run the relay boards.  The Arduino 5V pin will only signal the relay, but not activate it.
 
 ### Project Housing
-Finally, for the project housing, we just ripped out the guts of our existing controller and used the box to house our final project. Another option is the **Arington EB0708** electronic equipment enclosure.
+Finally, for the project housing, the 9"x9"x3" OUTDOOR CABLETEK ENCLOSURE PLASTIC GRAY CASE UTILITY CABLE BOX CTE-S from Amazon was a nice size that housed all the relay boards, as well as the Arduino+ThingShield. 
+
+<img src="https://cloud.githubusercontent.com/assets/5625006/3353586/c2ceb562-fa85-11e3-9a2a-df5ed5e429cb.jpg" width="200px"  />
 
 
 ## Wiring the Project

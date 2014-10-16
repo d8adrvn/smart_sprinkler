@@ -61,7 +61,7 @@ Depending on the volatage of the relays, you may also need a second DC power sup
 ### Project Housing
 Finally, for the project housing, the 9"x9"x3" OUTDOOR CABLETEK ENCLOSURE PLASTIC GRAY CASE UTILITY CABLE BOX CTE-S from Amazon was a nice size that housed all the relay boards, as well as the Arduino+ThingShield. 
 
-<img src="https://cloud.githubusercontent.com/assets/5625006/3353586/c2ceb562-fa85-11e3-9a2a-df5ed5e429cb.jpg" width="200px"  />
+<img src="https://cloud.githubusercontent.com/assets/5625006/4667478/5eee633e-555d-11e4-88fd-ced3e1fa7f52.jpg" width="200px"  />
 
 
 ## Wiring the Project

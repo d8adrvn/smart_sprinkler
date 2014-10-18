@@ -1,5 +1,5 @@
 /**
- *  Irrigation Controller
+ *  Irrigation Controller 8 Zones
  *  This SmartThings Device Type Code Works With Arduino Irrigation Controller also available at this site
  *  
  *
@@ -31,7 +31,7 @@ preferences {
 }
 
 metadata {
-    definition (name: "Irrigation Controller v2.66", version: "2.66", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") {
+    definition (name: "Irrigation Controller 8 Zones v2.66", version: "2.66", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") {
         
         fingerprint profileId: "0104", deviceId: "0138", inClusters: "0000"
         

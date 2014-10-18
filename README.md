@@ -29,11 +29,12 @@ This project contains code and instructions for how we built irrigation controll
 ###Each project inlcudes:
 * Arduino sketch which transforms an Arduino and associated relays into an irrigation controller
 * Smart Device Type code to connect your Arduino irrigation controller to the SmartThings Physical Graph
-* Smart App that allows you to schedule your irrigation and integrate hyperlocal weather forecasts
-* Optional Accessory Smart App to provide some master over-rides to the irrigation schedule
 * README with all the step by step detail to build either project
 
-Note: the Smart App and Optional Accessory Smart App are common to both projecs.   The hardware, Arduino sketch and Device-type code are project specific
+###A SmartApp works for both projects
+* Smart App allows you to schedule your irrigation and integrate hyperlocal weather forecasts
+* You can install the smart app multiple times to give you nearly unlimited schedules
+
 
 Enjoy,
 Stan and Matt

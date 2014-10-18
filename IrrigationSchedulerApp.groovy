@@ -1,7 +1,7 @@
 /**
 *  
 * 
-*  Irrigation Scheduler SmartApp Smarter Lawn Contoller
+*  Irrigation Scheduler SmartApp Smarter Lawn Controller
 *  Compatible with up to 24 Zones
 *
 *  Author: Stan Dotson (stan@dotson.info) and Matthew Nichols (matt@nichols.name)

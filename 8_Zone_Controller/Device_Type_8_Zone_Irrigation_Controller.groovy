@@ -31,7 +31,7 @@ preferences {
 }
 
 metadata {
-    definition (name: "Irrigation Controller v2.65", version: "2.65", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") {
+    definition (name: "Irrigation Controller v2.66", version: "2.66", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") {
         
         fingerprint profileId: "0104", deviceId: "0138", inClusters: "0000"
         
@@ -403,22 +403,22 @@ def update() {
 //}
 
 def rainDelayed() {
-    log.debug "rain delayed"
+    log.info "rain delayed"
     if(device.currentValue("switch") != "on") {
         sendEvent (name:"switch", value:"rainDelayed", displayed: true)
     }
 }
 
 def enablePump() {
-	log.info "Pump Enabled"
+    log.info "Pump Enabled"
     zigbee.smartShield(text: "pump,3").format()  //pump is queued and ready to turn on when zone is activated
 }
 def disablePump() {
-	log.info "Pump Disabled"
+    log.info "Pump Disabled"
     zigbee.smartShield(text: "pump,0").format()  //remove pump from system, reactivate Zone8
 }
 def onPump() {
-	log.info "Pump On"
+    log.info "Pump On"
     zigbee.smartShield(text: "pump,2").format()
     }
 
@@ -427,7 +427,7 @@ def offPump() {
     zigbee.smartShield(text: "pump,1").format()  //pump returned to queue state to turn on when zone turns on
         }
 def push() {
-	log.info "advance to next zone"
+    log.info "advance to next zone"
     zigbee.smartShield(text: "advance").format()  //turn off currently running zone and advance to next
     }
 
@@ -436,27 +436,27 @@ def push() {
 // skip one scheduled watering
 def	skip() {
     def evt = createEvent(name: "effect", value: "skip", displayed: true)
-    log.debug("Sending: $evt")
+    log.info("Sending: $evt")
     sendEvent(evt)
 }
 // over-ride rain delay and water even if it rains
 def	expedite() {
     def evt = createEvent(name: "effect", value: "expedite", displayed: true)
-    log.debug("Sending: $evt")
+    log.info("Sending: $evt")
     sendEvent(evt)
 }
 
 // schedule operates normally
 def	noEffect() {
     def evt = createEvent(name: "effect", value: "noEffect", displayed: true)
-    log.debug("Sending: $evt")
+    log.info("Sending: $evt")
     sendEvent(evt)
 }
 
 // turn schedule off indefinitely
 def	onHold() {
     def evt = createEvent(name: "effect", value: "onHold", displayed: true)
-    log.debug("Sending: $evt")
+    log.info("Sending: $evt")
     sendEvent(evt)
 }
 

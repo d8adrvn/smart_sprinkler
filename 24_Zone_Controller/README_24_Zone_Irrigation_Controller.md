@@ -82,7 +82,7 @@ Here is an overview of the project all wired up and placed in the suggested hous
 3. Connect another jumper wire from the +5V on the ThingShield to the VCC pin on the 16 Channel Relay. 
 4. Use 24 wires from your ribbon cable to connect pins 21-44 on Arduino MEGA to pins 1 to 16 on the relay 16 channel board and to pins 1-8 on an additional 8 channel relay board (or other scenarios depending on what combination of relay boards that you have purchased).
 
-ThingShield Connections: 5V power to Relay Board and RX/TX communication connections to MEGA:
+ThingShield Connections: 5V power to Relay Board and a jumper connecting pin10 to pin3 needed for communications:
 
 <img src="https://cloud.githubusercontent.com/assets/5625006/4689511/66510b88-56be-11e4-9bff-c4c9c9064543.jpg" width="200px"  />
 
@@ -100,7 +100,8 @@ In addition to making the connections between the Arduino MEGA and the relay pin
 
 Powering the Relays:
 The relays are potentiated by 5V current that comes from the ARDUINO MEGA pins 21-44.  However, the actual relay switching is seperately powered by either a 5V, 12V or 24V DC power, depending on which relay you purchase.
-* If you purchase 5V relays, you simply ensure the jumper on the relay board bridges VCC to JD-VCC.  The Arduino now powers the relays. Note: with this many relays, you would over-load the Arduino, however, in this project no more than 2 relays are on at any time so the total current is only ~40 mA which is acceptable.
+* If you purchase 5V relays, you need to pass the 5V power and Ground to the relay power pin or terminal.  1) Ensure you have connected the 5V and GND jumper from the Arduino to the 5V and ground pins on EACH relay board by daisy chaining/connecting the jumpers. 2) If applicable move the jumper on the relay board that bridges VCC to JD-VCC.  Or you may have to daisy chain/connect flexible jumper wire to the 5V and ground to a pair of terminals on the relay board.  The Arduino now powers the relays.   Note: with this many relays, you would over-load the Arduino, however, in this project no more than 2 relays are on at any time so the total current is only ~40 mA which is acceptable.
+
 * If you purchase 12V or 24V relays, then simply connect the appropriate power supply to the two terminals on the relay board.  
 
 Connecting a Common terminals across the relays.

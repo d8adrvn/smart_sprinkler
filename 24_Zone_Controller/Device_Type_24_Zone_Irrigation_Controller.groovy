@@ -1,5 +1,5 @@
 /**
- *  Irrigation Controller 24Zones with Master Valve and Pump Options v1.1
+ *  Irrigation Controller 24Zones with Master Valve and Pump Options v1.2
  *  This SmartThings Device Type Code Works With Arduino Irrigation Controller also available at this site
  *  
  *
@@ -42,7 +42,7 @@ preferences {
     input("twentyTimer", "text", title: "Zone Twenty", description: "Zone Twenty Time", required: false)
     input("twentyoneTimer", "text", title: "Zone Twentyone", description: "Zone Twentyone Time", required: false)
     input("twentytwoTimer", "text", title: "Zone Twentytwo", description: "Zone Twentytwo Time", required: false)
-    input("twentytheeTimer", "text", title: "Zone Twentythree", description: "Zone Twentythree Time", required: false)
+    input("twentythreeTimer", "text", title: "Zone Twentythree", description: "Zone Twentythree Time", required: false)
     input("twentyfourTimer", "text", title: "Zone Twentyfour", description: "Zone Twentyfour Time", required: false)    
     
 }
@@ -277,7 +277,7 @@ metadata {
             state "r17", label: 'Seventeen', action: "RelayOff17",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "sending17"
             state "sendingOff17", label: 'sending', action: "RelayOff17", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
         } 
-        standardTile("zoneEighteenTile", "device.zoneEighteen", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
+        standardTile("zoneEighteenTile", "device.zoneEightteen", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
             state "o18", label: 'Eighteen', action: "RelayOn18", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "sending18"
             state "sending18", label: 'sending', action: "RelayOff18", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
             state "q18", label: 'Eighteen', action: "RelayOff18",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "sending18"
@@ -841,7 +841,7 @@ def RelayOff24() {
 
 def on() {
     log.info "Executing 'allOn'"
-    zigbee.smartShield(text: "allOn,${oneTimer ?: 0},${twoTimer ?: 0},${threeTimer ?: 0},${fourTimer ?: 0},${fiveTimer ?: 0},${sixTimer ?: 0},${sevenTimer ?: 0},${eightTimer ?: 0},${nineTimer ?: 0},${tenTimer ?: 0},${elevenTimer ?: 0},${twelveTimer ?: 0},${thirteenTimer ?: 0},${fourteenTimer ?: 0},${fifteenTimer ?: 0},${sixteenTimer ?: 0},${seventeenTimer ?: 0},${eightteenTimer ?: 0},${nineteenTimer ?: 0},${twentyTimer ?: 0},${twentyoneTimer ?: 0},${twentytwoTimer ?: 0},${twentythreeTimer ?: 0}").format()
+    zigbee.smartShield(text: "allOn,${oneTimer ?: 0},${twoTimer ?: 0},${threeTimer ?: 0},${fourTimer ?: 0},${fiveTimer ?: 0},${sixTimer ?: 0},${sevenTimer ?: 0},${eightTimer ?: 0},${nineTimer ?: 0},${tenTimer ?: 0},${elevenTimer ?: 0},${twelveTimer ?: 0},${thirteenTimer ?: 0},${fourteenTimer ?: 0},${fifteenTimer ?: 0},${sixteenTimer ?: 0},${seventeenTimer ?: 0},${eightteenTimer ?: 0},${nineteenTimer ?: 0},${twentyTimer ?: 0},${twentyoneTimer ?: 0},${twentytwoTimer ?: 0},${twentythreeTimer ?: 0},${twentyfourTimer ?: 0}").format()
 }
 
 def OnWithZoneTimes(value) {
@@ -931,5 +931,6 @@ def	onHold() {
     log.info("Sending: $evt")
     sendEvent(evt)
 }
+
 
 

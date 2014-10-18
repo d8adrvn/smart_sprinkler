@@ -22,12 +22,12 @@
 **/
 
 definition(
-    name: "Irrigation Scheduler v2.91",
+    name: "Irrigation Scheduler v2.92",
     namespace: "d8adrvn/smart_sprinkler",
     author: "matt@nichols.name and stan@dotson.info",
     description: "Schedule sprinklers to run unless there is rain.",
     category: "Green Living",
-    version: "2.91",
+    version: "2.92",
     iconUrl: "https://s3.amazonaws.com/smartapp-icons/Meta/water_moisture.png",
     iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Meta/water_moisture@2x.png"
 )
@@ -45,7 +45,6 @@ preferences {
             required: false,
             multiple: true, // This must be changed to false for development (known ST IDE bug)
             metadata: [values: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']])
-            log.debug("wateringDays: $wateringDays")
         }
 
         section("Water every...") {
@@ -112,13 +111,11 @@ preferences {
 }		
 
 def installed() {
-    log.debug "Installed: $settings"
     scheduling()
     state.daysSinceLastWatering = [0,0,0]
 }
 
 def updated() {
-    log.debug "Updated: $settings"
     unschedule()
     scheduling()
     state.daysSinceLastWatering = [0,0,0]
@@ -151,7 +148,6 @@ def waterTimeThreeStart() {
 def scheduleCheck() {
 
     def schedulerState = switches?.latestValue("effect")?.toString() ?:"[noEffect]"
-	log.debug ("initial schedulerState is $schedulerState")
         
 
     if (schedulerState == "onHold") {
@@ -161,12 +157,11 @@ def scheduleCheck() {
     
 	if (schedulerState == "skip") { 
     	// delay this watering and reset device.effect to noEffect
-    	log.debug ("changeing schedulerState from skip to delay")
         schedulerState = "delay" 
         for(s in switches) {
             if("noEffect" in s.supportedCommands.collect { it.name }) {
                 s.noEffect()
-                log.debug ("sent noEffect() to ${s}")
+                log.info ("sent noEffect() to ${s}")
             }
         }
  	}    
@@ -197,7 +192,7 @@ def isWateringDay() {
     if (wateringDays.contains(today)) {
         return true
     }
-    log.trace "watering is not scheduled for today"
+    log.info "watering is not scheduled for today"
     return false
 }
 

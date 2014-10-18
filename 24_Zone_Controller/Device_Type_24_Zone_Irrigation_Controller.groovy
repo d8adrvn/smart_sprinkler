@@ -1,5 +1,5 @@
 /**
- *  Irrigation Controller 24Zones with Master Valve and Pump Options v1.0
+ *  Irrigation Controller 24Zones with Master Valve and Pump Options v1.1
  *  This SmartThings Device Type Code Works With Arduino Irrigation Controller also available at this site
  *  
  *
@@ -48,7 +48,7 @@ preferences {
 }
 
 metadata {
-    definition (name: "Irrigation Controller 24 Zones with Optional Pump v1.0", version: "1.0", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") {
+    definition (name: "Irrigation Controller 24 Zones with Optional Pump v1.1", version: "1.1", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") {
         
         fingerprint profileId: "0104", deviceId: "0138", inClusters: "0000"
         
@@ -908,27 +908,27 @@ def push() {
 // skip one scheduled watering
 def	skip() {
     def evt = createEvent(name: "effect", value: "skip", displayed: true)
-    log.debug("Sending: $evt")
+    log.info("Sending: $evt")
     sendEvent(evt)
 }
 // over-ride rain delay and water even if it rains
 def	expedite() {
     def evt = createEvent(name: "effect", value: "expedite", displayed: true)
-    log.debug("Sending: $evt")
+    log.info("Sending: $evt")
     sendEvent(evt)
 }
 
 // schedule operates normally
 def	noEffect() {
     def evt = createEvent(name: "effect", value: "noEffect", displayed: true)
-    log.debug("Sending: $evt")
+    log.info("Sending: $evt")
     sendEvent(evt)
 }
 
 // turn schedule off indefinitely
 def	onHold() {
     def evt = createEvent(name: "effect", value: "onHold", displayed: true)
-    log.debug("Sending: $evt")
+    log.info("Sending: $evt")
     sendEvent(evt)
 }
 

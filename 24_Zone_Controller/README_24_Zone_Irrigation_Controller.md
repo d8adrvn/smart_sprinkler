@@ -1,5 +1,5 @@
 ## **Hello, Smarter Lawn**
-## **TBD: This Needs To Be Updated for 24 Zone Smarter Lawn Irrigation Controller**
+## **Building A 24 Zone Smarter Lawn Irrigation Controller**
 
 
 ### **A project by Stan Dotson (stan@dotson.info) and Matthew Nichols (matt@nichols.name)**

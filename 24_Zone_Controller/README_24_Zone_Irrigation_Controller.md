@@ -13,7 +13,7 @@ Why would you build a lawn sprinkler system controller when you can just buy one
 1. Order the hardware
 2. Add SmartThings hub to your home network, download app to your iPhone
 3. Obtain a Maker/Developer account for SmartThings (graph.api.smartthings.com)
-4. Assemble the Arduino controller, ThingShield and 8 Channel Relay.  
+4. Connect Pins/Wires Between the Arduino controller, ThingShield and Relay Boards.  
 5. Download the Arduino developer environment and import the irrigation controller sketch as well as the required libraries for SmartThings and the Timer library.  
 6. Add Arduino to your SmartThings hub using your iPhone app
 7. Go to graph.api.smartthings.com
@@ -34,7 +34,7 @@ All items from this project were easily obtained from Amazon and mostly availabl
 
 An **Arduino MEGA* was used as the controller and was stacked with the SmartThings ThingShield.  *Note, set the DIP switch to D2/D3 if not already*.
 
-<img src="mega pic" width="200px"  />
+<img src="https://cloud.githubusercontent.com/assets/5625006/4689513/665f710a-56be-11e4-9c37-ec0ade60d44b.jpg" width="200px"  />
 
 <img src="https://cloud.githubusercontent.com/assets/5625006/3353577/8256ee78-fa85-11e3-93c8-866ef2ca9967.jpg" width="200px"  />
 
@@ -42,12 +42,13 @@ An **Arduino MEGA* was used as the controller and was stacked with the SmartThin
 
 To control the sprinkler valves, we used a **16 Channel Relay Board and an 8 Channel Relay Board**.  In reality, you can use about any combination of channels, you will just have to wire them up in serial.  Also, there is nothing that requires you to have all 24 relays.  If you choose to use less than 24 relays AND plan to use the optional software activated master pump relay, just be sure that pin44 from the Arduino Mega is attached to the relay associated with the Master Pump Relay.
 
+<img src="https://cloud.githubusercontent.com/assets/5625006/4689508/664a04fa-56be-11e4-9de9-37bd043f8fc1.jpg" width="200px"  />
 
 <img src="https://cloud.githubusercontent.com/assets/5625006/3353578/86de7d94-fa85-11e3-86b9-b3b08601987f.jpg" width="200px"  />
 
 ### Wiring
 
-For the wiring, we ordered a **20 cm dupont cable male to female** (Phantom YoYo 40P dupont cable 200mm male to female or similar from Amazon).  We liked this cable since the wires are organized as a ribbon cable which keeps the project neat.  We also used individual male to male jumper cables to wire the “COMMON” contacts together in parallel (see below).  We found these at Amazon such as **Male to Male Solderless Flexible Breadboard Jumper Cable Wires 65Pcs for Arduino by Sunkee**.
+For the wiring, we ordered both **20 cm dupont cable male to female** and **20 cm dupont cable female to female** (RioRand 3 x 40P 20cm Dupont Wire Jumper Cable 2.54 1P-1P Male-Male/Female-Female/Female-Male or similar from Amazon).  We liked this cable since the wires are organized as a ribbon cable which keeps the project neat.  We also used individual male to male jumper cables to wire the “COMMON” contacts together in parallel (see below).  We found these at Amazon such as **Male to Male Solderless Flexible Breadboard Jumper Cable Wires 65Pcs for Arduino by Sunkee**.
 
 <img src="https://cloud.githubusercontent.com/assets/5625006/3353583/b426908e-fa85-11e3-81de-3c7b55a1db92.jpg" width="200px"  />
 
@@ -68,26 +69,46 @@ Finally, for the project housing, the 9"x9"x3" OUTDOOR CABLETEK ENCLOSURE PLASTI
 
 * Wiring diagrams are included in the header of the Arduino sketch.
 
+Here is an overview of the project all wired up and placed in the suggested housing:
+
+
+<img src="https://cloud.githubusercontent.com/assets/5625006/4689514/6660b10a-56be-11e4-863c-e2f93a70f853.jpg" width="200px"  />
+
+
 
 ### Wiring The Arduino Controller
-1. Stack the SmartThing ThingShield on top of the Arduino Uno.  
-2. Connect a ground wire from the GND pin on ThingShield to the GND pin on the SainSmart 8 Channel relay.  
-3. Connect another jumper wire from the +5V on the ThingShield to the VCC pin on the Relay.  
-4. Make sure the jumper on the relay board bridges VCC to JD-VCC.  
-5. Use 8 wires from your ribbon cable to connect pins 12-5 on ThingShield to pins 1 to 8 on the relay board.   
+1. Stack the SmartThing ThingShield on top of the Arduino MEGA.  
+2. Connect a ground wire from the GND pin on ThingShield to the GND pin on the 16 Channel relay.  
+3. Connect another jumper wire from the +5V on the ThingShield to the VCC pin on the 16 Channel Relay. 
+4. Use 24 wires from your ribbon cable to connect pins 21-44 on Arduino MEGA to pins 1 to 16 on the relay 16 channel board and to pins 1-8 on an additional 8 channel relay board (or other scenarios depending on what combination of relay boards that you have purchased).
 
-<img src="https://cloud.githubusercontent.com/assets/5625006/3385379/81cfd7d6-fc69-11e3-8f89-9cb25b10bb7e.jpg" width="200px"  />
+ThingShield Connections: 5V power to Relay Board and RX/TX communication connections to MEGA:
 
+<img src="https://cloud.githubusercontent.com/assets/5625006/4689511/66510b88-56be-11e4-9bff-c4c9c9064543.jpg" width="200px"  />
 
-<img src="https://cloud.githubusercontent.com/assets/5625006/3353588/e52e942e-fa85-11e3-9513-89809a182c9c.jpg" width="200px"  />
+Jumper connections originating from the MEGA that will connect to the relay boards:
 
-<img src="https://cloud.githubusercontent.com/assets/5625006/3353589/e9610928-fa85-11e3-949f-5f8b6d63ccda.jpg" width="200px"  />
- 
-6. Finally, using seven short jumper cable (male to male) we daisy chained the COMMON contact positions together across all 8 relays.
+<img src="https://cloud.githubusercontent.com/assets/5625006/4689512/665d067c-56be-11e4-9348-c184c0246678.jpg" width="200px"  />
+
+Jumper connections from the MEGA terminating on the 16 channel relay:
+
+<img src="https://cloud.githubusercontent.com/assets/5625006/4689510/664f5b62-56be-11e4-8b00-f5e0f60c44dc.jpg" width="200px"  />
+
+### Wiring The Relay Boards
+
+In addition to making the connections between the Arduino MEGA and the relay pins (above), you also need to power the relay boards and connect the "Common" terminals between all 24 of the relays.  
+
+Powering the Relays:
+The relays are potentiated by 5V current that comes from the ARDUINO MEGA pins 21-44.  However, the actual relay switching is seperately powered by either a 5V, 12V or 24V DC power, depending on which relay you purchase.
+* If you purchase 5V relays, you simply ensure the jumper on the relay board bridges VCC to JD-VCC.  The Arduino now powers the relays. Note: with this many relays, you would over-load the Arduino, however, in this project no more than 2 relays are on at any time so the total current is only ~40 mA which is acceptable.
+* If you purchase 12V or 24V relays, then simply connect the appropriate power supply to the two terminals on the relay board.  
+
+Connecting a Common terminals across the relays.
+Using short male to male jumper flexible wires or pre-formed solid male-to-male jumper wire or combination, we daisy chained the COMMON contact positions together across all 24 relays.
 
 <img src="https://cloud.githubusercontent.com/assets/5625006/3353593/f3f9b8f8-fa85-11e3-877c-f05b27e22214.jpg" width="200px"  />
 
-Note, the ThingShield pins are not labeled.  So you can either identify the pins using labels on the Arduino or refer to a diagram.  Here is a diagram for Arduino Uno V2 from Flikr:   https://www.flickr.com/photos/28521811@N04/8520970405/
+Note, the ThingShield pins are not labeled.  So you can either identify the pins using labels on the Arduino or from the Arduino pic above
 7. Connect the Arduino to USB power or to a 9V power supply using the appropriate ports.  
 8. When not using the USB power supply, place a piece of black electrical tape over the USB port to prevent accidental shorting
 
@@ -124,19 +145,19 @@ Warning: Pumps run on 120V or 220V power and incorrect wiring could result in le
 Warning: Work is best done by licensed electrician following local codes.
 
 1. You should only be wiring the Pump Start Relay which uses 24V current.  Do not connect the 120V/240V wires!
-2. Wire the ground wire to the  ground wire bundle that contains the ground wire from the 24V irrigation transformer/power supply and the common ground that runs to the irrigation valves.
-3. Attach the load wire from the Pump Start Relay to Relay 8 or to the single relay that you added to the system, depending if you set up A) or B) above.
-4. In scenario A), where you use relay 8 to control your pump, you need to switch the use of the relay in the device type by tapping the pump tile.  See above to activate scenario B) by modifying the Arduino sketch. 
+2. Wire the ground wire from the Pump Start Relay to the  ground wire bundle that contains the ground wire from the 24V irrigation transformer/power supply and the common ground that runs to the irrigation valves.
+3. Attach the load wire from the Pump Start Relay to Relay 24 or to the single relay that you added to the system, depending if you set up A) or B) above.
+4. In scenario A), where you use relay 24 to control your pump, you need to switch the use of the relay in the device type software by tapping the pump tile.  See above to activate scenario B) by modifying the Arduino sketch. 
 
 ## The Software
 
 The code for this project is in a few files which are posted on github:
 
-https://github.com/d8adrvn/smart_sprinkler.git
+**https://github.com/d8adrvn/smart_sprinkler**
 
 ### Arduino Code 
 
-(ArduinoSmartShieldIrrigationController.ino):
+**(Arduino_24_Zone_Irrigation_Controller.ino)**
 
 In its most basic form, our controller manages a queue and turns on/off switches. That’s it. Nothing else. All other features are in the cloud!
 
@@ -158,7 +179,7 @@ Creates a queue to turn on or off a specific zone or all zones
 
 * The queue holds the state for each zone: 0=off, 1=waiting, 2=on
 * A traffic cop feature ensures only one zone is running at once
-* Works with up to 8 zones, although you can use less
+* Works with up to 24 zones (relays), although you can use less
 * Allows zone times to be communicated as a string, which is parsed into an array
 * Once a zone is turned on, the Arduino knows when to turn it off (no additional communication needed)
 * Utilizes a timer function to run the zones.  This keeps the CPU free to manage communication between Arduino and SmartThings while a zone is running
@@ -171,13 +192,15 @@ http://arduino.cc/en/main/software
 Once the software is installed, the first thing to do is obtain the required libraries.  
 
 * Timer library was created by Simon Monk as modified by JChristensen  https://github.com/JChristensen/Timer
-The KNOWN LIBRARY BUG (timer.cpp) - identified by mattnichols 5/20/14 - has no known affect on the code.  Also, the Timer library release downloads as "Timer-master-2".  Before loading into the Arduino IDE, change the name to "Timer"
+The KNOWN LIBRARY BUG (timer.cpp) - identified by mattnichols 5/20/14 - has no known affect on the code.  Also, the Timer library release zip file downloads to your computer as "Timer-master-2".  Before loading into the Arduino IDE, change the name to "Timer"
 * SmartThings library available from https://www.dropbox.com/s/8hon320qmuio8fz/Shield%20Library.zip
 * SoftwareSerial library was default library provided with Arduino IDE
  
 Once you have the zip files downloaded and you have changed the name for the Timer zip file, you can import them within the Arduino IDE. Go to the Sketch:Import Library;Add Library drop down menu. Once you have added the libraries, they will show up under Sketch:Add Library:Contributed as "Timer" and "SmartThings".  Be sure the Timer library is installed as "Timer"
 
-You can connect the Arduino Uno to your computer via an USB cable, create a new sketch, paste the code from github into the Arduino IDE and then transfer to tehe Arduino.
+Hint: Also make sure that under the <Tools<Boards menu, you have select Arduino MEGA 2560 as the board.  Otherwise you will receive a compile error and/or the code will not finish transferring to the Arduino MEGA
+
+You can connect the Arduino MEGA to your computer via an USB cable, create a new sketch, paste the code from github into the Arduino IDE and then transfer to the Arduino.
 
 Pairing instructions for the Arduino to the SmartThings hub can be found at SmartThings.com and are copied here:
 
@@ -192,7 +215,7 @@ Its more than a good idea to put a piece of electrical tape over the USB port to
 
 ### Device Type Code 
 
-**(IrrigationControllerDeviceType.groovy):**
+**(Device_Type_24_Zone_Irrigation_Controller.groovy):**
 
 
 
@@ -226,21 +249,6 @@ After totaling up the precip, the App checks the threshold that you set as a pre
 
 <img src="https://cloud.githubusercontent.com/assets/5625006/3353744/361a6372-fa8b-11e3-8fe5-1f1081f49fc2.jpg" width="200px"  />
 
-
-### Irrigation Virtual Scheduler Switch 
-
-**(IrrigationVirtualSchedulerSwitchDevice.groovy)**
-
-This is an optional utility that allows you to put your system on extended hold or in other states. To install:
-
-* Open the SmartThings IDE
-* Create a new device type and paste the code in
-* Save and then Publish (to me)
-* Create a new device and select the device type you just created
-* The device should now show up on your smartphone SmartThings app
-* You must select it in the Irrigation Scheduler app
-
-Example uses for this accessory app include putting the system on hold for the winter, during yard construction projects, after applying weed killer to the yard, and so on.  
 
 ## Take Your Controller to the Next Level:
 
@@ -283,8 +291,6 @@ Now when you 'push' or 'hold' a MiniMote button, the corresponding zone will act
 
 * What if you want to run your lawn irrigation on a different schedule than your drip irrigation?  No problems.  Just install the Irrigation Scheduler App for your lawn (rename it something like Lawn Irrigation Scheduler) and install the app a second time for the drip irrigation (rename it something like Drip Irrigation Scheduler).  
 
-* The Arduino runs on 9V power.  The sprinkler valves run on 24V power which is connected and daisy chained through the relays.  Be sure to keep them straight.  
+* The Arduino runs on 9V DC power.  Your relays may require on 5V DC, which can be supplied by the Arduino 5V pin or require an additional 12V DC or 24V DC power supply, depending on which relay board you purchase.  The sprinkler valves run on 24V AC power which is connected and daisy chained through the relays.  Be sure to keep them straight.  
 
 * The Arduino 9V power supply (transformer) can be purchased at Amazon by searching for "Arduino Power Supply".  CAUTION: There are 9V power supplies availble on Amazon that do not work for the Arduino (they are made for musical instrament controllers) and some that perform very poorly on Arduino.  Be sure to read the reviews!  
-
-

@@ -78,7 +78,7 @@ Finally, for the project housing, the 9"x9"x3" OUTDOOR CABLETEK ENCLOSURE PLASTI
 Here is an overview of the project all wired up and placed in the suggested housing:
 
 
-<img src="https://cloud.githubusercontent.com/assets/5625006/4689514/6660b10a-56be-11e4-863c-e2f93a70f853.jpg" width="200px"  />
+<img src="https://cloud.githubusercontent.com/assets/5625006/4691623/44894b36-5728-11e4-9674-c059561ec71a.jpg" width="200px"  />
 
 
 
@@ -109,9 +109,10 @@ The relays are potentiated by connections with the ARDUINO MEGA pins 21-44.  How
 
 * For our project, we used 24V relay boards so we simply connected a 24V DC power supply to the two terminals on the 16 channel 24V relay board, using an 2.1mm x 5.5mm Female CCTV Power Jack Adapter which gave a clean connection from a 24V power supply to a set of flexible jumper wires.   We also needed to provide power to the second 8 channel 24V relay which was accomplished by connecting jumpers between the VCC and the GND pins of the 8 channel relay and the 24V terminals on the 16 channel relay (above you can see the black and white jumpers (spliced) connecting the 8 channel relay to the 24V terminals along the top of picture of the fully wired project).  It turns out the 16 channel 24V relay board used in this project also generated a 5V current that powers the Arduino+ThingShield via the 5V and GND jumper wires that connect the two boards. So we did not need to connect a power supply directly to the Arduino.
 
-Picture showing the 2.1mm x 5.5mm Female CCTV Power Jack Adapter connect to jumpers attached to the 24V terminal of the 16 channel relay board:
+Picture showing the 2.1mm x 5.5mm Female CCTV Power Jack Adapter connect to jumpers connected to the 24V terminal of the 16 channel relay board:
 
-<img src="jpg" width="200px"  />
+<img src="https://cloud.githubusercontent.com/assets/5625006/4691622/3a88c030-5728-11e4-8182-64cee04a6989.jpg" width="200px"  />
+
 
 
 * If you purchase 5V relays, you need to pass the 5V power and Ground to the relay power pin or terminal from the Arduino.  1) Ensure you have connected the 5V and GND jumper from the Arduino to the 5V and ground pins on EACH relay board by daisy chaining/connecting with flexible jumper wires. 2) If applicable move the jumper on the relay board that bridges VCC to JD-VCC.  Or you may have to daisy chain/connect flexible jumper wire to the 5V and ground to a pair of terminals on the relay board.  The Arduino now powers the relays.   Note: with this many relays, you would over-load the Arduino, however, in this project no more than 2 relays are on at any time so the total current is only ~40 mA which is acceptable.

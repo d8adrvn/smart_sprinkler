@@ -215,7 +215,6 @@ def parse(String description) {
     }
     if (value == "pumpRemoved") {
     	sendEvent (name:"pump", value:"noPump", displayed: true, isStateChange: true, isPhysical: true)
-        sendEvent (name:"zoneEight", value:"off8", displayed: display, isStateChange: true, isPhysical: true)
     }
 
     if(anyZoneOn()) {

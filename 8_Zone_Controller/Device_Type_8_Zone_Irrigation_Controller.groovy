@@ -163,8 +163,8 @@ metadata {
             state "ok", label: "", action: "update", icon: "st.secondary.refresh", backgroundColor: "#ffffff"
         }
         standardTile("scheduleEffect", "device.effect", width: 1, height: 1) {
-            state("noEffect", label: "--", action: "skip", icon: "st.Office.office7", backgroundColor: "#ffffff")
-            state("skip", label: "Skip", action: "expedite", icon: "st.Office.office7", backgroundColor: "#c0a353")
+            state("noEffect", label: "Normal", action: "skip", icon: "st.Office.office7", backgroundColor: "#ffffff")
+            state("skip", label: "Skip 1X", action: "expedite", icon: "st.Office.office7", backgroundColor: "#c0a353")
             state("expedite", label: "Expedite", action: "onHold", icon: "st.Office.office7", backgroundColor: "#53a7c0")
             state("onHold", label: "Pause", action: "noEffect", icon: "st.Office.office7", backgroundColor: "#bc2323")
         }

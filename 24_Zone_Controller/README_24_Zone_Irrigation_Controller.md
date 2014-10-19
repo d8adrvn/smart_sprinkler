@@ -40,7 +40,7 @@ An **Arduino MEGA* was used as the controller and was stacked with the SmartThin
 
 ### Relays
 
-To control the sprinkler valves, we used a **16 Channel Relay Board and an 8 Channel Relay Board**.  In reality, you can use about any combination of channels, you will just have to wire them up in serial.  Also, there is nothing that requires you to have all 24 relays.  If you choose to use less than 24 relays AND plan to use the optional software activated master pump relay, just be sure that pin44 from the Arduino Mega is attached to the relay associated with the Master Pump Relay.
+To control the sprinkler valves, we used a **16 Channel Relay Board and an 8 Channel Relay Board**.  In reality, you can use about any combination of channels, you will just have to wire them up in serial.  For my project, I found on Ebay from nyplatform a **8-Channel 24V Relay Shield Module For Arduino UNO 2560 1280 ARM PIC AVR STM32** and a **16-Channel 24V Relay Shield Module For Arduino UNO 2560 1280 ARM PIC AVR STM32**.  They had excellent prices and fast shipping.  The 16 channel relay had an unexpected bonus feature in that it generated a +5V current that was able to power the Arduino via the +5V pin.  Who knew?
 
 <img src="https://cloud.githubusercontent.com/assets/5625006/4689508/664a04fa-56be-11e4-9de9-37bd043f8fc1.jpg" width="200px"  />
 
@@ -55,9 +55,15 @@ For the wiring, we ordered both **20 cm dupont cable male to female** and **20 c
 <img src="https://cloud.githubusercontent.com/assets/5625006/3353586/c2ceb562-fa85-11e3-9a2a-df5ed5e429cb.jpg" width="200px"  />
 
 ### Power Supplies
-The project requires at least two power supplies.  One power supply is to run the sprinkler valves which are typically 24V AC.   The **Rain Bird UT1 Sprinkler System Timer Electric Transformer Plug** is a good choice from Amazon Prime.  We  also needed a 9V power supply to run the Arduino+ThingShield+Relay.  This can be purchased at Amazon as well by searching for "Arduino Power Supply".  Right now, I am using the Super Power Supply® AC / DC Adapter Charger Cord Plug - 9V 650mA compatible with Arduino Freeduino Duemilanove Uno Mega Hobby Electronics, which was available by Amazon Prime.   CAUTION: There are 9V power supplies availble on Amazon that do not work for the Arduino (they are made for musical instrament controllers) and some that perform very poorly on Arduino.  Be sure to read the reviews!  
 
-Depending on the volatage of the relays, you may also need a second DC power supply to power the relays.  If you use 5V relays, these can be driven from the Arduino 5v pin (you use a jumper to connect the 5V pin and the VCC pin on the relay board).  This works because at most 2 relays are on at once (one for the valve and the other for the optional pump).  However, if purchase a 12V DC or 24V DC relay board, you will need to purchase an additional power supply to run the relay boards.  The Arduino 5V pin will only signal the relay, but not activate it.
+#### To run the sprinkler valves:
+The project requires at least two power supplies.  One power supply is to run the sprinkler valves which are typically 24V AC.   The **Rain Bird UT1 Sprinkler System Timer Electric Transformer Plug** is a good choice from Amazon Prime.  
+
+#### To run the Arduino, ThingShield and Relays:
+
+*If your relays are 5V:* You will need a 9V power supply to run the Arduino+ThingShield+Relays.   The 5V relays can be driven from the Arduino 5v pin (you use a jumper to connect the 5V pin and the VCC pin on the relay board).  This works because at most 2 relays are on at once (one for the valve and the other for the optional pump).   This can be purchased at Amazon as well by searching for "Arduino Power Supply".  Right now, I am using the Super Power Supply® AC / DC Adapter Charger Cord Plug - 9V 650mA compatible with Arduino Freeduino Duemilanove Uno Mega Hobby Electronics, which was available by Amazon Prime.   CAUTION: There are 9V power supplies availble on Amazon that do not work for the Arduino (they are made for musical instrament controllers) and some that perform very poorly on Arduino.  Be sure to read the reviews!  
+
+*If your relays are 24V or 12V:*  Purchase the respective power supply from Amazon.  We used 24V relays and purchased **100-240V to 24V 2A Switching AC/DC Power Adapter Charger US Plug by Gino** power supply.  We also used an adapter to make a clean transition from the power supply to flexible jumper wires.  The adapter can be found on Ebay or Amazon **10 Pack 2.1mm x 5.5mm Female CCTV Power Jack Adapter**  The 16 channel 24V relay board used in this project also provided a +5V current that travelled back to power the Arduiono+ThingShield (see below for wiring).
 
 ### Project Housing
 Finally, for the project housing, the 9"x9"x3" OUTDOOR CABLETEK ENCLOSURE PLASTIC GRAY CASE UTILITY CABLE BOX CTE-S from Amazon was a nice size that housed all the relay boards, as well as the Arduino+ThingShield. 
@@ -99,10 +105,18 @@ Jumper connections from the MEGA terminating on the 16 channel relay:
 In addition to making the connections between the Arduino MEGA and the relay pins (above), you also need to power the relay boards and connect the "Common" terminals between all 24 of the relays.  
 
 ####Powering the Relays:
-The relays are potentiated by 5V current that comes from the ARDUINO MEGA pins 21-44.  However, the actual relay switching is seperately powered by either a 5V, 12V or 24V DC power, depending on which relay you purchase.
-* If you purchase 5V relays, you need to pass the 5V power and Ground to the relay power pin or terminal.  1) Ensure you have connected the 5V and GND jumper from the Arduino to the 5V and ground pins on EACH relay board by daisy chaining/connecting the jumpers. 2) If applicable move the jumper on the relay board that bridges VCC to JD-VCC.  Or you may have to daisy chain/connect flexible jumper wire to the 5V and ground to a pair of terminals on the relay board.  The Arduino now powers the relays.   Note: with this many relays, you would over-load the Arduino, however, in this project no more than 2 relays are on at any time so the total current is only ~40 mA which is acceptable.
+The relays are potentiated by connections with the ARDUINO MEGA pins 21-44.  However, the actual relay switching is seperately powered by either a 5V, 12V or 24V DC power, depending on which relay you purchase.   
 
-* If you purchase 12V or 24V relays, then simply connect the appropriate power supply to the two terminals on the relay board.  
+* For our project, we used 24V relay boards so we simply connected a 24V DC power supply to the two terminals on the 16 channel 24V relay board, using an 2.1mm x 5.5mm Female CCTV Power Jack Adapter which gave a clean connection from a 24V power supply to a set of flexible jumper wires.   We also needed to provide power to the second 8 channel 24V relay which was accomplished by connecting jumpers between the VCC and the GND pins of the 8 channel relay and the 24V terminals on the 16 channel relay (above you can see the black and white jumpers (spliced) connecting the 8 channel relay to the 24V terminals along the top of picture of the fully wired project).  It turns out the 16 channel 24V relay board used in this project also generated a 5V current that powers the Arduino+ThingShield via the 5V and GND jumper wires that connect the two boards. So we did not need to connect a power supply directly to the Arduino.
+
+Picture showing the 2.1mm x 5.5mm Female CCTV Power Jack Adapter connect to jumpers attached to the 24V terminal of the 16 channel relay board:
+
+<img src="jpg" width="200px"  />
+
+
+* If you purchase 5V relays, you need to pass the 5V power and Ground to the relay power pin or terminal from the Arduino.  1) Ensure you have connected the 5V and GND jumper from the Arduino to the 5V and ground pins on EACH relay board by daisy chaining/connecting with flexible jumper wires. 2) If applicable move the jumper on the relay board that bridges VCC to JD-VCC.  Or you may have to daisy chain/connect flexible jumper wire to the 5V and ground to a pair of terminals on the relay board.  The Arduino now powers the relays.   Note: with this many relays, you would over-load the Arduino, however, in this project no more than 2 relays are on at any time so the total current is only ~40 mA which is acceptable.
+
+
 
 ####Connecting a Common terminals across the relays.
 Using short male to male jumper flexible wires or pre-formed solid male-to-male jumper wire or combination, we daisy chained the COMMON contact positions together across all 24 relays.
@@ -302,3 +316,5 @@ Now when you 'push' or 'hold' a MiniMote button, the corresponding zone will act
 * The Arduino runs on 9V DC power.  Your relays may require on 5V DC, which can be supplied by the Arduino 5V pin or require an additional 12V DC or 24V DC power supply, depending on which relay board you purchase.  The sprinkler valves run on 24V AC power which is connected and daisy chained through the relays.  Be sure to keep them straight.  
 
 * The Arduino 9V power supply (transformer) can be purchased at Amazon by searching for "Arduino Power Supply".  CAUTION: There are 9V power supplies availble on Amazon that do not work for the Arduino (they are made for musical instrament controllers) and some that perform very poorly on Arduino.  Be sure to read the reviews!  
+
+*  There is nothing that requires you to have all 24 relays.  If you choose to use less than 24 relays AND plan to use the optional software activated master pump relay, just be sure that pin44 from the Arduino Mega is attached to the relay associated with the Master Pump Relay.

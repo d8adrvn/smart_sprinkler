@@ -161,7 +161,7 @@ Once the software is installed, the first thing to do is obtain the required lib
 
 * Timer library was created by Simon Monk as modified by JChristensen  https://github.com/JChristensen/Timer
 The KNOWN LIBRARY BUG (timer.cpp) - identified by mattnichols 5/20/14 - has no known affect on the code.  Also, the Timer library release downloads with the name: "Timer-master-2".  Before loading into the Arduino IDE, change the name to: "Timer"
-* SmartThings library available from https://www.dropbox.com/s/8hon320qmuio8fz/Shield%20Library.zip
+* SmartThings library available from http://cl.ly/ZMHh)
 * SoftwareSerial library was default library provided with Arduino IDE
  
 Once you have the zip files downloaded and you have changed the name for the Timer zip file, you can import them within the Arduino IDE. Go to the Sketch:Import Library;Add Library drop down menu. Once you have added the libraries, they will show up under Sketch:Add Library:Contributed as "Timer" and "SmartThings".  Be sure the Timer library is installed as "Timer"

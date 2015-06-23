@@ -21,7 +21,7 @@ You now have a smarter lawn!
 
 ## The Hardware
 
-All items from this project were easily obtained from Amazon and mostly available via Amazon Prime
+Most items from this project were easily obtained from Amazon and mostly available via Amazon Prime.   The SmartThings ThingShield was obtained directly from SmartThings.
 
 ### An Arduino with SmartThing Shield
 

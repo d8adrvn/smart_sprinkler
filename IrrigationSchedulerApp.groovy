@@ -1,7 +1,7 @@
 /**
 *  
 * 
-*  Irrigation Scheduler SmartApp Smarter Lawn Controller
+*  Irrigation Scheduler SmartApp Smarter Lawn Contoller
 *  Compatible with up to 24 Zones
 *
 *  Author: Stan Dotson (stan@dotson.info) and Matthew Nichols (matt@nichols.name)
@@ -22,12 +22,12 @@
 **/
 
 definition(
-    name: "Irrigation Scheduler v2.92",
+    name: "Irrigation Scheduler v2.93",
     namespace: "d8adrvn/smart_sprinkler",
     author: "matt@nichols.name and stan@dotson.info",
     description: "Schedule sprinklers to run unless there is rain.",
     category: "Green Living",
-    version: "2.92",
+    version: "2.93",
     iconUrl: "https://s3.amazonaws.com/smartapp-icons/Meta/water_moisture.png",
     iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Meta/water_moisture@2x.png"
 )
@@ -36,7 +36,9 @@ preferences {
 	page(name: "schedulePage", title: "Schedule", nextPage: "sprinklerPage", uninstall: true) {
       	section("App configruation...") {
         	label title: "Choose an title for App", required: true, defaultValue: "Irrigation Scheduler"
+        	input "isNotificationEnabled", "boolean", title: "Send Push Notification To Report Status At Irrigation Start", description: "Do You Want To Receive Push Notifications?", defaultValue: "true", required: false
         }
+        
         section {
             input (
             name: "wateringDays",
@@ -57,11 +59,15 @@ preferences {
             input name: "waterTimeThree",  type: "time", required: false, title: "and again at..."
         }
     }
+    
 
-    page(name: "sprinklerPage", title: "Sprinkler Controller Setup", install: true) {
+    page(name: "sprinklerPage", title: "Sprinkler Controller Setup", nextPage: "virtualRainGuage", uninstall: true) {
         section("Sprinkler switches...") {
             input "switches", "capability.switch", multiple: false
         }
+
+
+
         section("Zone Times...") {
             input "zone1", "string", title: "Zone 1 Time", description: "minutes", multiple: false, required: false
             input "zone2", "string", title: "Zone 2 Time", description: "minutes", multiple: false, required: false
@@ -89,9 +95,9 @@ preferences {
             input "zone24", "string", title: "Zone 24 Time", description: "minutes", multiple: false, required: false
         }
 
- //	}
+ 	}
     
-//	page (name: "virtualRainGuage", title: "Virtual Rain Guage Setup", install: true) {
+	page(name: "virtualRainGuage", title: "Virtual Rain Guage Setup", install: true) {
 		
         section("Zip code to check weather...") {
             input "zipcode", "text", title: "Zipcode?", required: false
@@ -178,7 +184,9 @@ def scheduleCheck() {
     log.info("Scheduler state: $schedulerState. Days since last watering: ${daysSince()}. Is watering day? ${isWateringDay()}. Enought time? ${enoughTimeElapsed(schedulerState)} ")
 
     if ((isWateringDay() && enoughTimeElapsed(schedulerState) && schedulerState != "delay") || schedulerState == "expedite") {
-        sendPush("$switches[0] Is Watering Now!" ?: "null pointer on app name")
+        if (isNotificationEnabled) {
+        	sendPush("$switches Is Watering Now!" ?: "null pointer on app name")
+        }
         state.daysSinceLastWatering[state.currentTimerIx] = 0
         water()
         // Assuming that sprinklers will turn themselves off. 
@@ -224,7 +232,9 @@ def isRainDelay() {
     
     log.info ("Virtual rain gauge reads $rainGauge in")
     if (rainGauge > (wetThreshold?.toFloat() ?: 0.5)) {
-        sendPush("Skipping watering today due to precipitation.")
+        if (isNotificationEnabled) {
+        	sendPush("Skipping watering today due to precipitation.")
+     	}
         for(s in switches) {
             if("rainDelayed" in s.supportedCommands.collect { it.name }) {
                 s.rainDelayed()

@@ -32,7 +32,7 @@ All items from this project were easily obtained from Amazon and mostly availabl
 
 ### An Arduino with SmartThing Shield
 
-An **Arduino MEGA* was used as the controller and was stacked with the SmartThings ThingShield.  *Note, set the DIP switch to D2/D3 if not already*.
+An **Arduino MEGA 2560* was used as the controller and was stacked with the SmartThings ThingShield.  *Note, set the DIP switch to D2/D3 if not already*.
 
 <img src="https://cloud.githubusercontent.com/assets/5625006/4689513/665f710a-56be-11e4-9c37-ec0ade60d44b.jpg" width="200px"  />
 

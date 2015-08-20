@@ -33,8 +33,6 @@ preferences {
 metadata {
     definition (name: "Irrigation Controller 8 Zones v2.66", version: "2.66", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") {
         
-        fingerprint profileId: "0104", deviceId: "0138", inClusters: "0000"
-        
         capability "Switch"
         capability "Momentary"
  //       capability "Refresh"

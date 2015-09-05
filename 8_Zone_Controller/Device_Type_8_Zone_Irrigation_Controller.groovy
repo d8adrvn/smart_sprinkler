@@ -31,7 +31,7 @@ preferences {
 }
 
 metadata {
-    definition (name: "Irrigation Controller 8 Zones v2.66", version: "2.66", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") {
+    definition (name: "Irrigation Controller 8 Zones v2.67", version: "2.67", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") {
         
         capability "Switch"
         capability "Momentary"

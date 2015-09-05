@@ -179,11 +179,11 @@ def parse(String description) {
   
     
     def value = zigbee.parse(description)?.text
-    if (value != null && value != " " && value != '"' && value != "havePump" && value != "noPump") {
+    if (value != null && value != " " && value != '"' && value != "ping" && value != "havePump" && value != "noPump") {
         String delims = ","
         String[] tokens = value.split(delims)
         for (int x=0; x<tokens.length; x++) {
-            def displayed = tokens[x] && tokens[x] != "ping"  //evaluates whether to display message
+            def displayed = tokens[x]  //evaluates whether to display message
 
             def name = tokens[x] in ["on1", "q1", "off1"] ? "zoneOne"
             : tokens[x] in ["on2", "q2", "off2"] ? "zoneTwo"

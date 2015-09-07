@@ -184,7 +184,7 @@ def scheduleCheck() {
     log.info("Scheduler state: $schedulerState. Days since last watering: ${daysSince()}. Is watering day? ${isWateringDay()}. Enought time? ${enoughTimeElapsed(schedulerState)} ")
 
     if ((isWateringDay() && enoughTimeElapsed(schedulerState) && schedulerState != "delay") || schedulerState == "expedite") {
-        if (isNotificationEnabled) {
+        if (isNotificationEnabled.equals("true")) {
         	sendPush("$switches Is Watering Now!" ?: "null pointer on app name")
         }
         state.daysSinceLastWatering[state.currentTimerIx] = 0
@@ -232,7 +232,7 @@ def isRainDelay() {
     
     log.info ("Virtual rain gauge reads $rainGauge in")
     if (rainGauge > (wetThreshold?.toFloat() ?: 0.5)) {
-        if (isNotificationEnabled) {
+        if (isNotificationEnabled.equals("true")) {
         	sendPush("Skipping watering today due to precipitation.")
      	}
         for(s in switches) {

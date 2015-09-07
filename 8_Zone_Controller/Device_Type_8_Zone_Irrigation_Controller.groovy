@@ -78,17 +78,15 @@ metadata {
         status "refresh_all_off" : "catchall: 0104 0000 01 01 0140 00 D919 00 00 0000 0A 00 0A6F6B2C6F6666312C6F6666322C6F6666332C6F6666342C6F6666352C6F6666362C6F6666372C6F6666382C"
         status "turn_all_on" : "catchall: 0104 0000 01 01 0140 00 D919 00 00 0000 0A 00 0A6F6B2C6F6E312C71322C71332C71342C71352C71362C71372C71382C"
     }
-
-
-
     
     tiles {
         standardTile("allZonesTile", "device.switch", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
             state "off", label: 'Start', action: "switch.on", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "starting"
             state "on", label: 'Running', action: "switch.off", icon: "st.Health & Wellness.health7", backgroundColor: "#53a7c0", nextState: "stopping"
-            state "starting", label: 'Starting...', action: "switch.on", icon: "st.Health & Wellness.health7", backgroundColor: "#53a7c0"
+            state "starting", label: 'Starting...', action: "switch.off", icon: "st.Health & Wellness.health7", backgroundColor: "#53a7c0"
             state "stopping", label: 'Stopping...', action: "switch.off", icon: "st.Health & Wellness.health7", backgroundColor: "#53a7c0"
             state "rainDelayed", label: 'Rain Delay', action: "switch.off", icon: "st.Weather.weather10", backgroundColor: "#fff000", nextState: "off"
+            state "autoStarting", label: 'Program starting...', action: "switch.off", icon: "st.Health & Wellness.health7", backgroundColor: "#53a7c0"        
         }
         standardTile("zoneOneTile", "device.zoneOne", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
             state "off1", label: 'One', action: "RelayOn1", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff",nextState: "sending1"
@@ -174,11 +172,12 @@ metadata {
 
 // parse events into attributes to create events
 def parse(String description) {
-    log.debug "Parsing '${description}'"
-    log.debug "Parsed: ${zigbee.parse(description)}"
+//    log.debug "Parsing '${description}'"
+//    log.debug "Parsed: ${zigbee.parse(description)}"
   
     
     def value = zigbee.parse(description)?.text
+    log.debug "Parsed: ${value}"
     if (value != null && value != " " && value != '"' && value != "ping" && value != "havePump" && value != "noPump") {
         String delims = ","
         String[] tokens = value.split(delims)
@@ -370,7 +369,11 @@ def on() {
 }
 
 def OnWithZoneTimes(value) {
-    log.debug "Executing 'allOn' with zone times [$value]"
+    log.info "Executing 'allOn' with zone times [$value]"
+    def evt = createEvent(name: "switch", value: "autoStarting", displayed: true)
+    log.info("Sending: $evt")
+    sendEvent(evt)
+    
 	def zoneTimes = [:]
     for(z in value.split(",")) {
     	def parts = z.split(":")

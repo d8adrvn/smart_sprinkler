@@ -1,4 +1,4 @@
-UNDER CONSTRUCTION - I WILL ANNOUNCE ON SMARTTHINGS FORUM WHEN FINISHED
+Note:  The pictures are for a 24 Zone System.  I will update with a 16 zone system in the near future.
 
 
 
@@ -44,7 +44,7 @@ An **Arduino MEGA* was used as the controller and was stacked with the SmartThin
 
 ### Relays
 
-To control the sprinkler valves, we used a **16 Channel Relay Board and an 8 Channel Relay Board**.  In reality, you can use about any combination of channels, you will just have to wire them up in serial.  For my project, I found on Ebay from nyplatform a **8-Channel 24V Relay Shield Module For Arduino UNO 2560 1280 ARM PIC AVR STM32** and a **16-Channel 24V Relay Shield Module For Arduino UNO 2560 1280 ARM PIC AVR STM32**.  They had excellent prices and fast shipping.  The 16 channel relay had an unexpected bonus feature in that it generated a +5V current that was able to power the Arduino via the +5V pin.  Who knew?
+To control the sprinkler valves, we used a **16 Channel Relay Board**.  You can also use 2x 8 Channel Relay Boards,  you will just have to wire them up in serial.  Special Note: the relays for sale online can be +5V, +12V, +24V.  The SIMPLEST thing to do was to buy +5V relays so that you can power directly from the Arduino.  Since only one (up to three if you add a pump and master valve) relays are on at any given time, the Arduino is able to power them.   
 
 <img src="https://cloud.githubusercontent.com/assets/5625006/4689508/664a04fa-56be-11e4-9de9-37bd043f8fc1.jpg" width="200px"  />
 
@@ -65,9 +65,8 @@ The project requires at least two power supplies.  One power supply is to run th
 
 #### To run the Arduino, ThingShield and Relays:
 
-*If your relays are 5V:* You will need a 9V power supply to run the Arduino+ThingShield+Relays.   The 5V relays can be driven from the Arduino 5v pin (you use a jumper to connect the 5V pin and the VCC pin on the relay board).  This works because at most 2 relays are on at once (one for the valve and the other for the optional pump).   This can be purchased at Amazon as well by searching for "Arduino Power Supply".  Right now, I am using the Super Power Supply® AC / DC Adapter Charger Cord Plug - 9V 650mA compatible with Arduino Freeduino Duemilanove Uno Mega Hobby Electronics, which was available by Amazon Prime.   CAUTION: There are 9V power supplies availble on Amazon that do not work for the Arduino (they are made for musical instrament controllers) and some that perform very poorly on Arduino.  Be sure to read the reviews!  
+*If your relays are 5V:* You will need a 9V power supply to run the Arduino+ThingShield+Relays.   The 5V relays can be driven from the Arduino 5v pin (you use a jumper to connect the 5V pin and the VCC pin on the relay board).  This works because at most 3 relays are on at once (one for the valve and the other for the optional pump and optional master valve).   This can be purchased at Amazon as well by searching for "Arduino Power Supply".  Right now, I am using the Super Power Supply® AC / DC Adapter Charger Cord Plug - 9V 650mA compatible with Arduino Freeduino Duemilanove Uno Mega Hobby Electronics, which was available by Amazon Prime.   CAUTION: There are 9V power supplies availble on Amazon that do not work for the Arduino (they are made for musical instrament controllers) and some that perform very poorly on Arduino.  Be sure to read the reviews!  
 
-*If your relays are 24V or 12V:*  Purchase the respective power supply from Amazon.  We used 24V relays and purchased **100-240V to 24V 2A Switching AC/DC Power Adapter Charger US Plug by Gino** power supply.  We also used an adapter to make a clean transition from the power supply to flexible jumper wires.  The adapter can be found on Ebay or Amazon **10 Pack 2.1mm x 5.5mm Female CCTV Power Jack Adapter**  The 16 channel 24V relay board used in this project also provided a +5V current that travelled back to power the Arduiono+ThingShield (see below for wiring).
 
 ### Project Housing
 Finally, for the project housing, the 9"x9"x3" OUTDOOR CABLETEK ENCLOSURE PLASTIC GRAY CASE UTILITY CABLE BOX CTE-S from Amazon was a nice size that housed all the relay boards, as well as the Arduino+ThingShield. 
@@ -90,7 +89,7 @@ Here is an overview of the project all wired up and placed in the suggested hous
 1. Stack the SmartThing ThingShield on top of the Arduino MEGA.  
 2. Connect a ground wire from the GND pin on ThingShield to the GND pin on the 16 Channel relay.  
 3. Connect another jumper wire from the +5V on the ThingShield to the VCC pin on the 16 Channel Relay. 
-4. Use 24 wires from your ribbon cable to connect pins 21-44 on Arduino MEGA to pins 1 to 16 on the relay 16 channel board and to pins 1-8 on an additional 8 channel relay board (or other scenarios depending on what combination of relay boards that you have purchased).
+4. Use 16 wires from your ribbon cable to connect pins 21-36 on Arduino MEGA to pins 1 to 16 on the relay 16 channel board (or other scenarios depending on what combination of relay boards that you have purchased).
 
 ThingShield Connections: 5V power to Relay Board and a jumper connecting pin10 to pin3 needed for communications:
 
@@ -106,25 +105,13 @@ Jumper connections from the MEGA terminating on the 16 channel relay:
 
 ### Wiring The Relay Boards
 
-In addition to making the connections between the Arduino MEGA and the relay pins (above), you also need to power the relay boards and connect the "Common" terminals between all 24 of the relays.  
+In addition to making the connections between the Arduino MEGA and the relay pins (above), you also need to power the relay boards and connect the "Common" terminals between all 16 of the relays.  
 
 ####Powering the Relays:
-The relays are potentiated by connections with the ARDUINO MEGA pins 21-44.  However, the actual relay switching is seperately powered by either a 5V, 12V or 24V DC power, depending on which relay you purchase.   
-
-* For our project, we used 24V relay boards so we simply connected a 24V DC power supply to the two terminals on the 16 channel 24V relay board, using an 2.1mm x 5.5mm Female CCTV Power Jack Adapter which gave a clean connection from a 24V power supply to a set of flexible jumper wires.   We also needed to provide power to the second 8 channel 24V relay which was accomplished by connecting jumpers between the VCC and the GND pins of the 8 channel relay and the 24V terminals on the 16 channel relay (above you can see the black and white jumpers (spliced) connecting the 8 channel relay to the 24V terminals along the top of picture of the fully wired project).  It turns out the 16 channel 24V relay board used in this project also generated a 5V current that powers the Arduino+ThingShield via the 5V and GND jumper wires that connect the two boards. So we did not need to connect a power supply directly to the Arduino.
-
-Picture showing the 2.1mm x 5.5mm Female CCTV Power Jack Adapter connect to jumpers connected to the 24V terminal of the 16 channel relay board:
-
-<img src="https://cloud.githubusercontent.com/assets/5625006/4691622/3a88c030-5728-11e4-8182-64cee04a6989.jpg" width="200px"  />
-
-
-
-* If you purchase 5V relays, you need to pass the 5V power and Ground to the relay power pin or terminal from the Arduino.  1) Ensure you have connected the 5V and GND jumper from the Arduino to the 5V and ground pins on EACH relay board by daisy chaining/connecting with flexible jumper wires. 2) If applicable move the jumper on the relay board that bridges VCC to JD-VCC.  Or you may have to daisy chain/connect flexible jumper wire to the 5V and ground to a pair of terminals on the relay board.  The Arduino now powers the relays.   Note: with this many relays, you would over-load the Arduino, however, in this project no more than 2 relays are on at any time so the total current is only ~40 mA which is acceptable.
-
-
+The relays are potentiated by connections with the ARDUINO MEGA pins 21-44.  However, the actual relay switching is seperately powered by either a 5V, 12V or 24V DC power, depending on which relay you purchase. If using a +5V relays, run jumpers from the +5V and GND pins on the Arduino to the VCC and GND pins on the Relay Board, respectively.  If applicable move the jumper on the relay board that bridges VCC to JD-VCC.
 
 ####Connecting a Common terminals across the relays.
-Using short male to male jumper flexible wires or pre-formed solid male-to-male jumper wire or combination, we daisy chained the COMMON contact positions together across all 24 relays.
+Using short male to male jumper flexible wires or pre-formed solid male-to-male jumper wire or combination, we daisy chained the COMMON contact positions together across all 16 relays.
 
 Example of daisy chaining the COMMON terminals of the relays using flexible jumper wire:
 
@@ -141,12 +128,12 @@ Note, the ThingShield pins are not labeled.  So you can either identify the pins
 
 
 ### Wiring The Controller To The Irrigation System
-The final wiring of the project to your irrigation system is straight forward.  Irrigation sytems use a standard irrigation wire bundle which has multiple colored wires (one per valve + extras) and a white wire as a common ground. They typically run on 24V power.  
+The final wiring of the project to your irrigation system is straight forward.  Irrigation sytems use a standard irrigation wire bundle which has multiple colored wires (one per valve + extras) and a white wire as a common ground. They typically run on 24V AC power.  
 
 * Be sure power is disconnected before attempting to wire. Avoid being shocked or creating a fire hazard!  
 
 
-We connected “ground” wire from the 24V transformer to the common ground (white) wire in the irrigation wire bundle.
+We connected “ground” wire from the 24V AC transformer to the common ground (white) wire in the irrigation wire bundle.
 
 To connect the wires running to each valve, we used the Normally Open positions on the relay.  Each colored wire for each valve was connected to one of the NO positions on a relay.  One valve per relay.   Up to 8 are possible with this hardware, however, you do not need to use all 8.  We then connected the “hot” wire from the transformer to connect to the COMMON position (middle contact) on one of the relays.  This provides power to all realys since they are daisy chained together (see Arduino wiring above)  
 
@@ -173,8 +160,8 @@ Warning: Work is best done by licensed electrician following local codes.
 
 1. You should only be wiring the Pump Start Relay which uses 24V current.  Do not connect the 120V/240V wires!
 2. Wire the ground wire from the Pump Start Relay to the  ground wire bundle that contains the ground wire from the 24V irrigation transformer/power supply and the common ground that runs to the irrigation valves.
-3. Attach the load wire from the Pump Start Relay to Relay 24 or to the single relay that you added to the system, depending if you set up A) or B) above.
-4. In scenario A), where you use relay 24 to control your pump, you need to switch the use of the relay in the device type software by tapping the pump tile.  See above to activate scenario B) by modifying the Arduino sketch. 
+3. Attach the load wire from the Pump Start Relay to Relay 16 or to the single relay that you added to the system, depending if you set up A) or B) above.
+4. In scenario A), where you use relay 16 to control your pump, you need to switch the use of the relay in the device type software by tapping the pump tile.  See above to activate scenario B) by modifying the Arduino sketch. 
 
 ## The Software
 
@@ -184,7 +171,7 @@ The code for this project is in a few files which are posted on github:
 
 ### Arduino Code 
 
-**(Arduino_24_Zone_Irrigation_Controller.ino)**
+**(Arduino_16_Zone_Irrigation_Controller.ino)**
 
 In its most basic form, our controller manages a queue and turns on/off switches. That’s it. Nothing else. All other features are in the cloud!
 
@@ -206,7 +193,7 @@ Creates a queue to turn on or off a specific zone or all zones
 
 * The queue holds the state for each zone: 0=off, 1=waiting, 2=on
 * A traffic cop feature ensures only one zone is running at once
-* Works with up to 24 zones (relays), although you can use less
+* Works with up to 16 zones (relays), although you can use less
 * Allows zone times to be communicated as a string, which is parsed into an array
 * Once a zone is turned on, the Arduino knows when to turn it off (no additional communication needed)
 * Utilizes a timer function to run the zones.  This keeps the CPU free to manage communication between Arduino and SmartThings while a zone is running
@@ -214,13 +201,13 @@ Creates a queue to turn on or off a specific zone or all zones
 
 To load the code onto the Arduino, you will need the Arduino developer environment:
 
-http://arduino.cc/en/main/software
+http://arduino.cc/en/main/software or follow your board manufacturer's suggestion.
 
 Once the software is installed, the first thing to do is obtain the required libraries.  
 
 * Timer library was created by Simon Monk as modified by JChristensen  https://github.com/JChristensen/Timer
 The KNOWN LIBRARY BUG (timer.cpp) - identified by mattnichols 5/20/14 - has no known affect on the code.  Also, the Timer library release zip file downloads to your computer as "Timer-master-2".  Before loading into the Arduino IDE, change the name to "Timer"
-* SmartThings library available from https://www.dropbox.com/s/8hon320qmuio8fz/Shield%20Library.zip
+*  An enhanced SmartThings Library was created by  Dan G Ogorchock & Daniel J Ogorchock and their version is required for this implementation.  Their enhanced library can found at: https://github.com/DanielOgorchock/ST_Anything/tree/master/Arduino/libraries/SmartThings
 * SoftwareSerial library was default library provided with Arduino IDE
  
 Once you have the zip files downloaded and you have changed the name for the Timer zip file, you can import them within the Arduino IDE. Go to the Sketch:Import Library;Add Library drop down menu. Once you have added the libraries, they will show up under Sketch:Add Library:Contributed as "Timer" and "SmartThings".  Be sure the Timer library is installed as "Timer"
@@ -242,7 +229,7 @@ Its more than a good idea to put a piece of electrical tape over the USB port to
 
 ### Device Type Code 
 
-**(Device_Type_24_Zone_Irrigation_Controller.groovy):**
+**(Device_Type_16_Zone_Irrigation_Controller.groovy):**
 
 
 
@@ -318,8 +305,8 @@ Now when you 'push' or 'hold' a MiniMote button, the corresponding zone will act
 
 * What if you want to run your lawn irrigation on a different schedule than your drip irrigation?  No problems.  Just install the Irrigation Scheduler App for your lawn (rename it something like Lawn Irrigation Scheduler) and install the app a second time for the drip irrigation (rename it something like Drip Irrigation Scheduler).  
 
-* The Arduino runs on 9V DC power.  Your relays may require on 5V DC, which can be supplied by the Arduino 5V pin or require an additional 12V DC or 24V DC power supply, depending on which relay board you purchase.  The sprinkler valves run on 24V AC power which is connected and daisy chained through the relays.  Be sure to keep them straight.  
+* The Arduino runs on 9V DC power.  Your relays may require on 5V DC, which can be supplied by the Arduino 5V pin or your relays may require an additional 12V DC or 24V DC power supply, depending on which relay boards you purchase.  The sprinkler valves run on 24V AC power which is connected and daisy chained through the relays.  Be sure to keep them straight.  
 
 * The Arduino 9V power supply (transformer) can be purchased at Amazon by searching for "Arduino Power Supply".  CAUTION: There are 9V power supplies availble on Amazon that do not work for the Arduino (they are made for musical instrament controllers) and some that perform very poorly on Arduino.  Be sure to read the reviews!  
 
-*  There is nothing that requires you to have all 24 relays.  If you choose to use less than 24 relays AND plan to use the optional software activated master pump relay, just be sure that pin44 from the Arduino Mega is attached to the relay associated with the Master Pump Relay.
+*  There is nothing that requires you to have all 16 relays.  If you choose to use less than 16 relays AND plan to use the optional software activated master pump relay, just be sure that pin36 from the Arduino Mega is attached to the relay associated with the Master Pump Relay.

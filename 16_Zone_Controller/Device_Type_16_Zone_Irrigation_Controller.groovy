@@ -616,7 +616,7 @@ def OnWithZoneTimes(value) {
         zoneTimes[parts[0].toInteger()] = parts[1]
         log.info("Zone ${parts[0].toInteger()} on for ${parts[1]} minutes")
     }
-    zigbee.smartShield(text: "allOn,${checkTime(zoneTimes[1]) ?: 0},${checkTime(zoneTimes[2]) ?: 0},${checkTime(zoneTimes[3]) ?: 0},${checkTime(zoneTimes[4]) ?: 0},${checkTime(zoneTimes[5]) ?: 0},${checkTime(zoneTimes[6]) ?: 0},${checkTime(zoneTimes[7]) ?: 0},${checkTime(zoneTimes[8]) ?: 0},${checkTime(zoneTimes[9]) ?: 0},${checkTime(zoneTimes[10]) ?: 0},${checkTime(zoneTimes[11]) ?: 0},${checkTime(zoneTimes[12]) ?: 0},${checkTime(zoneTimes[13]) ?: 0},${checkTime(zoneTimes[14]) ?: 0},${checkTime(zoneTimes[15]) ?: 0},${checkTime(zoneTimes[16]) ?: 0},${checkTime(zoneTimes[17]) ?: 0},${checkTime(zoneTimes[18]) ?: 0},${checkTime(zoneTimes[19]) ?: 0},${checkTime(zoneTimes[20]) ?: 0},${checkTime(zoneTimes[21]) ?: 0},${checkTime(zoneTimes[22]) ?: 0},${checkTime(zoneTimes[23]) ?: 0}").format()
+    zigbee.smartShield(text: "allOn,${checkTime(zoneTimes[1]) ?: 0},${checkTime(zoneTimes[2]) ?: 0},${checkTime(zoneTimes[3]) ?: 0},${checkTime(zoneTimes[4]) ?: 0},${checkTime(zoneTimes[5]) ?: 0},${checkTime(zoneTimes[6]) ?: 0},${checkTime(zoneTimes[7]) ?: 0},${checkTime(zoneTimes[8]) ?: 0},${checkTime(zoneTimes[9]) ?: 0},${checkTime(zoneTimes[10]) ?: 0},${checkTime(zoneTimes[11]) ?: 0},${checkTime(zoneTimes[12]) ?: 0},${checkTime(zoneTimes[13]) ?: 0},${checkTime(zoneTimes[14]) ?: 0},${checkTime(zoneTimes[15]) ?: 0},${checkTime(zoneTimes[16]) ?: 0}").format()
 }
 
 def off() {

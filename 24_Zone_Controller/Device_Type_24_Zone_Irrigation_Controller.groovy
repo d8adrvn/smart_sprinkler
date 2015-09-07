@@ -840,8 +840,11 @@ def RelayOff24() {
 }
 
 def on() {
+//ToDo:  Need to split this up into two seperate payloads to keep each payload under the 63 character limit.
     log.info "Executing 'allOn'"
-    zigbee.smartShield(text: "allOn,${oneTimer ?: 0},${twoTimer ?: 0},${threeTimer ?: 0},${fourTimer ?: 0},${fiveTimer ?: 0},${sixTimer ?: 0},${sevenTimer ?: 0},${eightTimer ?: 0},${nineTimer ?: 0},${tenTimer ?: 0},${elevenTimer ?: 0},${twelveTimer ?: 0},${thirteenTimer ?: 0},${fourteenTimer ?: 0},${fifteenTimer ?: 0},${sixteenTimer ?: 0},${seventeenTimer ?: 0},${eightteenTimer ?: 0},${nineteenTimer ?: 0},${twentyTimer ?: 0},${twentyoneTimer ?: 0},${twentytwoTimer ?: 0},${twentythreeTimer ?: 0},${twentyfourTimer ?: 0}").format()
+    zigbee.smartShield(text: "allOn1,${oneTimer ?: 0},${twoTimer ?: 0},${threeTimer ?: 0},${fourTimer ?: 0},${fiveTimer ?: 0},${sixTimer ?: 0},${sevenTimer ?: 0},${eightTimer ?: 0},${nineTimer ?: 0},${tenTimer ?: 0},${elevenTimer ?: 0},${twelveTimer ?: 0},${thirteenTimer ?: 0},${fourteenTimer ?: 0},${fifteenTimer ?: 0},${sixteenTimer ?: 0}").format()
+    wait(5000)
+    zigbee.smartShield(text: "allOn2,${seventeenTimer ?: 0},${eightteenTimer ?: 0},${nineteenTimer ?: 0},${twentyTimer ?: 0},${twentyoneTimer ?: 0},${twentytwoTimer ?: 0},${twentythreeTimer ?: 0},${twentyfourTimer ?: 0}").format()
 }
 
 def OnWithZoneTimes(value) {
@@ -852,7 +855,10 @@ def OnWithZoneTimes(value) {
         zoneTimes[parts[0].toInteger()] = parts[1]
         log.info("Zone ${parts[0].toInteger()} on for ${parts[1]} minutes")
     }
-    zigbee.smartShield(text: "allOn,${checkTime(zoneTimes[1]) ?: 0},${checkTime(zoneTimes[2]) ?: 0},${checkTime(zoneTimes[3]) ?: 0},${checkTime(zoneTimes[4]) ?: 0},${checkTime(zoneTimes[5]) ?: 0},${checkTime(zoneTimes[6]) ?: 0},${checkTime(zoneTimes[7]) ?: 0},${checkTime(zoneTimes[8]) ?: 0},${checkTime(zoneTimes[9]) ?: 0},${checkTime(zoneTimes[10]) ?: 0},${checkTime(zoneTimes[11]) ?: 0},${checkTime(zoneTimes[12]) ?: 0},${checkTime(zoneTimes[13]) ?: 0},${checkTime(zoneTimes[14]) ?: 0},${checkTime(zoneTimes[15]) ?: 0},${checkTime(zoneTimes[16]) ?: 0},${checkTime(zoneTimes[17]) ?: 0},${checkTime(zoneTimes[18]) ?: 0},${checkTime(zoneTimes[19]) ?: 0},${checkTime(zoneTimes[20]) ?: 0},${checkTime(zoneTimes[21]) ?: 0},${checkTime(zoneTimes[22]) ?: 0},${checkTime(zoneTimes[23]) ?: 0}").format()
+//this up into two seperate payloads to keep each payload under the 63 character limit.
+    zigbee.smartShield(text: "allOn1,${checkTime(zoneTimes[1]) ?: 0},${checkTime(zoneTimes[2]) ?: 0},${checkTime(zoneTimes[3]) ?: 0},${checkTime(zoneTimes[4]) ?: 0},${checkTime(zoneTimes[5]) ?: 0},${checkTime(zoneTimes[6]) ?: 0},${checkTime(zoneTimes[7]) ?: 0},${checkTime(zoneTimes[8]) ?: 0},${checkTime(zoneTimes[9]) ?: 0},${checkTime(zoneTimes[10]) ?: 0},${checkTime(zoneTimes[11]) ?: 0},${checkTime(zoneTimes[12]) ?: 0},${checkTime(zoneTimes[13]) ?: 0},${checkTime(zoneTimes[14]) ?: 0},${checkTime(zoneTimes[15]) ?: 0},${checkTime(zoneTimes[16]) ?: 0}").format()
+    wait(5000)
+    zigbee.smartShield(text: "allOn2,${checkTime(zoneTimes[17]) ?: 0},${checkTime(zoneTimes[18]) ?: 0},${checkTime(zoneTimes[19]) ?: 0},${checkTime(zoneTimes[20]) ?: 0},${checkTime(zoneTimes[21]) ?: 0},${checkTime(zoneTimes[22]) ?: 0},${checkTime(zoneTimes[24]) ?: 0}").format()
 }
 
 def off() {

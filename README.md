@@ -21,8 +21,9 @@ This project contains code and instructions for how we built irrigation controll
 * A virtual rain guage that uses local weather stations to measure recent and forecasted rain and skip irrigation when rain exceeds a threshhold
 * Easty to follow documentation
 
-###There are two subprojects:
+###There are three subprojects:
 * 8 Zone Irrigation Controller
+* 16 Zone Irrigation Controller
 * 24 Zone Irrigation Controller
 
 
@@ -31,7 +32,7 @@ This project contains code and instructions for how we built irrigation controll
 * Smart Device Type code to connect your Arduino irrigation controller to the SmartThings Physical Graph
 * README with all the step by step detail to build either project
 
-###A SmartApp works for both projects
+###A SmartApp works for all three projects
 * Smart App allows you to schedule your irrigation and integrate hyperlocal weather forecasts
 * You can install the smart app multiple times to give you nearly unlimited schedules
 

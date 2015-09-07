@@ -1,6 +1,6 @@
 /**
- *  Irrigation Controller 24Zones with Master Valve and Pump Options v1.2
- *  This SmartThings Device Type Code Works With Arduino Irrigation Controller also available at this site
+ *  Irrigation Controller 24Zones with Master Valve and Pump Options v1.3
+ *  This SmartThings Device Type Code Works With Arduino Irrigation Controller for 24 zones v1.3 also available at this site
  *  
  *
  *	Creates connected irrigation controller

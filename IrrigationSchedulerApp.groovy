@@ -22,11 +22,11 @@
 **/
 
 definition(
-    name: "Irrigation Scheduler v2.93",
+    name: "Irrigation Scheduler v2.94",
     namespace: "d8adrvn/smart_sprinkler",
     author: "matt@nichols.name and stan@dotson.info",
     description: "Schedule sprinklers to run unless there is rain.",
-    version: "2.93",
+    version: "2.94",
     iconUrl: "https://s3.amazonaws.com/smartapp-icons/Meta/water_moisture.png",
     iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Meta/water_moisture@2x.png"
 )

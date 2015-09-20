@@ -26,7 +26,6 @@ definition(
     namespace: "d8adrvn/smart_sprinkler",
     author: "matt@nichols.name and stan@dotson.info",
     description: "Schedule sprinklers to run unless there is rain.",
-    category: "Green Living",
     version: "2.93",
     iconUrl: "https://s3.amazonaws.com/smartapp-icons/Meta/water_moisture.png",
     iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Meta/water_moisture@2x.png"
@@ -35,7 +34,7 @@ definition(
 preferences {
 	page(name: "schedulePage", title: "Schedule", nextPage: "sprinklerPage", uninstall: true) {
       	section("App configruation...") {
-        	label title: "Choose an title for App", required: true, defaultValue: "Irrigation Scheduler"
+        	label name: "label", title: "Choose an title for App", required: true, defaultValue: "Irrigation Scheduler"
         	input "isNotificationEnabled", "boolean", title: "Send Push Notification To Report Status At Irrigation Start", description: "Do You Want To Receive Push Notifications?", defaultValue: "true", required: false
         }
         
@@ -140,6 +139,8 @@ def scheduling() {
 
 def waterTimeOneStart() {
     state.currentTimerIx = 0
+    log.info (title: $title)
+    log.info (label: $label)
     scheduleCheck()
 }
 def waterTimeTwoStart() {
@@ -215,34 +216,35 @@ def daysSince() {
 }
 
 def isRainDelay() { 
+	if (zipcode) {
+        def rainGauge = 0
 
-	def rainGauge = 0
-    
-    if (isYesterdaysRainEnabled.equals("true")) {        
-    	rainGauge = rainGauge + wasWetYesterday()
-   	}
-    
-    if (isTodaysRainEnabled.equals("true")) {
-    	rainGauge = rainGauge + isWet()
-    }
-    
-    if (isForecastRainEnabled.equals("true")) {
-    	rainGauge = rainGauge + isStormy()
-  	}
-    
-    log.info ("Virtual rain gauge reads $rainGauge in")
-    if (rainGauge > (wetThreshold?.toFloat() ?: 0.5)) {
-        if (isNotificationEnabled.equals("true")) {
-        	sendPush("Skipping watering today due to precipitation.")
-     	}
-        for(s in switches) {
-            if("rainDelayed" in s.supportedCommands.collect { it.name }) {
-                s.rainDelayed()
-                log.trace "Watering is rain delayed for $s"
-            }
+        if (isYesterdaysRainEnabled.equals("true")) {        
+            rainGauge = rainGauge + wasWetYesterday()
         }
-        return true
-    }
+
+        if (isTodaysRainEnabled.equals("true")) {
+            rainGauge = rainGauge + isWet()
+        }
+
+        if (isForecastRainEnabled.equals("true")) {
+            rainGauge = rainGauge + isStormy()
+        }
+
+        log.info ("Virtual rain gauge reads $rainGauge in")
+        if (rainGauge > (wetThreshold?.toFloat() ?: 0.5)) {
+            if (isNotificationEnabled.equals("true")) {
+                sendPush("Skipping watering today due to precipitation.")
+            }
+            for(s in switches) {
+                if("rainDelayed" in s.supportedCommands.collect { it.name }) {
+                    s.rainDelayed()
+                    log.info "Watering is rain delayed for $s"
+                }
+            }
+            return true
+        	}
+     	}
     return false
 }
 

@@ -14,11 +14,14 @@
  *
  ****************************************************************************************************************************
  * Libraries:
- * Timer library was created by Simon Monk as modified by JChristensen  https://github.com/JChristensen/Timer
- *   KNOWN LIBRARY BUG (timer.cpp) - identified by mattnichols 5/20/14 - has no known affect on the code below
- * SmartThings library available from https://www.dropbox.com/s/8hon320qmuio8fz/Shield%20Library.zip
- * SoftwareSerial library was default library provided with Arduino IDE
+ * Timer library was created by Simon Monk as modified by JChristensen  https://github.com/JChristensen/Timer.  Note: if you
+ * download the library from the source, you must rename the zip file to "Timer" before importing into the Arduino IDE.
+ * 
+ * An enhanced SmartThings Library was created by  Dan G Ogorchock & Daniel J Ogorchock and their version is required for this implementation.
+ * Their enhanced library can found at:
+ * https://github.com/DanielOgorchock/ST_Anything/tree/master/Arduino/libraries/SmartThings
  *
+ * SoftwareSerial library was default library provided with Arduino IDE
  ****************************************************************************************************************************
  *  Copyright 2014 Stan Dotson (stan@dotson.info) and Matthew Nichols (matt@nichols.name)
  *
@@ -226,11 +229,12 @@ int trafficCop =0;  //tracks which station has the right of way (is on)
 int stations=relays; //sets number of stations reserving 1 relay for the pump.
 int relayOn = HIGH;
 int relayOff = LOW;
-// initialize irrigation zone variables; for readability, zone values store [1]-[23] and [0] is not used
+// initialize irrigation zone variables; for readability, zone values store [1]-[24] and [0] is not used
 long stationTime[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 int8_t stationTimer[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}; 
 int queue[]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};  // off: 0, queued: 1, running: 2
-int relay[25];  //for readability, zone values store [1]-[23] and [0] is not used
+int relay[25];  //for readability, zone values store [1]-[24] and [0] is not used
+
 
 //initialize pump related variables. 
 int pin4Relay = 4;  //pin4 reserved for optional additional relay to control a pump or master valve
@@ -336,24 +340,39 @@ void messageCallout(String message)
   if (strcmp(inValue[0],"update")==0) {
     scheduleUpdate();
   }
-  if (strcmp(inValue[0],"allOn")==0) {
+  if (strcmp(inValue[0],"allOn1")==0) {   //read in times for zones 1-17
     int i=1;
-    while (i<stations+1) {
+    while (i<17) {
       if (i != trafficCop) {
         if (strcmp(inValue[i],"0")!=0 && strcmp(inValue[i],"null")!=0) {  //do not add to queue if zero time
           queue[i]=1;
+          stationTime[i]=atoi(inValue[i])*60L*1000L;
         }
       }
-      stationTime[i]=atoi(inValue[i])*60L*1000L;
       i++;
     }
     scheduleUpdate();
   }
-  if (strcmp(inValue[0],"allOff")==0) {
-    allOff();
+  
+  if (strcmp(inValue[0],"allOn2")==0) {  //read times for in zone 17-24
+    int i=1;
+    while (i<9) {
+      if (i+16 != trafficCop) { 
+        if (strcmp(inValue[i],"0")!=0 && strcmp(inValue[i],"null")!=0) {  //do not add to queue if zero time
+          queue[i+16]=1;
+          stationTime[i+16]=atoi(inValue[i])*60L*1000L;
+        }
+      }
+      i++;
+    }
+    scheduleUpdate();
   }
+  
   if (strcmp(inValue[0],"advance")==0) {
     toggleOff();
+  }
+  if (strcmp(inValue[0],"allOff")==0) {
+    allOff();
   }
   if (strcmp(inValue[0],"pump")==0) {
     if (strcmp(inValue[1],"0")==0) {
@@ -513,9 +532,11 @@ void sendUpdate(String statusUpdate) {
     statusUpdate.concat (action + i + ",");
   }
   smartthing.send(statusUpdate);
-  Serial.println(statusUpdate);
+  if (isDebugEnabled) {
+    Serial.println(statusUpdate);
+  }
   statusUpdate = "";
-  delay (2000);  //allow SmartThings time to process first string
+  delay (2000);  //allow SmartThings hub time to process first string
   
     for (int i=(stations/2+1); i<(stations+1); i++) {
     if (queue[i]==0) {
@@ -530,7 +551,9 @@ void sendUpdate(String statusUpdate) {
     statusUpdate.concat (action + i + ",");
   }
   smartthing.send(statusUpdate);
-  Serial.println(statusUpdate);
+  if (isDebugEnabled) {
+    Serial.println(statusUpdate);
+  }
   statusUpdate = "";
 }
 

@@ -46,15 +46,10 @@ preferences {
     input("twentyfourTimer", "text", title: "Zone Twentyfour", description: "Zone Twentyfour Time", required: false)    
     
 }
-
 metadata {
-    definition (name: "Irrigation Controller 24 Zones with Optional Pump v1.1", version: "1.1", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") {
-        
-        fingerprint profileId: "0104", deviceId: "0138", inClusters: "0000"
-        
+    definition (name: "Irrigation Controller 24 Zones with Optional Pump v1.3", version: "1.3", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") 
+    {
         capability "Switch"
-        capability "Momentary"
- //       capability "Refresh"
         command "OnWithZoneTimes"
         command "RelayOn1"
         command "RelayOn1For"
@@ -153,7 +148,7 @@ metadata {
         standardTile("allZonesTile", "device.switch", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
             state "off", label: 'Start', action: "switch.on", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "starting"
             state "on", label: 'Running', action: "switch.off", icon: "st.Health & Wellness.health7", backgroundColor: "#53a7c0", nextState: "stopping"
-            state "starting", label: 'Starting...', action: "switch.on", icon: "st.Health & Wellness.health7", backgroundColor: "#53a7c0"
+            state "starting", label: 'Starting...', action: "switch.off", icon: "st.Health & Wellness.health7", backgroundColor: "#53a7c0"
             state "stopping", label: 'Stopping...', action: "switch.off", icon: "st.Health & Wellness.health7", backgroundColor: "#53a7c0"
             state "rainDelayed", label: 'Rain Delay', action: "switch.off", icon: "st.Weather.weather10", backgroundColor: "#fff000", nextState: "off"
         }
@@ -326,9 +321,7 @@ metadata {
             state "r24", label: 'Twentyfour', action: "RelayOff24",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "sending24"
             state "sendingOff24", label: 'sending', action: "RelayOff24", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
             state "havePump", label: 'Twentyfour', action: "disablePump", icon: "st.custom.buttons.subtract-icon", backgroundColor: "#ffffff"
-
-}        
-           
+		}                
         standardTile("pumpTile", "device.pump", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
             state "noPump", label: 'Pump', action: "enablePump", icon: "st.custom.buttons.subtract-icon", backgroundColor: "#ffffff",nextState: "enablingPump"
             state "offPump", label: 'Pump', action: "onPump", icon: "st.valves.water.closed", backgroundColor: "#ffffff", nextState: "sendingPump"
@@ -336,8 +329,7 @@ metadata {
             state "disablingPump", label: 'sending', action: "disablePump", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
             state "onPump", label: 'Pump', action: "offPump",icon: "st.valves.water.open", backgroundColor: "#53a7c0", nextState: "sendingPump"
             state "sendingPump", label: 'sending', action: "offPump", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
-        }
-        	
+        }    	
      	standardTile("scheduleEffect", "device.effect", width: 1, height: 1) {
             state("noEffect", label: "Normal", action: "skip", icon: "st.Office.office7", backgroundColor: "#ffffff")
             state("skip", label: "Skip 1X", action: "expedite", icon: "st.Office.office7", backgroundColor: "#c0a353")
@@ -361,10 +353,9 @@ def parse(String description) {
     
     def value = zigbee.parse(description)?.text
    	log.debug "Parsing: ${value}"
-    if (value != null && value != " " && value != '"' && value != "havePump" && value != "noPump") {
+    if (value != null && value != " " && value != "ping" && value != '"' && value != "havePump" && value != "noPump") {
      	String delims = ","
 		String[] tokens = value.split(delims)
-//		String[] tokens = value.split("(?<=\\G.{3})")
 
         for (int x=0; x<tokens.length; x++) {
             def displayed = tokens[x] && tokens[x] != "ping"  //evaluates whether to display message
@@ -399,8 +390,6 @@ def parse(String description) {
             def currentVal = device.currentValue(name)
 
             def stateChange = true
-            // It seems like this should work. When a state change is made due to a nextState parameter, the value is not changed.
-            // if(currentVal) stateChange = currentVal != tokens[x]
 
             def result = createEvent(name: name, value: tokens[x], displayed: true, isStateChange: true, isPhysical: true)
             log.debug "Parse returned ${result?.descriptionText}"
@@ -837,14 +826,17 @@ def RelayOn24For(value) {
 def RelayOff24() {
     log.info "Executing 'off,24'"
     zigbee.smartShield(text: "off,24").format()
+    
 }
 
 def on() {
-//ToDo:  Need to split this up into two seperate payloads to keep each payload under the 63 character limit.
-    log.info "Executing 'allOn'"
-    zigbee.smartShield(text: "allOn1,${oneTimer ?: 0},${twoTimer ?: 0},${threeTimer ?: 0},${fourTimer ?: 0},${fiveTimer ?: 0},${sixTimer ?: 0},${sevenTimer ?: 0},${eightTimer ?: 0},${nineTimer ?: 0},${tenTimer ?: 0},${elevenTimer ?: 0},${twelveTimer ?: 0},${thirteenTimer ?: 0},${fourteenTimer ?: 0},${fifteenTimer ?: 0},${sixteenTimer ?: 0}").format()
-    wait(5000)
+//split this up into two seperate payloads to keep each payload under the 63 character limit.
+    log.info "Executing allOn"
+	[
+    zigbee.smartShield(text: "allOn1,${oneTimer ?: 0},${twoTimer ?: 0},${threeTimer ?: 0},${fourTimer ?: 0},${fiveTimer ?: 0},${sixTimer ?: 0},${sevenTimer ?: 0},${eightTimer ?: 0},${nineTimer ?: 0},${tenTimer ?: 0},${elevenTimer ?: 0},${twelveTimer ?: 0},${thirteenTimer ?: 0},${fourteenTimer ?: 0},${fifteenTimer ?: 0},${sixteenTimer ?: 0}").format(),
+    "delay 20000",
     zigbee.smartShield(text: "allOn2,${seventeenTimer ?: 0},${eightteenTimer ?: 0},${nineteenTimer ?: 0},${twentyTimer ?: 0},${twentyoneTimer ?: 0},${twentytwoTimer ?: 0},${twentythreeTimer ?: 0},${twentyfourTimer ?: 0}").format()
+	]
 }
 
 def OnWithZoneTimes(value) {
@@ -856,9 +848,11 @@ def OnWithZoneTimes(value) {
         log.info("Zone ${parts[0].toInteger()} on for ${parts[1]} minutes")
     }
 //this up into two seperate payloads to keep each payload under the 63 character limit.
-    zigbee.smartShield(text: "allOn1,${checkTime(zoneTimes[1]) ?: 0},${checkTime(zoneTimes[2]) ?: 0},${checkTime(zoneTimes[3]) ?: 0},${checkTime(zoneTimes[4]) ?: 0},${checkTime(zoneTimes[5]) ?: 0},${checkTime(zoneTimes[6]) ?: 0},${checkTime(zoneTimes[7]) ?: 0},${checkTime(zoneTimes[8]) ?: 0},${checkTime(zoneTimes[9]) ?: 0},${checkTime(zoneTimes[10]) ?: 0},${checkTime(zoneTimes[11]) ?: 0},${checkTime(zoneTimes[12]) ?: 0},${checkTime(zoneTimes[13]) ?: 0},${checkTime(zoneTimes[14]) ?: 0},${checkTime(zoneTimes[15]) ?: 0},${checkTime(zoneTimes[16]) ?: 0}").format()
-    wait(5000)
-    zigbee.smartShield(text: "allOn2,${checkTime(zoneTimes[17]) ?: 0},${checkTime(zoneTimes[18]) ?: 0},${checkTime(zoneTimes[19]) ?: 0},${checkTime(zoneTimes[20]) ?: 0},${checkTime(zoneTimes[21]) ?: 0},${checkTime(zoneTimes[22]) ?: 0},${checkTime(zoneTimes[24]) ?: 0}").format()
+    [
+    zigbee.smartShield(text: "allOn1,${checkTime(zoneTimes[1]) ?: 0},${checkTime(zoneTimes[2]) ?: 0},${checkTime(zoneTimes[3]) ?: 0},${checkTime(zoneTimes[4]) ?: 0},${checkTime(zoneTimes[5]) ?: 0},${checkTime(zoneTimes[6]) ?: 0},${checkTime(zoneTimes[7]) ?: 0},${checkTime(zoneTimes[8]) ?: 0},${checkTime(zoneTimes[9]) ?: 0},${checkTime(zoneTimes[10]) ?: 0},${checkTime(zoneTimes[11]) ?: 0},${checkTime(zoneTimes[12]) ?: 0},${checkTime(zoneTimes[13]) ?: 0},${checkTime(zoneTimes[14]) ?: 0},${checkTime(zoneTimes[15]) ?: 0},${checkTime(zoneTimes[16]) ?: 0}").format(),
+    "delay 20000",
+    zigbee.smartShield(text: "allOn2,${checkTime(zoneTimes[17]) ?: 0},${checkTime(zoneTimes[18]) ?: 0},${checkTime(zoneTimes[19]) ?: 0},${checkTime(zoneTimes[20]) ?: 0},${checkTime(zoneTimes[21]) ?: 0},${checkTime(zoneTimes[22]) ?: 0},${checkTime(zoneTimes[23]) ?: 0},${checkTime(zoneTimes[24]) ?: 0}").format()
+	]
 }
 
 def off() {
@@ -875,10 +869,6 @@ def update() {
     log.info "Execting refresh"
     zigbee.smartShield(text: "update").format()
 }
-//def refresh() {
-//    log.debug "Executing polling"
-//    update()
-//}
 
 def rainDelayed() {
     log.debug "rain delayed"

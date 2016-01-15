@@ -237,7 +237,7 @@ The device type code allows you to control the Arduino via the SmartThings physi
 
 The Main Tile is an all on or all off tile and links to the “switch” capability to turn on or off all 8 zones of the sprinkler by pressing one button.  By using the “switch” capability, you to use any of the SmartThings apps that includes a switch capability to run the sprinkler system!  There is also an “switch off” capability that turns off all zones. The Main Tile can also receive a message when the system is on Rain Delay mode.
 
-Once you enter the Device Handler (Device Type), you will see the following screen:
+Once you enter the Device Handler (Device Type), you will see the following screen (note this is for the 8 zone, the 16 zone will look the same but with more zones):
 
 <img src="https://cloud.githubusercontent.com/assets/5625006/12346436/d3ea402c-bb19-11e5-87f0-770bbd9923c1.jpg" width="200px"  />
 

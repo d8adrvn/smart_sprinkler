@@ -208,6 +208,9 @@ Scheduler Override Tile.  This tile interacts with the Schedular App (see below)
 
 Example uses for this Scheduler Overide tile include putting the system on hold for the winter, during yard construction projects, after applying weed killer to the yard, and so on.
 
+<img src="https://cloud.githubusercontent.com/assets/5625006/12346445/df465bd6-bb19-11e5-83d7-66223d6a96cc.jpg" width="200px"  />
+
+
 The “Preferences” page allows you to enter the run times for each station.  To get to the preferences page, press the 3 vertical dots in the top right corner of the Device Handler:
 
 <img src="https://cloud.githubusercontent.com/assets/5625006/12346438/d5876e8c-bb19-11e5-907d-3fbba667f8c0.jpg" width="200px"  />
@@ -215,8 +218,9 @@ The “Preferences” page allows you to enter the run times for each station.  
 
 Once in the Preferences page, you can enter a set of times for each zone that you trigger manually (by pressing the zone tile in the Device Handler).  To enter you manual zone times, just enter the times in minutes.  If you are using less than 8 zones, just enter zero minutes for zones not in use.  These time Preferences are used when you run the sprinkler manually from within the Irrigation Controller Device Type app.  If you are using the SmartApp Irrigation Scheduler App to automatically run the system and have entered times via that app, the Scheduler supplied times are used.
 
+<img src="https://cloud.githubusercontent.com/assets/5625006/12346439/d70889c6-bb19-11e5-8896-72a52dba53c1.jpg" width="200px"  />
 
-### Irrigation Schedular Smart App 
+
 
 **(IrrigationSchedulerApp.groovy)**
 

@@ -181,7 +181,7 @@ Once you have finished transfering the code to the Arduino, you can remove the U
 
 Its more than a good idea to put a piece of electrical tape over the USB port to prevent accidental grounding of the port!
 
-### Device Type Code 
+### Device Handler Code 
 
 **(IrrigationControllerDeviceType.groovy):**
 
@@ -191,15 +191,32 @@ The device type code allows you to control the Arduino via the SmartThings physi
 
 The Main Tile is an all on or all off tile and links to the “switch” capability to turn on or off all 8 zones of the sprinkler by pressing one button.  By using the “switch” capability, you to use any of the SmartThings apps that includes a switch capability to run the sprinkler system!  There is also an “switch off” capability that turns off all zones. The Main Tile can also receive a message when the system is on Rain Delay mode.
 
+Once you enter the Device Handler (Device Type), you will see the following screen:
+
+<img src="https://cloud.githubusercontent.com/assets/5625006/12346436/d3ea402c-bb19-11e5-87f0-770bbd9923c1.jpg" width="200px"  />
+
+
 Each sprinkler zone additionally has its own tile.  When the zone is off, the tile is white.  If the zone is in the queue and waiting its turn, the tile is gold.  When the zone is running, the tile is blue.
 
-The “Refresh” tile can be pressed to refresh the status of all the zones.  There are a number of situations that the tiles become out of synch.  If you press too many individual tiles to fast, the communication may not be captured by the Arduino.  If you try to add or delete a zone from the queue while “refresh” is running (it takes 8 sec to refresh), the communication may not be captured by the Arduino.  And there are times the SmartThings hub just doesn’t seem to capture the message from the Arduino or at least is slow to respond.  If in doubt, press the “Refresh”.   As an additional "escape" feature, any tile that seems to be out of synch can be pressed again to trigger the zone to turn off.  
+The “Refresh” tile can be pressed to refresh the status of all the zones.  There are a number of situations that the tiles become out of synch.  If you press too many individual tiles to fast, the communication may not be captured by the Arduino.  If you try to add or delete a zone from the queue while “refresh” is running (it takes 8 sec to refresh), the communication may not be captured by the Arduino.  And there are times the SmartThings hub just doesn’t seem to capture the message from the Arduino or at least is slow to respond.  If in doubt, press the “Refresh”.   As an additional "rescue" feature, any tile that seems to be out of synch can be pressed again to trigger the zone to turn off.  
 
-The “Preferences” tile allows you to enter the run times for each station.  Just enter the times in minutes.  If you are using less than 8 zones, just enter zero minutes for zones not in use.  These time Preferences are used when you run the sprinkler manually from within the Irrigation Controller Device Type app.  If you are using the SmartApp Irrigation Scheduler App to automatically run the system and have entered times via that app, the Scheduler supplied times are used.
+Scheduler Override Tile.  This tile interacts with the Schedular App (see below) to provide additional functionality.  By pressing the tile you can rotate through the features
+* Normal - allows Schedular App to run as scheduled
+* Skip 1X - skips one scheduled watering routine
+* Expedite - over-rides the weather forecast and allows the Schedule to run, even if there is rain
+* Pause - indefinitely pauses the Scheduler App.  
 
-<img src="https://cloud.githubusercontent.com/assets/5625006/3353741/2cdbb0ea-fa8b-11e3-9e13-81c3b004f902.jpg" width="200px"  />
+Example uses for this Scheduler Overide tile include putting the system on hold for the winter, during yard construction projects, after applying weed killer to the yard, and so on.
 
-### Irrigation Controller Smart App 
+The “Preferences” page allows you to enter the run times for each station.  To get to the preferences page, press the 3 vertical dots in the top right corner of the Device Handler:
+
+<img src="https://cloud.githubusercontent.com/assets/5625006/12346438/d5876e8c-bb19-11e5-907d-3fbba667f8c0.jpg" width="200px"  />
+
+
+Once in the Preferences page, you can enter a set of times for each zone that you trigger manually (by pressing the zone tile in the Device Handler).  To enter you manual zone times, just enter the times in minutes.  If you are using less than 8 zones, just enter zero minutes for zones not in use.  These time Preferences are used when you run the sprinkler manually from within the Irrigation Controller Device Type app.  If you are using the SmartApp Irrigation Scheduler App to automatically run the system and have entered times via that app, the Scheduler supplied times are used.
+
+
+### Irrigation Schedular Smart App 
 
 **(IrrigationSchedulerApp.groovy)**
 
@@ -218,20 +235,8 @@ After totaling up the precip, the App checks the threshold that you set as a pre
 <img src="https://cloud.githubusercontent.com/assets/5625006/3353744/361a6372-fa8b-11e3-8fe5-1f1081f49fc2.jpg" width="200px"  />
 
 
-### Irrigation Virtual Scheduler Switch 
-
-**(IrrigationVirtualSchedulerSwitchDevice.groovy)**
-
-This is an optional utility that allows you to put your system on extended hold or in other states. To install:
-
-* Open the SmartThings IDE
-* Create a new device type and paste the code in
-* Save and then Publish (to me)
-* Create a new device and select the device type you just created
-* The device should now show up on your smartphone SmartThings app
-* You must select it in the Irrigation Scheduler app
-
-Example uses for this accessory app include putting the system on hold for the winter, during yard construction projects, after applying weed killer to the yard, and so on.  
+You can install multipe Scheduler apps.  For example one to run your lawn sprinklers every day and another to run your drip sprinklers a couple times of week.  Or whatever unique situation exists with your system.
+  
 
 ## Take Your Controller to the Next Level:
 
@@ -259,12 +264,16 @@ Here is how to virtualize your switches:
 
 The above is a bit tedious.  As soon as SmartThings supports child devices, I imagine we will update our code and can do away with the need to create virtual switches.  
 
-Now for the cool part.  To control your system with the Aeon MiniMote:
+Now for the cool part.  You can integrate the sprinkler system with other SmartThings devices.  See below for some examples:
+
+To control your system with the Aeon MiniMote:
 1. Add the MiniMote to the sytem using Aeon's instructions "Becoming a Secondary/Inclusion Controller to Another Z-Wave Controller or Gateway in an Existing Z-Wave Network
 2. When it asks you to configure 'button 1': add Virtual Irrigation Zone 1  as the switch under 'Pushed' and Virtual Irrigation Zone 2 as the switch under 'Held'
 3. Repeat for buttons 2,3,4 using zones 3-8
 
 Now when you 'push' or 'hold' a MiniMote button, the corresponding zone will activate.  If you push again, it will turn off.   If you do not turn off the sytem, it will run for as long as the zone ran, the last time it was activated from the device type or the smart app.   Tip: you can tell push and hold apart.  When you push, a solid blue led comes on.  When you have 'held' the button, the blue led starts flashing.  
+
+To control your system with the Amazone Echo, just import your SmartThings devices into Echo.  The Sprinkler system will show up as an on/off switch which will trigger the sprinkler to run through each station using the manual zone times (the ones set in the preferences).  If you set up virtual switches for each zone, then you can use the Echo to turn on a specific zone.  Just say Alex, turn on my Sprinkler system!
 
 ## FAQs
 

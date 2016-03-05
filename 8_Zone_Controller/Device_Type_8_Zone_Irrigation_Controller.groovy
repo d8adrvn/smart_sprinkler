@@ -177,7 +177,9 @@ def parse(String description) {
   
     
     def value = zigbee.parse(description)?.text
-    log.debug "Parsed: ${value}"
+    if (value != null && value != " " && value != '"' && value != "ping" ) {
+	 log.debug "Parsed: ${value}"
+    }
     if (value != null && value != " " && value != '"' && value != "ping" && value != "havePump" && value != "noPump") {
         String delims = ","
         String[] tokens = value.split(delims)

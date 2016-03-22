@@ -22,7 +22,7 @@
 **/
 
 definition(
-    name: "Irrigation Scheduler v2.94",
+    name: "Irrigation Scheduler v2.95",
     namespace: "d8adrvn/smart_sprinkler",
     author: "matt@nichols.name and stan@dotson.info",
     description: "Schedule sprinklers to run unless there is rain.",
@@ -32,27 +32,28 @@ definition(
 )
 
 preferences {
-	page(name: "schedulePage", title: "Schedule", nextPage: "sprinklerPage", uninstall: true) {
-      	section("App configruation...") {
-        	label name: "label", title: "Choose an title for App", required: true, defaultValue: "Irrigation Scheduler"
-        	input "isNotificationEnabled", "boolean", title: "Send Push Notification To Report Status At Irrigation Start", description: "Do You Want To Receive Push Notifications?", defaultValue: "true", required: false
+	page(name: "schedulePage", title: "Create An Irrigation Schedule", nextPage: "sprinklerPage", uninstall: true) {
+        
+        section("Preferences") {
+        	label name: "title", title: "Name this irrigation schedule...", required: false, multiple: false, defaultValue: "Irrigation Scheduler"
+        	input "isNotificationEnabled", "boolean", title: "Send Push Notification When Irrigation Starts", description: "Do You Want To Receive Push Notifications?", defaultValue: "true", required: false
         }
         
         section {
             input (
             name: "wateringDays",
             type: "enum",
-            title: "Water which days?",
+            title: "Water on which days?",
             required: false,
             multiple: true, // This must be changed to false for development (known ST IDE bug)
             metadata: [values: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']])
         }
 
-        section("Water every...") {
-            input "days", "number", title: "Days?", description: "minimum # days between watering", required: false
+        section("Minimum interval between waterings...") {
+            input "days", "number", title: "Days?", description: "minimum # days between watering", defaultValue: "1", required: false
         }
 
-        section("Water when...") {
+        section("Start watering at what times...") {
             input name: "waterTimeOne",  type: "time", required: true, title: "Turn them on at..."
             input name: "waterTimeTwo",  type: "time", required: false, title: "and again at..."
             input name: "waterTimeThree",  type: "time", required: false, title: "and again at..."
@@ -60,8 +61,8 @@ preferences {
     }
     
 
-    page(name: "sprinklerPage", title: "Sprinkler Controller Setup", nextPage: "virtualRainGuage", uninstall: true) {
-        section("Sprinkler switches...") {
+    page(name: "sprinklerPage", title: "Sprinkler Controller Setup", nextPage: "weatherPage", uninstall: true) {
+        section("Select your sprinkler controller(s)...") {
             input "switches", "capability.switch", multiple: false
         }
 
@@ -96,20 +97,24 @@ preferences {
 
  	}
     
-	page(name: "virtualRainGuage", title: "Virtual Rain Guage Setup", install: true) {
+	page(name: "weatherPage", title: "Virtual Weather Station Setup", install: true) {
 		
-        section("Zip code to check weather...") {
-            input "zipcode", "text", title: "Zipcode?", required: false
+        section("Zip code or Weather Station ID to check weather...") {
+            input "zipcode", "text", title: "Enter zipcode or or pws:stationid", required: false
         }
         
-        section("Select which rain to add to guage...") {
+        section("Select which rain to add to your virtual rain guage...") {
         	input "isYesterdaysRainEnabled", "boolean", title: "Yesterday's Rain", description: "Include?", defaultValue: "true", required: false
         	input "isTodaysRainEnabled", "boolean", title: "Today's Rain", description: "Include?", defaultValue: "true", required: false
         	input "isForecastRainEnabled", "boolean", title: "Today's Forecasted Rain", description: "Include?", defaultValue: "false", required: false
         }
        
-       section("Skip watering if more than... (default 0.5)") {
-            input "wetThreshold", "decimal", title: "Inches?", required: false
+       	section("Skip watering if virutal rain guage totals more than... (default 0.5)") {
+            input "wetThreshold", "decimal", title: "Inches?", defaultValue: "0.5", required: false
+        }
+        
+        section("Run watering only if forecasted high temp (F) is greater than... (default 50)") {
+            input "tempThreshold", "decimal", title: "Temp?", defaultValue: "50", required: false
         }
         
     }
@@ -139,8 +144,6 @@ def scheduling() {
 
 def waterTimeOneStart() {
     state.currentTimerIx = 0
-    log.info (title: $title)
-    log.info (label: $label)
     scheduleCheck()
 }
 def waterTimeTwoStart() {
@@ -155,10 +158,10 @@ def waterTimeThreeStart() {
 def scheduleCheck() {
 
     def schedulerState = switches?.latestValue("effect")?.toString() ?:"[noEffect]"
-        
+    log.info "Running Irrigation Schedule: ${app.label}"
 
     if (schedulerState == "onHold") {
-        log.info("Sprinkler schedule on hold.")
+        log.info("${app.label} sprinkler schedule on hold.")
         return
     } 
     
@@ -168,21 +171,21 @@ def scheduleCheck() {
         for(s in switches) {
             if("noEffect" in s.supportedCommands.collect { it.name }) {
                 s.noEffect()
-                log.info ("sent noEffect() to ${s}")
+                log.info ("${app.label} sent noEffect() to ${s}")
             }
         }
  	}    
     
 	if (schedulerState != "expedite") { 
-    	// Change to rain delay if wet
-    	schedulerState = isRainDelay() ? "delay" : schedulerState
+    	// Change to delay if wet or too cold
+        schedulerState = isWeatherDelay() ? "delay" : schedulerState
  	}
 
     if (schedulerState != "delay") {
         state.daysSinceLastWatering[state.currentTimerIx] = daysSince() + 1
     }
 
-    log.info("Scheduler state: $schedulerState. Days since last watering: ${daysSince()}. Is watering day? ${isWateringDay()}. Enought time? ${enoughTimeElapsed(schedulerState)} ")
+    log.info("${app.label} scheduler state: $schedulerState. Days since last watering: ${daysSince()}. Is watering day? ${isWateringDay()}. Enought time? ${enoughTimeElapsed(schedulerState)} ")
 
     if ((isWateringDay() && enoughTimeElapsed(schedulerState) && schedulerState != "delay") || schedulerState == "expedite") {
         if (isNotificationEnabled.equals("true")) {
@@ -201,7 +204,7 @@ def isWateringDay() {
     if (wateringDays.contains(today)) {
         return true
     }
-    log.info "watering is not scheduled for today"
+    log.info "${app.label} watering is not scheduled for today"
     return false
 }
 
@@ -215,10 +218,14 @@ def daysSince() {
     state.daysSinceLastWatering[state.currentTimerIx] ?: 0
 }
 
-def isRainDelay() { 
-	if (zipcode) {
+def isWeatherDelay() { 
+	log.info "${app.label} Is Checking The Weather"
+    log.debug "zipcode is $zipcode"
+    if (zipcode) {
+        
+        //add rain to virtual rain guage
         def rainGauge = 0
-
+		log.debug "Checking rain guage"
         if (isYesterdaysRainEnabled.equals("true")) {        
             rainGauge = rainGauge + wasWetYesterday()
         }
@@ -230,11 +237,13 @@ def isRainDelay() {
         if (isForecastRainEnabled.equals("true")) {
             rainGauge = rainGauge + isStormy()
         }
-
         log.info ("Virtual rain gauge reads $rainGauge in")
+        
+ //     check to see if virtual rainguage exceeds threshold
         if (rainGauge > (wetThreshold?.toFloat() ?: 0.5)) {
             if (isNotificationEnabled.equals("true")) {
                 sendPush("Skipping watering today due to precipitation.")
+                log.info "${app.label} skipping watering today due to precipitation."
             }
             for(s in switches) {
                 if("rainDelayed" in s.supportedCommands.collect { it.name }) {
@@ -243,8 +252,19 @@ def isRainDelay() {
                 }
             }
             return true
-        	}
-     	}
+        }
+        
+//      check to see if today's forecast high will exceed temp threshold
+//      log.debug "Temp Threshold Is: $tempThreshold"
+        def maxThermometer = isHot()
+        if (maxThermometer < (tempThreshold?.toFloat() ?: 0)) {
+        	if (isNotificationEnabled.equals("true")) {
+                sendPush("Skipping watering: temp is below threshold temp.")
+            }
+            log.info "${app.label} is skipping watering: temp is below threshold temp."
+            return true
+		}
+     }
     return false
 }
 
@@ -254,7 +274,6 @@ def safeToFloat(value) {
 }
 
 def wasWetYesterday() {
-    if (!zipcode) return false
 
     def yesterdaysWeather = getWeatherFeature("yesterday", zipcode)
     def yesterdaysPrecip=yesterdaysWeather.history.dailysummary.precipi.toArray()
@@ -265,7 +284,6 @@ def wasWetYesterday() {
 
 
 def isWet() {
-    if (!zipcode) return false
 
     def todaysWeather = getWeatherFeature("conditions", zipcode)
     def todaysInches = safeToFloat(todaysWeather.current_observation.precip_today_in)
@@ -274,13 +292,21 @@ def isWet() {
 }
 
 def isStormy() {
-    if (!zipcode) return false
 
     def forecastWeather = getWeatherFeature("forecast", zipcode)
     def forecastPrecip=forecastWeather.forecast.simpleforecast.forecastday.qpf_allday.in.toArray()
-    def forecastInches=forecastPrecip[0]
+    def forecastInches=(forecastPrecip[0])
     log.info("Checking forecast percipitation for $zipcode: $forecastInches in")
     return forecastInches
+}
+
+def isHot() {
+
+    def forecastWeather = getWeatherFeature("forecast", zipcode)
+    def todaysTemps=forecastWeather.forecast.simpleforecast.forecastday.high.fahrenheit.toArray()
+    def todaysHighTemp=(todaysTemps[0]).toFloat()
+    log.info("Checking forecast high temperature for $zipcode: $todaysHighTemp F")
+    return todaysHighTemp
 }
 
 def water() {
@@ -292,9 +318,11 @@ def water() {
             if(zoneTime) {
             zoneTimes += "${z}:${zoneTime}"
             log.info("Zone ${z} on for ${zoneTime} minutes")
+           
         }
     }
         switches.OnWithZoneTimes(zoneTimes.join(","))
+//        switches.deviceNotification("Watering Started")
     } else {
         log.debug("Turning all zones on")
         switches.on()

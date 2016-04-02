@@ -31,10 +31,11 @@ preferences {
 }
 
 metadata {
-    definition (name: "Irrigation Controller 8 Zones v2.67", version: "2.67", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") {
+    definition (name: "Irrigation Controller 8 Zones v2.7b1", version: "2.7b1", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") {
         
         capability "Switch"
         capability "Momentary"
+        capability "Notification"
  //       capability "Refresh"
         command "OnWithZoneTimes"
         command "RelayOn1"
@@ -165,8 +166,13 @@ metadata {
             state("onHold", label: "Pause", action: "noEffect", icon: "st.Office.office7", backgroundColor: "#bc2323")
         }
         
+        valueTile("messageTile", "device.notification", width: 3, height:1, inactiveLabel: false, decoration: "flat") 
+    	{
+			state "default", label:'${currentValue}'
+		}
+        
         main "allZonesTile"
-        details(["zoneOneTile","zoneTwoTile","zoneThreeTile","zoneFourTile","zoneFiveTile","zoneSixTile","zoneSevenTile","zoneEightTile", "pumpTile","scheduleEffect","refreshTile"])
+        details(["zoneOneTile","zoneTwoTile","zoneThreeTile","zoneFourTile","zoneFiveTile","zoneSixTile","zoneSevenTile","zoneEightTile", "pumpTile","scheduleEffect","refreshTile", "messageTile"])
     }
 }
 
@@ -218,7 +224,8 @@ def parse(String description) {
 
     if(anyZoneOn()) {
         return createEvent(name: "switch", value: "on", displayed: true)
-    } else if (device.currentValue("switch") != "rainDelayed") {
+    } 
+    else if (device.currentValue("switch") != "rainDelayed") {
         return createEvent(name: "switch", value: "off", displayed: true)
     }
 }
@@ -462,4 +469,9 @@ def	onHold() {
     sendEvent(evt)
 }
 
+//display device notifications to message tile
+def deviceNotifications(message) {
+	log.debug "received device notification from SmartApp: $message"
+	sendEvent (name:"notification", value:"$message", displayed: true, isStateChange: true, isPhysical: false) 
+}
 

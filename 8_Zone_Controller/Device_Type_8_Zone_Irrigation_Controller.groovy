@@ -178,15 +178,9 @@ metadata {
 
 // parse events into attributes to create events
 def parse(String description) {
-//    log.debug "Parsing '${description}'"
-//    log.debug "Parsed: ${zigbee.parse(description)}"
-  
-    
+	// log.debug "Parsing '${description}'" 
     def value = zigbee.parse(description)?.text
-    if (value != null && value != " " && value != '"' && value != "ping" ) {
-	 log.debug "Parsed: ${value}"
-    }
-    if (value != null && value != " " && value != '"' && value != "ping" && value != "havePump" && value != "noPump") {
+    if (!value.contains("ping") && value.trim().length() > 0 && value != "havePump" && value != "noPump" && value != "pumpRemoved") {
         String delims = ","
         String[] tokens = value.split(delims)
         for (int x=0; x<tokens.length; x++) {
@@ -203,30 +197,43 @@ def parse(String description) {
             : tokens[x] in ["onPump", "offPump"] ? "pump"
             : tokens[x] in ["ok"] ? "refresh" : null
 
+            //manage logging and display of events
             def currentVal = device.currentValue(name)
-
-            def stateChange = true
-            // It seems like this should work. When a state change is made due to a nextState parameter, the value is not changed.
-            // if(currentVal) stateChange = currentVal != tokens[x]
-
-            def result = createEvent(name: name, value: tokens[x], displayed: true, isStateChange: true, isPhysical: true)
-            log.debug "Parse returned ${result?.descriptionText}"
-            sendEvent(result)
+            def isDisplayed = true
+            def isPhysical = true
+            //manage display of events
+			if (tokens[x].contains("q")) {
+				isDisplayed = false
+                isPhysical = false
+            }
+			//send an event if there is a state change
+			if (currentVal != tokens[x]) {
+				def result = createEvent(name: name, value: tokens[x], displayed: isDisplayed, isStateChange: true, isPhysical: isPhysical)
+            	log.info "Parse returned ${result?.descriptionText}"
+            	sendEvent(result)
+            }
         }
     }
     if (value == "pumpAdded") {
-    	sendEvent (name:"zoneEight", value:"havePump", displayed: true, isStateChange: true, isPhysical: true)
-        sendEvent (name:"pump", value:"offPump", displayed: true, isStateChange: true, isPhysical: true)
+    	//send an event if there is a state change
+        if (device.currentValue("zoneEight") != "havePump" && device.currentValue("pump") != "offPump") {
+    		sendEvent (name:"zoneEight", value:"havePump", displayed: true, isStateChange: true, isPhysical: true)
+        	sendEvent (name:"pump", value:"offPump", displayed: true, isStateChange: true, isPhysical: true)
+    	}
     }
     if (value == "pumpRemoved") {
-    	sendEvent (name:"pump", value:"noPump", displayed: true, isStateChange: true, isPhysical: true)
+    	//send event if there is a state change
+        if (device.currentValue("pump") != "noPump") {
+    		sendEvent (name:"pump", value:"noPump", displayed: true, isStateChange: true, isPhysical: true)
+    	}
     }
 
     if(anyZoneOn()) {
-        return createEvent(name: "switch", value: "on", displayed: true)
-    } 
-    else if (device.currentValue("switch") != "rainDelayed") {
-        return createEvent(name: "switch", value: "off", displayed: true)
+        //manages the state of the overall system.  Overall state is "on" if any zone is on
+        //set displayed to false; does not need to be logged in mobile app
+        return createEvent(name: "switch", value: "on", descriptionText: "Irrigation Is On", displayed: false)
+    } else if (device.currentValue("switch") != "rainDelayed") {
+        return createEvent(name: "switch", value: "off", descriptionText: "Irrigation Is Off", displayed: false)
     }
 }
 
@@ -242,6 +249,8 @@ def anyZoneOn() {
 
     false;
 }
+
+
 
 // handle commands
 def RelayOn1() {

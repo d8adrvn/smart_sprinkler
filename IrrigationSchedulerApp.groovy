@@ -22,11 +22,11 @@
 **/
 
 definition(
-    name: "Irrigation Scheduler v3.0b1",
+    name: "Irrigation Scheduler v3.0",
     namespace: "d8adrvn/smart_sprinkler",
     author: "matt@nichols.name and stan@dotson.info",
     description: "Schedule sprinklers to run unless there is rain.",
-    version: "3.0b1",
+    version: "3.0",
     iconUrl: "https://s3.amazonaws.com/smartapp-icons/Meta/water_moisture.png",
     iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Meta/water_moisture@2x.png"
 )
@@ -62,7 +62,7 @@ preferences {
     
 
     page(name: "sprinklerPage", title: "Sprinkler Controller Setup", nextPage: "weatherPage", uninstall: true) {
-        section("Select your sprinkler controller(s)...") {
+        section("Select your sprinkler controller...") {
             input "switches", "capability.switch", multiple: false
         }
 
@@ -171,7 +171,7 @@ def scheduleCheck() {
         for(s in switches) {
             if("noEffect" in s.supportedCommands.collect { it.name }) {
                 s.noEffect()
-                log.info ("${app.label} sent noEffect() to ${s}")
+                log.info ("${app.label} skipped one watering and will resume normal operations at next scheduled time")
             }
         }
  	}    
@@ -185,11 +185,11 @@ def scheduleCheck() {
         state.daysSinceLastWatering[state.currentTimerIx] = daysSince() + 1
     }
 
-    log.info("${app.label} scheduler state: $schedulerState. Days since last watering: ${daysSince()}. Is watering day? ${isWateringDay()}. Enought time? ${enoughTimeElapsed(schedulerState)} ")
+//    log.info("${app.label} scheduler state: $schedulerState. Days since last watering: ${daysSince()}. Is watering day? ${isWateringDay()}. Enought time? ${enoughTimeElapsed(schedulerState)} ")
 
     if ((isWateringDay() && enoughTimeElapsed(schedulerState) && schedulerState != "delay") || schedulerState == "expedite") {
         if (isNotificationEnabled.equals("true")) {
-        	sendPush("$switches Is Watering Now!" ?: "null pointer on app name")
+        	sendPush("${app.label} Is Watering Now!" ?: "null pointer on app name")
         }
         state.daysSinceLastWatering[state.currentTimerIx] = 0
         def wateringAttempts = 1
@@ -309,52 +309,49 @@ def isHot() {
     return todaysHighTemp
 }
 
-def water(numeric attempts) {
-    if (attempts <4) {
-    	if(anyZoneTimes()) {
-        	def zoneTimes = []
-        	for(int z = 1; z <= 24; z++) {
-            	def zoneTime = settings["zone${z}"]
-            	if(zoneTime) {
-            		zoneTimes += "${z}:${zoneTime}"
-            		log.info("Zone ${z} on for ${zoneTime} minutes")
-           		}
-    		}
-        	switches.OnWithZoneTimes(zoneTimes.join(","))
-    	} 
-    	else {
-        log.debug("Turning all zones on")
-        switches.on()
+def water(attempts) {
+	log.info ("Starting Irrigation Schedule: ${app.label}")
+    if(anyZoneTimes()) {
+        def zoneTimes = []
+        for(int z = 1; z <= 24; z++) {
+            def zoneTime = settings["zone${z}"]
+            if(zoneTime) {
+            	zoneTimes += "${z}:${zoneTime}"
+            	log.info("Zone ${z} on for ${zoneTime} minutes")
+           	}
     	}
-    	
-    	switches.deviceNotification("Starting Irrigation Schedule: ${app.label}")
-    	runIn(20, isWatering(attempts)
+        switches.OnWithZoneTimes(zoneTimes.join(","))
+    } 
+    else {
+        switches.on()
+    }
+	if (attempts <2) {
+        // developers note: runIn() appears to only call void methods
+        runIn(20, isWateringCheckOnce)
 	}
-	else {	//tried three times and failed to turn on.  something is wrong
-		switches.deviceNotification("WARNING: ${app.label} failed to water. Check your system")
+	else {
+        runIn(20, isWateringCheckTwice)
 	}
 }
 
-def isWatering(wateringAttempts) {
-	def switchCurrentValue = switch.currentValue
-	log.debug "Unable to turn on irrigation system.  Trying again"
-	log.debug "current value of switch is $switchCurrentValue"
-	log.debug "number of attempts is: $attempts"
-	if (switchCurrentValue= "off") {
-		switches.deviceNotification("${app.label} Failed To Turn On ${switches}.  Trying again")
-		log.debug "Unable to turn on irrigation system.  Trying again"
-		log.debug "number of attempts is: $attempts"
-		state.triggered = false
-		wateringAttempts=wateringAttempts + 1
-		state.triggered = false
+def isWateringCheckOnce() { 
+    def switchCurrentState = switches.currentSwitch    
+	if (switchCurrentState != "on") {
+		log.info "${app.label} is unable to turn on irrigation system.  Trying a second time"
+		def wateringAttempts = 2
 		// try to start watering again
 		water(wateringAttempts)
 	}
-	else {
-		state.triggered = true
-	}
 }		
-		
+
+def isWateringCheckTwice() { 
+    def switchCurrentState = switches.currentSwitch    
+	if (switchCurrentState != "on") {
+		switches.warning()
+        sendPush("${app.label} did not start after two attempts.  Check system")
+        log.info "WARNING: ${app.label} failed to water. Check your system"
+	}  
+}		
 
 def anyZoneTimes() {
     return zone1 || zone2 || zone3 || zone4 || zone5 || zone6 || zone7 || zone8 || zone9 || zone10 || zone11 || zone12 || zone13 || zone14 || zone15 || zone16 || zone17 || zone18 || zone19 || zone20 || zone21 || zone22 || zone23 || zone24

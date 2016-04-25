@@ -61,11 +61,11 @@
 ///               |            6 |--  
 ///             --| A0         5 |--  
 ///             --| A1    ( )  4 |--       pin4 Optional Pump/Master Valve 
-///             --| A2         3 |------|  pin3 connect to pin14 TX3
-///             --| A3         2 |--|   |  pin2 connect to pin15 RX3
+///             --| A2         3 |------|  pin3 connect jumper to pin15 RX3
+///             --| A3         2 |--|   |  pin2 connect jumper to pin15 TX3
 ///             --| A4         1 |--|   |
-///             --| A5        14 |--]---|  TX3 Hardware Serial 3
-///             --| A6        15 |--|      RX3 Hardware Serial 3
+///             --| A5        14 |--|   |  TX3 connect jumper to pin2
+///             --| A6        15 |------|   RX3 connect jumper to pin3
 ///             --| A7        16 |--
 ///             --| A8        17 |--
 ///             --| A9        18 |--

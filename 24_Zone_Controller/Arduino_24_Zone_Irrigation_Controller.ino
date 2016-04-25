@@ -2,7 +2,7 @@
 /**
 * 
  ****************************************************************************************************************************
- * Irrigation Controller 24 Zones With Options for Master Valve and Pump  v1
+ * Irrigation Controller 24 Zones With Options for Master Valve and Pump  v3.0
  * Simple, elegant irrigation controller that takes advantage of the cloud and SmartThings ecosystem
  * Arduino MEGA with SmartThings Shield  and 24 relay modules
  * Works by receiving irrigation run times from the Cloud and then builds a queue to execute
@@ -52,19 +52,19 @@
 ///               |           13 |--
 ///               |           12 |--
 ///               |           11 |--
-///             --| 3.3V      10 |----|  Run jumper from pin10 to pin3
-/// Relay VCC   --| 5V         9 |--  |
-/// Relay Ground--| GND        8 |--  |
-///             --| GND          |    |
-///             --| Vin        7 |--  |
-///               |            6 |--  |
-///             --| A0         5 |--  |
-///             --| A1    ( )  4 |--  |  pin4 Optional Pump/Master Valve 
-///             --| A2         3 |----|  pin3 THING_RX
-///             --| A3         2 |--     pin2 THING_TX
-///             --| A4         1 |--
-///             --| A5        14 |--
-///             --| A6        15 |--
+///             --| 3.3V      10 |--
+/// Relay VCC   --| 5V         9 |--  
+/// Relay Ground--| GND        8 |--  
+///             --| GND          |    
+///             --| Vin        7 |--  
+///               |            6 |--  
+///             --| A0         5 |--  
+///             --| A1    ( )  4 |--       pin4 Optional Pump/Master Valve 
+///             --| A2         3 |------|  pin3 connect jumper to pin15 RX3
+///             --| A3         2 |--|   |  pin2 connect jumper to pin15 TX3
+///             --| A4         1 |--|   |
+///             --| A5        14 |--|   |  TX3 connect jumper to pin2
+///             --| A6        15 |------|   RX3 connect jumper to pin3
 ///             --| A7        16 |--
 ///             --| A8        17 |--
 ///             --| A9        18 |--
@@ -211,16 +211,14 @@
 #include <SmartThings.h>
 #include <Event.h>
 #include <Timer.h>
-#define PIN_THING_RX    10
-#define PIN_THING_TX    2
-#define PIN_THING_LED  13
 SmartThingsCallout_t messageCallout;    // call out function forward decalaration
-SmartThings smartthing(PIN_THING_RX, PIN_THING_TX, messageCallout);  // constructor
+SmartThings smartthing(HW_SERIAL3, messageCallout);  // constructor
+
 
 //user configurable global variables to set before loading to Arduino
 int relays = 24;  //set up before loading to Arduino (max = 24 with current code and assumes last relay is a master valve/pump actuator)
 boolean isActiveHigh=false; //set to true if using "active high" relay, set to false if using "active low" relay
-boolean isDebugEnabled=false;    // enable or disable debug in this example  
+boolean isDebugEnabled=true;    // enable or disable debug in this example  
 boolean isPin4Pump =false;  //set to true if you add an additional relay to pin4 and use as pump or master valve.  
 
 //set global variables
@@ -239,8 +237,8 @@ int relay[25];  //for readability, zone values store [1]-[24] and [0] is not use
 //initialize pump related variables. 
 int pin4Relay = 4;  //pin4 reserved for optional additional relay to control a pump or master valve
 boolean isConfigPump = false; // if true, relay24 is used as the pump/master valve switch.  Can be toggled by device tye v2.7 and later
-char* configPumpStatus = "off";
-char* pin4PumpStatus= "off";
+const char* configPumpStatus = "off";
+const char* pin4PumpStatus= "off";
 boolean doUpdate = false;
 boolean doPumpUpdate = false;
 
@@ -309,7 +307,7 @@ void messageCallout(String message)
     Serial.print(message);
     Serial.println("' "); 
   }
-  char* inValue[stations+2]; //array holds any values being delivered with message (1-24) and NULL; [0] is not used
+  const char* inValue[stations+2]; //array holds any values being delivered with message (1-24) and NULL; [0] is not used
   char delimiters[] = ",";
   char charMessage[100];
   strncpy(charMessage, message.c_str(), sizeof(charMessage));

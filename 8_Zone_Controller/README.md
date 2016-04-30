@@ -132,15 +132,15 @@ Just download the zip file by clicking on the Download Zip link near the top rig
 
 
 The folders will contain 3 files:
-A file with the extension .ino  This is the file that you will load onto the Arduino using the Arduino IDE (see below).
+A file with the extension **.ino**  This is the file that you will load onto the Arduino using the Arduino IDE (see below).
 
-The zip file also contained the file Device_Type_8_Zone_Irrigation_Controller_.groovy.  This file is used to create a Device Handler in the SmartThings IDE (see below).
+The zip file also contains the file **Device_Type_8_Zone_Irrigation_Controller_.groovy**.  This file is used to create a Device Handler in the SmartThings IDE (see below).
 
-In addition to the folders, the zip file also contains a file  named IrrigationSchedulerApp.groovy.  This file is used to create a Smart App via the SmartThings IDE.  You can create one or more instances (copies) of the SmartApp in the IDE to represent specific irrigation schedules (see below).
+In addition to the folders, the zip file  contains a file  named **IrrigationSchedulerApp.groovy**.  This file is used to create a Smart App via the SmartThings IDE.  You can create one or more instances (copies) of the SmartApp in the IDE to represent specific irrigation schedules (see below).
 
 ### Install The Arduino Code 
 
-The Arduino code can be found in the folders corresponding to the number of zones your project needs to support.  Look for the file with the extension ".ino"
+The Arduino code can be found in the folders corresponding to the number of zones your project needs to support.  Look for the file with the extension "**.ino**"
 
 In its most basic form, our controller manages a queue and turns on/off switches. That’s it. Nothing else. All other features are in the cloud!
 
@@ -171,7 +171,7 @@ Creates a queue to turn on or off a specific zone or all zones
 
 #### The Arduino IDE Software
 
-Ok now head on over to http://www.arduino.cc/en/main/software and download the Arduino Software. Download the latest version.  Open the software, you will notice that it automatically creates a sketch with the date as part of the name.   That  is fine it’s just an automatic name based on your computer date.  Erase any code that automatically comes up on the window, you do not need it for this.To load the code onto the Arduino, you will need the Arduino developer environment:
+Ok now head on over to http://www.arduino.cc/en/main/software and download the Arduino Interactive Developer Environment (IDE). Download the latest version.  Open the software, you will notice that it automatically creates a sketch with the date as part of the name.   That  is fine it’s just an automatic name based on your computer date.  Erase any code that automatically comes up on the window, you do not need it for this.To load the code onto the Arduino, you will need the Arduino developer environment:
 
 #### The Libraries
 
@@ -180,11 +180,11 @@ Once the software is installed, the first thing to do is obtain the required lib
 * Timer library was created by Simon Monk as modified by JChristensen  
 You need to get this https://github.com/JChristensen/Timer, just click on download zip as before. Rename the zip file to “Timer.zip” and extract it. Now go into the extracted folder and rename the folder ”Timer-Master” to “Timer”. It is this folder that you will use to upload the Timer.cpp to the Arduino Libraries, you must upload the entire folder as it also uses Event.cpp.
 
-* Go to http://cl.ly/ZMHh and download the SmartThings Shield library. Extract it , this will give you a folder structure of Shield Library/Shield Library/SmartThings it is this SmartThings folder you will be using to upload the libraries to the Arduino.
+* Go to http://cl.ly/ZMHh and download the SmartThings Thing Shield library. Extract it, this will give you a folder structure of Shield Library/Shield Library/SmartThings it is this SmartThings folder you will be using to upload the libraries to the Arduino.
 
 * SoftwareSerial library was default library provided with Arduino IDE.  It was automatically uploaded to the Arduino IDE.  Do nothing here.
 
-#### Installing the libraries
+#### Installing The Libraries
 
 In the Arduino IDE, use the menus to go to Sketch | Include Library | Add .ZIP library… it will open a select library dialogue box, find your “Timer” folder (Select the folder not individual files) that you downloaded select it and click open to install the library.
 
@@ -201,7 +201,7 @@ Connect your Arduino to the computer via the USB cut and paste all the code from
 
 **** Important:  Make sure you got to Tools | Board and select the correct Arduino Board.  For the 8 Zone Arduino, the recommended board is the  “Arduino/Genuine Uno”
 
-Make sure the Com port is set correctly , you can got to Tools | serial Monitor and see where your Board is (what com is it on)
+Make sure the COM port is set correctly , you can got to Tools | serial Monitor and see where your Board is (what com is it on)
 
 Go to To sketch | Upload, once uploaded you are done programming the Arduino.
  
@@ -209,7 +209,7 @@ Once you have finished transfering the code to the Arduino, you can remove the U
 
 Its more than a good idea to put a piece of electrical tape over the USB port to prevent accidental grounding of the port!
 
-### Pair The SmartThings Shield (Arduino) to The SmartThings Hub
+### Pair The SmartThings Shield (Arduino) To The SmartThings Hub
 
 Pairing instructions for the Arduino to the SmartThings hub can be found at SmartThings.com and are copied here:
 

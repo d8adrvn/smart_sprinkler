@@ -222,7 +222,7 @@ To unpair the shield, press and hold the Switch button for 6 seconds and release
 
 ### Install The Device Handler Code 
 
-Go to your browser and connect to api.graph.smartthings.com.  Once on the site, go to Device Handlers page.  Click on the "+" and add a new Device Handler.  Select "Add From Code".   Simply copy and paste the code from file **Device_Type_8_Zone_Irrigation_Controller_.groovy**
+Go to your browser and connect to api.graph.smartthings.com.  Once on the site, go to My Device Handlers page.  Click on the "+" and add a new Device Handler.  Select "Add From Code".   Simply copy and paste the code from file **Device_Type_8_Zone_Irrigation_Controller_.groovy**
 
 Now hit "Save" and very importantly, press the "Publish" then "for me" buttons.  
 
@@ -264,7 +264,7 @@ Once in the Preferences page, you can enter a set of times for each zone that yo
 
 ### Install The Irrigation Scheduler SmartApp
 
-Go to your browser and connect to api.graph.smartthings.com.  Once on the site, go to SmartApp page.  Click on the "+" and add a new SmartApp.  Select "Add From Code".   Simply copy and paste the code from file **IrrigationSchedulerApp.groovy**
+Go to your browser and connect to api.graph.smartthings.com.  Once on the site, go to My SmartApps page.  Click on the "+" and add a new SmartApp.  Select "Add From Code".   Simply copy and paste the code from file **IrrigationSchedulerApp.groovy**
 
 Now hit "Save" and very importantly, press the "Publish" then "for me" buttons.  
 

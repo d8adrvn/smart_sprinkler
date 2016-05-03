@@ -56,14 +56,16 @@ For the wiring, we ordered both **20 cm dupont cable male to female** and **20 c
 
 ### Power Supplies
 
-#### To run the sprinkler valves:
+#### To power the sprinkler valves:
 The project requires at least two power supplies.  One power supply is to run the sprinkler valves which are typically 24V AC.   The **Rain Bird UT1 Sprinkler System Timer Electric Transformer Plug** is a good choice from Amazon Prime.  
 
-#### To run the Arduino, ThingShield and Relays:
+#### To power the Arduino, ThingShield and Relays:
 
-*If your relays are 5V:* You will need a 9V power supply to run the Arduino+ThingShield+Relays.   The 5V relays can be driven from the Arduino 5v pin (you use a jumper to connect the 5V pin and the VCC pin on the relay board).  This works because at most 2 relays are on at once (one for the valve and the other for the optional pump).   This can be purchased at Amazon as well by searching for "Arduino Power Supply".  Right now, I am using the Super Power Supply® AC / DC Adapter Charger Cord Plug - 9V 650mA compatible with Arduino Freeduino Duemilanove Uno Mega Hobby Electronics, which was available by Amazon Prime.   CAUTION: There are 9V power supplies availble on Amazon that do not work for the Arduino (they are made for musical instrament controllers) and some that perform very poorly on Arduino.  Be sure to read the reviews!  
+*If your relays are 24V or 12V*  This is the recommended solution.  In this solution, the power to the Relay Board power is used to power the Arduino/ThingShield.  Purchase the respective power supply from Amazon.  We used 24V relays and purchased **100-240V to 24V 2A Switching AC/DC Power Adapter Charger US Plug by Gino** power supply.  We also used an adapter to make a clean transition from the power supply to flexible jumper wires.  The adapter can be found on Ebay or Amazon **10 Pack 2.1mm x 5.5mm Female CCTV Power Jack Adapter**  The 16 channel 24V relay board used in this project provide a +5V current that can be used to power the Arduiono+ThingShield (see below for wiring).
 
-*If your relays are 24V or 12V:*  Purchase the respective power supply from Amazon.  We used 24V relays and purchased **100-240V to 24V 2A Switching AC/DC Power Adapter Charger US Plug by Gino** power supply.  We also used an adapter to make a clean transition from the power supply to flexible jumper wires.  The adapter can be found on Ebay or Amazon **10 Pack 2.1mm x 5.5mm Female CCTV Power Jack Adapter**  The 16 channel 24V relay board used in this project also provided a +5V current that travelled back to power the Arduiono+ThingShield (see below for wiring).
+*If your relays are 5V:* You will need a 9V power supply to run the Arduino+ThingShield+Relays.  In this solution, the Arduino power is used to power the 5V relays (you use a jumper to connect the 5V pin and the VCC pin on the relay board).  This works because at most 2 relays are on at once (one for the valve and the other for the optional pump).   This can be purchased at Amazon as well by searching for "Arduino Power Supply".  Right now, I am using the Super Power Supply® AC / DC Adapter Charger Cord Plug - 9V 650mA compatible with Arduino Freeduino Duemilanove Uno Mega Hobby Electronics, which was available by Amazon Prime.   CAUTION: There are 9V power supplies availble on Amazon that do not work for the Arduino (they are made for musical instrament controllers) and some that perform very poorly on Arduino.  Be sure to read the reviews!  
+
+
 
 ### Project Housing
 Finally, for the project housing, the 9"x9"x3" OUTDOOR CABLETEK ENCLOSURE PLASTIC GRAY CASE UTILITY CABLE BOX CTE-S from Amazon was a nice size that housed all the relay boards, as well as the Arduino+ThingShield. 

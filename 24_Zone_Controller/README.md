@@ -83,16 +83,26 @@ Here is an overview of the project all wired up and placed in the suggested hous
 
 
 ### Wiring The Arduino Controller
-1. Stack the SmartThing ThingShield on top of the Arduino MEGA.  
-2. Connect a ground wire from the GND pin on ThingShield to the GND pin on the 16 Channel relay.  
-3. Connect another jumper wire from the +5V on the ThingShield to the VCC pin on the 16 Channel Relay. 
-4. Use 24 wires from your ribbon cable to connect pins 21-44 on Arduino MEGA to pins 1 to 16 on the relay 16 channel board and to pins 1-8 on an additional 8 channel relay board (or other scenarios depending on what combination of relay boards that you have purchased).
 
-ThingShield Connections: 5V power to Relay Board and a jumper connecting pin10 to pin3 needed for communications:
+Stack the SmartThing ThingShield on top of the Arduino MEGA.  
 
-<img src="https://cloud.githubusercontent.com/assets/5625006/4689511/66510b88-56be-11e4-9bff-c4c9c9064543.jpg" width="200px"  />
+Arduino Mega and ThingShield Connections: 
 
-Jumper connections originating from the MEGA that will connect to the relay boards:
+  We will be using the Hardware Serial 3 to drive communications with the ThingShield.  
+    1. Be sure the DIP switch on the ThingShield is set to D2/D3
+    2. Connect a jumper from Pin2 to Pin14 (Tx->Tx)
+    3. Connect a jumper from Pin3 to Pin15 (Rx->Rx)
+
+  We also need to run power from the Relay Board to the Arduino Mega
+    1. Run jumper from the 5V pin on Relay Board to the +5V on the Arduino. 
+    2. Run a jumper from GND on the Relay Board to the Arduino
+
+
+<img src="https://cloud.githubusercontent.com/assets/5625006/14973958/998baa60-10b4-11e6-8cf9-cbfc58161e46.jpg" width="200px"  />
+
+Jumper connections originating from the MEGA that will connect to the relay boards:  
+
+Use 24 wires from your ribbon cable to connect pins 21-44 on Arduino MEGA to pins 1 to 16 on the relay 16 channel board and to pins 1-8 on an additional 8 channel relay board (or other scenarios depending on what combination of relay boards that you have purchased).
 
 <img src="https://cloud.githubusercontent.com/assets/5625006/4689512/665d067c-56be-11e4-9348-c184c0246678.jpg" width="200px"  />
 

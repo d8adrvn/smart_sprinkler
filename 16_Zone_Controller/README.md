@@ -63,9 +63,11 @@ For the wiring, we ordered both **20 cm dupont cable male to female** and **20 c
 #### To run the sprinkler valves:
 The project requires at least two power supplies.  One power supply is to run the sprinkler valves which are typically 24V AC.   The **Rain Bird UT1 Sprinkler System Timer Electric Transformer Plug** is a good choice from Amazon Prime.  
 
-#### To run the Arduino, ThingShield and Relays:
+#### To power the Arduino, ThingShield and Relays:
 
-*If your relays are 5V:* You will need a 9V power supply to run the Arduino+ThingShield+Relays.   The 5V relays can be driven from the Arduino 5v pin (you use a jumper to connect the 5V pin and the VCC pin on the relay board).  This works because at most 3 relays are on at once (one for the valve and the other for the optional pump and optional master valve).   This can be purchased at Amazon as well by searching for "Arduino Power Supply".  Right now, I am using the Super Power Supply® AC / DC Adapter Charger Cord Plug - 9V 650mA compatible with Arduino Freeduino Duemilanove Uno Mega Hobby Electronics, which was available by Amazon Prime.   CAUTION: There are 9V power supplies availble on Amazon that do not work for the Arduino (they are made for musical instrament controllers) and some that perform very poorly on Arduino.  Be sure to read the reviews!  
+*If your relays are 24V or 12V*  This is the recommended solution.  In this solution, the power to the Relay Board power is used to power the Arduino/ThingShield.  Purchase the respective power supply from Amazon.  We used 24V relays and purchased **100-240V to 24V 2A Switching AC/DC Power Adapter Charger US Plug by Gino** power supply.  We also used an adapter to make a clean transition from the power supply to flexible jumper wires.  The adapter can be found on Ebay or Amazon **10 Pack 2.1mm x 5.5mm Female CCTV Power Jack Adapter**  The 16 channel 24V relay board used in this project provide a +5V current that can be used to power the Arduiono+ThingShield (see below for wiring).
+
+*If your relays are 5V:* You will need a 9V power supply to run the Arduino+ThingShield+Relays.  In this solution, the Arduino power is used to power the 5V relays (you use a jumper to connect the 5V pin and the VCC pin on the relay board).  This works because at most 2 relays are on at once (one for the valve and the other for the optional pump).   This can be purchased at Amazon as well by searching for "Arduino Power Supply".  Right now, I am using the Super Power Supply® AC / DC Adapter Charger Cord Plug - 9V 650mA compatible with Arduino Freeduino Duemilanove Uno Mega Hobby Electronics, which was available by Amazon Prime.   CAUTION: There are 9V power supplies availble on Amazon that do not work for the Arduino (they are made for musical instrament controllers) and some that perform very poorly on Arduino.  Be sure to read the reviews! 
 
 
 ### Project Housing
@@ -86,16 +88,27 @@ Here is an overview of the project all wired up and placed in the suggested hous
 
 
 ### Wiring The Arduino Controller
-1. Stack the SmartThing ThingShield on top of the Arduino MEGA.  
-2. Connect a ground wire from the GND pin on ThingShield to the GND pin on the 16 Channel relay.  
-3. Connect another jumper wire from the +5V on the ThingShield to the VCC pin on the 16 Channel Relay. 
-4. Use 16 wires from your ribbon cable to connect pins 21-36 on Arduino MEGA to pins 1 to 16 on the relay 16 channel board (or other scenarios depending on what combination of relay boards that you have purchased).
 
-ThingShield Connections: 5V power to Relay Board and a jumper connecting pin10 to pin3 needed for communications:
+Stack the SmartThing ThingShield on top of the Arduino MEGA.  
 
-<img src="https://cloud.githubusercontent.com/assets/5625006/4689511/66510b88-56be-11e4-9bff-c4c9c9064543.jpg" width="200px"  />
+Arduino Mega and ThingShield Connections: 
+We will be using the Hardware Serial 3 to drive communications with the ThingShield.
+
+* Be sure the DIP switch on the ThingShield is set to D2/D3
+* Connect a jumper from Pin2 to Pin14 (Tx->Tx)
+* Connect a jumper from Pin3 to Pin15 (Rx->Rx)
+
+We also need to run power from the Relay Board to the Arduino Mega
+
+* Run jumper from the 5V pin on Relay Board to the +5V on the Arduino. 
+* Run a jumper from GND on the Relay Board to the Arduino
+
+<img src="https://cloud.githubusercontent.com/assets/5625006/14973958/998baa60-10b4-11e6-8cf9-cbfc58161e46.jpg" width="200px"  />
+
 
 Jumper connections originating from the MEGA that will connect to the relay boards:
+
+Use 16 wires from your ribbon cable to connect pins 21-36 on Arduino MEGA to pins 1 to 16 on the relay 16 channel board (or other scenarios depending on what combination of relay boards that you have purchased).
 
 <img src="https://cloud.githubusercontent.com/assets/5625006/4689512/665d067c-56be-11e4-9348-c184c0246678.jpg" width="200px"  />
 

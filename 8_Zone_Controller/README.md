@@ -236,8 +236,7 @@ The Main Tile is an all on or all off tile and links to the “switch” capabil
 
 Once you enter the Device Handler (Device Type), you will see the following screen:
 
-<img src="https://cloud.githubusercontent.com/assets/5625006/12346436/d3ea402c-bb19-11e5-87f0-770bbd9923c1.jpg" width="200px"  />
-
+<img src="https://cloud.githubusercontent.com/assets/5625006/15092465/d33c18e2-1430-11e6-862c-80ad63e34391.jpg" width="200px"  />
 
 Each sprinkler zone additionally has its own tile.  When the zone is off, the tile is white.  If the zone is in the queue and waiting its turn, the tile is gold.  When the zone is running, the tile is blue.
 
@@ -251,17 +250,18 @@ Scheduler Override Tile.  This tile interacts with the Schedular SmartApp (see b
 
 Example uses for this Scheduler Overide tile include putting the system on hold for the winter, during yard construction projects, after applying weed killer to the yard, and so on.
 
-<img src="https://cloud.githubusercontent.com/assets/5625006/12346445/df465bd6-bb19-11e5-83d7-66223d6a96cc.jpg" width="200px"  />
+<img src="https://cloud.githubusercontent.com/assets/5625006/15092468/dc467298-1430-11e6-8759-04b14c4028a6.jpg" width="200px"  />
 
 
 The “Preferences” page allows you to enter the run times for each station.  To get to the preferences page, press the sprocket in the top right corner of the Device Handler:
 
-<img src="https://cloud.githubusercontent.com/assets/5625006/12346438/d5876e8c-bb19-11e5-907d-3fbba667f8c0.jpg" width="200px"  />
+** Important: You need to enter default times for each zone to run in manual mode.  Click on the "sprocket" icon in the top right.  This will bring up the Device Handler Configuration Screen where you can enter the manual run times. **
+
+<img src="https://cloud.githubusercontent.com/assets/5625006/15092466/d788e830-1430-11e6-99c9-c9fb5a0eab14.jpg" width="200px"  />
 
 
-Once in the Preferences page, you can enter a set of times for each zone that you trigger manually (by pressing the zone tile in the Device Handler).  To enter you manual zone times, just enter the times in minutes.  If you are using less than 8 zones, just enter zero minutes for zones not in use.  These time Preferences are used when you run the sprinkler manually from within the Irrigation Controller Device Type app.  If you are using the SmartApp Irrigation Scheduler App to automatically run the system and have entered times via that app, the Scheduler supplied times are used.
+Once in the Preferences page, you can enter a set of times for each zone that you trigger manually (by pressing the zone tile in the Device Handler).  To enter you manual zone times, just enter the times in minutes.  If you are using less than 8 zones, just enter zero minutes for zones not in use.  These time Preferences are used when you run the sprinkler manually from within the Irrigation Controller Device Type app.  (Note: you will also have the opportunity to enter run times for each automatic watering schedule you set up.  This will be done later in the Smart App).  You can also rename your device and upload an image for a custom look.
 
-<img src="https://cloud.githubusercontent.com/assets/5625006/12346439/d70889c6-bb19-11e5-8896-72a52dba53c1.jpg" width="200px"  />
 
 
 ### Install The Irrigation Scheduler SmartApp

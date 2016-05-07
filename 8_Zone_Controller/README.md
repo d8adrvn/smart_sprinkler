@@ -14,8 +14,10 @@
   1. On My Device Types, create a new device type and paste in the device type code.  Save & Publish
   2. On My SmartApps, create a new Smart App and paste in the smart app code. Save & Publish
 9.  Go to My Devices, select the Arduino and edit the Device Type and select the Irrigation Controller device handler
-10.  Test out system 
+10. From your the SmartThings app on your SmartPhone, find your "sprinkler" system and open the Device Handler. Click on the "sprocket" icon in the top right corner and manually enter times for each of your zones.
+11. Go ahead and test our your project by activating each zone, watch for the LED's to light on your boards and listen for a click when the relay activates.  If everything checks out, you are ready to connect the project to your irrigation system.
 11.  Wire the Arduino to your irrigation system
+12.  Test out system by manually pressing each of the tiles and confirming your zones activate
 
 You now have a smarter lawn!
 

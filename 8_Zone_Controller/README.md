@@ -161,8 +161,7 @@ The irrigation controller also has three basic protections
 
 The code for the Arduino has the following features:
 
-Creates a queue to turn on or off a specific zone or all zones
-
+* Creates a queue to turn on or off a specific zone or all zones
 * The queue holds the state for each zone: 0=off, 1=waiting, 2=on
 * A traffic cop feature ensures only one zone is running at once
 * Works with up to 8 zones, although you can use less

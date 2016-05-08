@@ -1,4 +1,4 @@
-Note:  For convenience, some of the pictures are for a 24 Zone System.  This will not affect your ability to complete the project.
+Note:  For convenience, some of the pictures are from the 8 or a 24 Zone System.  This will not affect your ability to complete the project.
 
 
 

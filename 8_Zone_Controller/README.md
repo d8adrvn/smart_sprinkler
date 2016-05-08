@@ -338,6 +338,8 @@ You can also use your sprinkler system as a first line of defense.  For example,
 
 ## FAQs
 
+* You have just finished the project and are ready to try turning on a zone for the first time.  With great trepidation, you press the Zone 1 tile and it turns to "Sending..." but nothing else happens.  You are trying to turn on the system for zero minutes.  This is the most common question from the community.  Press on the "sprocket" in the top right corner of the Device Handler.  This takes you to the "preferences page".  You must enter a time (in minutes) for each of your active zones.  (Note: you will also get to enter zone times for each automatic schedule that you create.  These are entered seperately within the SmartApp).  
+
 * After installing the Device Type or the Smart App, be sure to both Save AND Publish (for me).  If you do not publish, they will not be able to communicate with the hub.  If you make changes to either code, Publish early and often to avoid IDE issues.
 
 * After powering off the Arduino or switching from USB power to 9V power, you may notice that the SmartShield LED goes dark.  The SmartShield LED will relight at the first activity and then function normally after that.  The Arduino LEDs should both be on at all times when power is supplied to the hardware

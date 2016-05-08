@@ -54,8 +54,16 @@ For a power supply to power up the relay and run the irrigation valves, we re-us
 
 ### Project Housing
 
-There are a couple options for the project housing.  The coolest option is to 3D Print your own housing.  @BD0G has published the 3D printing instructions to create a custom housing for the project.  It really looks great.  
-Instructions can be found at:   <insert here>
+There are a couple options for the project housing.  The coolest option is to 3D Print your own housing.  Community contributor @BD0G has published the 3D printing instructions to create a custom housing for the project.  It really looks great.  
+<a href="http://www.thingiverse.com/thing:1088168" target=0>Click here for 3D printer files and instructions</a>
+
+
+<img src="https://cloud.githubusercontent.com/assets/5625006/15095836/c70da880-14a1-11e6-8ea4-66b3e6f0c593.jpg" width="200px"  />
+
+<img src="https://cloud.githubusercontent.com/assets/5625006/15095837/c83a53a2-14a1-11e6-88bd-7f62f8770147.jpg" width="200px"  />
+
+<img src="https://cloud.githubusercontent.com/assets/5625006/15095838/cbab2d9a-14a1-11e6-80ce-cbefb850eee5.jpg" width="200px"  />
+
 
 Not quite as cool, but still functional, we just ripped out the guts of our existing controller and used the existing box to house our final project. Another option is the **Arington EB0708** electronic equipment enclosure. Or try the 9"x9"x3" OUTDOOR CABLETEK ENCLOSURE PLASTIC GRAY CASE UTILITY CABLE BOX CTE-S.  All available from Amazon
 

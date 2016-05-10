@@ -307,6 +307,8 @@ The “Preferences” page allows you to enter the run times for each station.  
 
 **Important: You need to enter default times for each zone to run in manual mode.  Click on the "sprocket" icon in the top right.  This will bring up the Device Handler Configuration Screen where you can enter the manual run times.**
 
+<img src="https://cloud.githubusercontent.com/assets/5625006/15133525/2d4f5016-1629-11e6-9ec7-1df71f003c68.jpg" width="200px"  />
+
 <img src="https://cloud.githubusercontent.com/assets/5625006/15092466/d788e830-1430-11e6-99c9-c9fb5a0eab14.jpg" width="200px"  />
 
 

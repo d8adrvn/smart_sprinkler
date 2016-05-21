@@ -1,5 +1,5 @@
 /**
- *  Irrigation Controller 16 Zones w/Optional Pump v3.0
+ *  Irrigation Controller 16 Zones w/Optional Pump v1
  *
  *
  *  This SmartThings Device Type Code Works With Arduino Irrigation Controller available at https://github.com/d8adrvn/smart_sprinkler
@@ -40,7 +40,7 @@ preferences {
 }
 
 metadata {
-    definition (name: "Irrigation Controller 16 Zones with Optional Pump v3.0", version: "3.0", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") {
+    definition (name: "Irrigation Controller 16 Zones with Optional Pump v3.01", version: "3.01", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") {
         
         
         capability "Switch"
@@ -283,6 +283,10 @@ def parse(String description) {
 			if (tokens[x].contains("q")) {
 				isDisplayed = false
                 isPhysical = false
+            }         
+            if (tokens[x].contains("o") && currentVal.contains("q")) {
+				isDisplayed = false
+            	isPhysical = false
             }
 			//send an event if there is a state change
 			if (currentVal != tokens[x]) {

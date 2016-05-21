@@ -312,7 +312,7 @@ The “Preferences” page allows you to enter the run times for each station.  
 <img src="https://cloud.githubusercontent.com/assets/5625006/15092466/d788e830-1430-11e6-99c9-c9fb5a0eab14.jpg" width="200px"  />
 
 
-Once in the Preferences page, you can enter a set of times for each zone that you trigger manually (by pressing the zone tile in the Device Handler).  To enter you manual zone times, just enter the times in minutes.  If you are using less than 8 zones, just enter zero minutes for zones not in use.  These time Preferences are used when you run the sprinkler manually from within the Irrigation Controller Device Type app.  (Note: you will also have the opportunity to enter run times for each automatic watering schedule you set up.  This will be done later in the Smart App).  You can also rename your device and upload an image for a custom look.
+Once in the Preferences page, you can enter a set of times for each zone that you trigger manually (by pressing the zone tile in the Device Handler).  To enter you manual zone times, just enter the times in minutes.  If you are using less than 16 zones, just enter zero minutes for zones not in use.  These time Preferences are used when you run the sprinkler manually from within the Irrigation Controller Device Type app.  (Note: you will also have the opportunity to enter run times for each automatic watering schedule you set up.  This will be done later in the Smart App).  You can also rename your device and upload an image for a custom look.
 
 ### Install The Irrigation Scheduler SmartApp
 

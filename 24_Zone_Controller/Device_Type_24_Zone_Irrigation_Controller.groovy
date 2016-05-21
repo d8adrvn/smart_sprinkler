@@ -1,5 +1,5 @@
 /**
- *  Irrigation Controller 24Zones with Master Valve and Pump Options v3.0
+ *  Irrigation Controller 24Zones with Master Valve and Pump Options 
  *  This SmartThings Device Type Code Works With Arduino Irrigation Controller for 24 zones v1.3 also available at this site
  *  
  *
@@ -20,13 +20,13 @@
  
  // for the UI
 preferences {
-    input("oneTimer", "text", title: "Zone One", description: "Zone One Time", required: false, defaultValue: "1")
-    input("twoTimer", "text", title: "Zone Two", description: "Zone Two Time", required: false, defaultValue: "1")
-    input("threeTimer", "text", title: "Zone Three", description: "Zone Three Time", required: false, defaultValue: "1")
-    input("fourTimer", "text", title: "Zone Four", description: "Zone Four Time", required: false, defaultValue: "1")
-    input("fiveTimer", "text", title: "Zone Five", description: "Zone Five Time", required: false, defaultValue: "1")
-    input("sixTimer", "text", title: "Zone Six", description: "Zone Six Time", required: false, defaultValue: "1")
-    input("sevenTimer", "text", title: "Zone Seven", description: "Zone Seven Time", required: false, defaultValue: "1")
+    input("oneTimer", "enum", title: "Zone One", description: "Zone One Time", required: false, defaultValue: 1)
+    input("twoTimer", "enum", title: "Zone Two", description: "Zone Two Time", required: false, defaultValue: 1)
+    input("threeTimer", "enum", title: "Zone Three", description: "Zone Three Time", required: false, defaultValue: 1)
+    input("fourTimer", "enum", title: "Zone Four", description: "Zone Four Time", required: false, defaultValue: 1)
+    input("fiveTimer", "enum", title: "Zone Five", description: "Zone Five Time", required: false, defaultValue: 1)
+    input("sixTimer", "text", title: "Zone Six", description: "Zone Six Time", required: false, defaultValue: 1)
+    input("sevenTimer", "text", title: "Zone Seven", description: "Zone Seven Time", required: false, defaultValue: 1)
     input("eightTimer", "text", title: "Zone Eight", description: "Zone Eight Time", required: false, defaultValue: "1")
     input("nineTimer", "text", title: "Zone Nine", description: "Zone Nine Time", required: false, defaultValue: "1")
     input("tenTimer", "text", title: "Zone Ten", description: "Zone Ten Time", required: false, defaultValue: "1")
@@ -47,7 +47,7 @@ preferences {
     
 }
 metadata {
-    definition (name: "Irrigation Controller 24 Zones with Optional Pump v3.0", version: "3.0", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") 
+    definition (name: "Irrigation Controller 24 Zones with Optional Pump v3.01", version: "3.01", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") 
     {
         capability "Switch"
         command "OnWithZoneTimes"
@@ -370,6 +370,11 @@ def parse(String description) {
 				isDisplayed = false
                 isPhysical = false
             }
+            if (tokens[x].contains("o") && currentVal.contains("q")) {
+				isDisplayed = false
+            	isPhysical = false
+            }
+            
 			//send an event if there is a state change
 			if (currentVal != tokens[x]) {
 				def result = createEvent(name: name, value: tokens[x], displayed: isDisplayed, isStateChange: true, isPhysical: isPhysical)

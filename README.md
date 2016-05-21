@@ -4,7 +4,7 @@
 
 ## Background
 
-Why would you build a lawn sprinkler system controller when you can just buy one?  But you can’t just buy one... at least not the sprinkler system we were thinking about!!  Let’s start by first making the controller connected.  And of course, we will need iPhone controls.  Then we need to make it smart.  Smart like it knows when it has rained, is raining or will rain!   And then what if we could add cognition so that it actually learns how to water your lawn!  Not that would be really smart!!!
+Why would you buy a lawn sprinkler system controller when you can just build one?  And the one you build will have even more cool features!!  Let’s start by first making the your sprinkler system connected to the cloud.  And of course, we will need iPhone controls.  Then we need to make it smart.  Smart like it knows when it has rained, is raining or will rain!  Smart like it can run a second watering when it gets really hot!  And then of course you will want voice recognition so that you can say "Alexa, turn on my sprinkler".  Now that would be really smart!!!
 
 
 ## Description
@@ -19,6 +19,8 @@ This project contains code and instructions for how we built irrigation controll
 * Easily over-ride the schedule
 * Two options to control a master relay or pump
 * A virtual rain guage that uses local weather stations to measure recent and forecasted rain and skip irrigation when rain exceeds a threshhold
+* A virtual temperature guage gives you flexibility to set minimum temperature thresholds to initiate an irrigation
+* Voice controls via the SmartThings integration with Alexa (Amazon Echo)
 * Easty to follow documentation
 
 ###There are three subprojects:

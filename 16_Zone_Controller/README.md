@@ -125,7 +125,7 @@ Jumper connections from the MEGA terminating on the 16 channel relay:
 In addition to making the connections between the Arduino MEGA and the relay pins (above), you also need to power the relay boards and connect the "Common" terminals between all 16 of the relays.  
 
 ####Powering the Relays:
-The relays are potentiated by connections with the ARDUINO MEGA pins 21-44.  However, the actual relay switching is seperately powered by either a 5V, 12V or 24V DC power, depending on which relay you purchase. If using a +5V relays, run jumpers from the +5V and GND pins on the Arduino to the VCC and GND pins on the Relay Board, respectively.  If applicable move the jumper on the relay board that bridges VCC to JD-VCC.
+The relays are potentiated by connections with the ARDUINO MEGA pins 21-36.  However, the actual relay switching is seperately powered by either a 5V, 12V or 24V DC power, depending on which relay you purchase. If using a +5V relays, run jumpers from the +5V and GND pins on the Arduino to the VCC and GND pins on the Relay Board, respectively.  If applicable move the jumper on the relay board that bridges VCC to JD-VCC.
 
 ####Connecting a Common terminals across the relays.
 Using short male to male jumper flexible wires or pre-formed solid male-to-male jumper wire or combination, we daisy chained the COMMON contact positions together across all 16 relays.
@@ -152,7 +152,7 @@ The final wiring of the project to your irrigation system is straight forward.  
 
 We connected “ground” wire from the 24V AC transformer to the common ground (white) wire in the irrigation wire bundle.
 
-To connect the wires running to each valve, we used the Normally Open positions on the relay.  Each colored wire for each valve was connected to one of the NO positions on a relay.  One valve per relay.   Up to 8 are possible with this hardware, however, you do not need to use all 8.  We then connected the “hot” wire from the transformer to connect to the COMMON position (middle contact) on one of the relays.  This provides power to all realys since they are daisy chained together (see Arduino wiring above)  
+To connect the wires running to each valve, we used the Normally Open positions on the relay.  Each colored wire for each valve was connected to one of the NO positions on a relay.  One valve per relay.   Up to 16 are possible with this project, however, you do not need to use all 16.  We then connected the “hot” wire from the transformer to connect to the COMMON position (middle contact) on one of the relays.  This provides power to all realys since they are daisy chained together (see Arduino wiring above)  
 
 
 <img src="https://cloud.githubusercontent.com/assets/5625006/3353611/6b78fc9a-fa86-11e3-9557-424b4a2bf896.jpg" width="200px"  />

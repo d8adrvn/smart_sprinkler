@@ -1,3 +1,5 @@
+Note: For convenience, some of the pictures and description may refer to the 8 or 16 zone system.  This will not affect your ability to complete the project.
+
 ## **Hello, Smarter Lawn**
 ## **Building A 24 Zone Smarter Lawn Irrigation Controller**
 

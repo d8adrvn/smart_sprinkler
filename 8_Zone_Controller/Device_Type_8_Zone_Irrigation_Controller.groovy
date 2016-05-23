@@ -31,7 +31,7 @@ preferences {
 }
 
 metadata {
-    definition (name: "Irrigation Controller 8 Zones v3.0", version: "3.0", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") {
+    definition (name: "Irrigation Controller 8 Zones v3.01", version: "3.01", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") {
         
         capability "Switch"
         capability "Momentary"
@@ -162,8 +162,8 @@ metadata {
 
 // parse events into attributes to create events
 def parse(String description) {
-	// log.debug "Parsing '${description}'" 
     def value = zigbee.parse(description)?.text
+    log.debug "Parsing: $value" 
     if (!value.contains("ping") && value.trim().length() > 0 && value != "havePump" && value != "noPump" && value != "pumpRemoved") {
         String delims = ","
         String[] tokens = value.split(delims)
@@ -187,9 +187,13 @@ def parse(String description) {
             def isPhysical = true
             
             //manage which events are displayed in log
-			if (tokens[x].contains("q")) {
-				isDisplayed = false
+	    if (tokens[x].contains("q")) {
+		isDisplayed = false
                 isPhysical = false
+            }
+            if (tokens[x].contains("o") && currentVal.contains("q")) {
+		isDisplayed = false
+            	isPhysical = false
             }
 			//send an event if there is a state change
 			if (currentVal != tokens[x]) {
@@ -201,6 +205,7 @@ def parse(String description) {
     }
     if (value == "pumpAdded") {
     	//send an event if there is a state change
+        log.debug "parsing pump"
         if (device.currentValue("zoneEight") != "havePump" && device.currentValue("pump") != "offPump") {
     		sendEvent (name:"zoneEight", value:"havePump", displayed: true, isStateChange: true, isPhysical: true)
         	sendEvent (name:"pump", value:"offPump", displayed: true, isStateChange: true, isPhysical: true)
@@ -372,7 +377,6 @@ def on() {
 def OnWithZoneTimes(value) {
     log.info "Executing 'allOn' with zone times [$value]"
     def evt = createEvent(name: "switch", value: "starting", displayed: true)
-    log.info("Sending: $evt")
     sendEvent(evt)
     
 	def zoneTimes = [:]
@@ -407,27 +411,27 @@ def rainDelayed() {
 }
 
 def warning() {
-    log.info "Switch Did Not AutoStart"
+    log.info "Warning: Programmed Irrigation Did Not Start"
     if(device.currentValue("switch") != "on") {
         sendEvent (name:"switch", value:"warning", displayed: true)
     }
 }
 
 def enablePump() {
-    log.info "Pump Enabled"
+    log.info "Enabling Pump"
     zigbee.smartShield(text: "pump,3").format()  //pump is queued and ready to turn on when zone is activated
 }
 def disablePump() {
-    log.info "Pump Disabled"
+    log.info "Disabling Pump"
     zigbee.smartShield(text: "pump,0").format()  //remove pump from system, reactivate Zone8
 }
 def onPump() {
-    log.info "Pump On"
+    log.info "Turning On Pump"
     zigbee.smartShield(text: "pump,2").format()
     }
 
 def offPump() {
-	log.info "Pump Enabled"
+	log.info "Turning Off Pump"
     zigbee.smartShield(text: "pump,1").format()  //pump returned to queue state to turn on when zone turns on
         }
 def push() {

@@ -40,7 +40,7 @@ preferences {
 }
 
 metadata {
-    definition (name: "Irrigation Controller 16 Zones with Optional Pump v3.01", version: "3.01", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") {
+    definition (name: "Irrigation Controller 16 Zones with Optional Pump v3.0.1", version: "3.0.1", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") {
         
         
         capability "Switch"

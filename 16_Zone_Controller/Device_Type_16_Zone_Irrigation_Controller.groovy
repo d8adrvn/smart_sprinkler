@@ -1,5 +1,5 @@
 /**
- *  Irrigation Controller 16 Zones w/Optional Pump v1
+ *  Irrigation Controller 16 Zones w/Optional Pump
  *
  *
  *  This SmartThings Device Type Code Works With Arduino Irrigation Controller available at https://github.com/d8adrvn/smart_sprinkler

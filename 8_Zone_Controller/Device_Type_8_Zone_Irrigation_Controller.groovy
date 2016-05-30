@@ -31,7 +31,7 @@ preferences {
 }
 
 metadata {
-    definition (name: "Irrigation Controller 8 Zones v3.0.1", version: "3.0.1", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") {
+    definition (name: "Irrigation Controller 8 Zones v3.0.2", version: "3.0.2", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") {
         
         capability "Switch"
         capability "Momentary"
@@ -191,7 +191,7 @@ def parse(String description) {
 		isDisplayed = false
                 isPhysical = false
             }
-            if (tokens[x].contains("o") && currentVal.contains("q")) {
+            if (tokens[x].contains("off") && currentVal.contains("q")) {
 		isDisplayed = false
             	isPhysical = false
             }
@@ -467,3 +467,4 @@ def	onHold() {
     log.info("Sending: $evt")
     sendEvent(evt)
 }
+

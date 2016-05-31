@@ -309,20 +309,25 @@ We modified our Device Type command set to be compatible with the Virtual Switch
 Here is how to virtualize your switches:
 
 1. Log into graph.api.smartthings.com
-2. Go to "My Device Types"
-3. Create a new SmartDevice, filling out the required info to create the device
-4. Paste in the VirtualSwitch.groovy code from jwsf:  https://github.com/d8adrvn/device-type.arduino-8-way-relay/blob/master/VirtualSwitch.groovy
+2. Go to "My Devices"
+3. Create a new Device by clicking the green "+New Device" button
+4. Give it a nName such as "Sprinkler Zone One" or whatever zone you want to control.
+5. Copy the name into the Label field
+6. Go to the Type drop down and select "Simulated Switch"
+7. Select your Location and Hub from the drop downs.
 5. Save and Publish (for me)
-6. Go to My SmartApps and create a new SmartApp
-7. Paste in the code for the VirtualSwitchParent.groovy that has been modified to recoginize our Irrigation Controller.  The modified code can be found at:   https://github.com/d8adrvn/device-type.arduino-8-way-relay/blob/master/VirtualSwitchParent.groovy
-8. Save and Publish (for me)
-9. Go to My Devices and create a new Device.
-10. Give it a 'name' and a 'label' such as "Virtual Irrigation Zone #1"
-11. Under 'type', select "virtual switch", which is the device type you created in #4 above
-12. For 'version', select "published"
-13. Now repeat this 7 more times for each of your zones!
+6. Now repeat this 7 more times for each of your zones!
+8. No go to "My SmartApps" at graph.api.smartthings.com
+8. Select +New SmartApp and use From Source Code tab
+9. Paste in the code for the VirtualSwitchParent.groovy that has been modified to recoginize our Irrigation Controller.  The modified code can be found at:   https://github.com/d8adrvn/device-type.arduino-8-way-relay/blob/master/VirtualSwitchParent.groovy
+10. Save and Publish (for me)
+11. And finally, go to your smart phone and open SmartThings app
+12. Go to Marketplace and create a new a new SmartApp
+13. Select the Irrigation Virtual Switch Integration App that you just created in step 9
+14. Follow the instructions to match up the virtual switches with each zone in the sprinkler
+15. When finished, click Done and you are done!
 
-The above is a bit tedious.  As soon as SmartThings supports child devices, I imagine we will update our code and can do away with the need to create virtual switches.  
+The above is a bit tedious.  There is a way to automate the process which I am looking into and will publish an updated integration app when ready.
 
 Now for the cool part.  You can integrate the sprinkler system with other SmartThings devices.  See below for some examples:
 

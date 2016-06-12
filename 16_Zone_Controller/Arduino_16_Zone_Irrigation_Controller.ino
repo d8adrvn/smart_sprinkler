@@ -2,7 +2,7 @@
 /**
 * 
  ****************************************************************************************************************************
- * Irrigation Controller 16 Zones With Options for Master Valve and Pump  v3_0
+ * Irrigation Controller 16 Zones With Options for Master Valve and Pump  v3_1
  * Simple, elegant irrigation controller that takes advantage of the cloud and SmartThings ecosystem
  * Arduino MEGA with SmartThings Shield  and 16 relay modules
  * Works by receiving irrigation run times from the Cloud and then builds a queue to execute
@@ -219,7 +219,7 @@ SmartThings smartthing(HW_SERIAL3, messageCallout);  // constructor
 //user configurable global variables to set before loading to Arduino
 int relays = 16;  //set up before loading to Arduino (max = 16 with current code and assumes last relay is a master valve/pump actuator)
 boolean isActiveHigh=false; //set to true if using "active high" relay, set to false if using "active low" relay
-boolean isDebugEnabled=false;    // enable or disable debug in this example  
+boolean isDebugEnabled=true;    // enable or disable debug in this example  
 boolean isPin4Pump =false;  //set to true if you add an additional relay to pin4 and use as pump or master valve.  
 
 //set global variables
@@ -241,6 +241,7 @@ const char* configPumpStatus = "off";
 const char* pin4PumpStatus= "off";
 boolean doUpdate = false;
 boolean doPumpUpdate = false;
+long pumpOffDelay = 0; // set number of minutes to delay turning pump or master valve off after last zone has finished running
 
 void setup()
 {
@@ -416,22 +417,16 @@ void toggleOn() {
   scheduleUpdate();
   schedulePumpUpdate();
 }
+
 void toggleOff() {
   digitalWrite(relay[trafficCop], relayOff);
   smartthing.shieldSetLED(0, 0, 1);
   queue[trafficCop]=0; //remove relay from from queue
-  if (isConfigPump== true) {
-    if (maxvalue() ==0) {
-      digitalWrite(relay[16], relayOff);
-      configPumpStatus = "off";
-    }
+  if (maxvalue() ==0) {
+    if (isConfigPump || isPin4Pump) {
+      int8_t pumpOffEvent = t.after(pumpOffDelay*60L*1000L, pumpOff);  //turns off pump after delay
+    }  
   }
-  if (isPin4Pump) {
-    if (maxvalue() ==0) {
-      digitalWrite(pin4Relay, relayOff);
-      pin4PumpStatus = "off";
-    }
-  }  
   trafficCop=0; //ready to check queue or watch for new commmonds
   scheduleUpdate();
   schedulePumpUpdate();
@@ -445,15 +440,9 @@ void allOff() {
     digitalWrite(relay[i], relayOff);
     i++;
   }
-   if (isConfigPump) {
-     digitalWrite(relay[16], relayOff);
-     configPumpStatus="off";
+  if (isConfigPump || isPin4Pump) {
+    int8_t pumpOffEvent = t.after(pumpOffDelay*60L*1000L, pumpOff);  //turns off pump after delay
   } 
-  
-  if (isPin4Pump) {
-    digitalWrite(pin4Relay, relayOff);
-    pin4PumpStatus="off";
-  }
   smartthing.shieldSetLED(0, 0, 1);
   trafficCop=0;
   scheduleUpdate();
@@ -469,6 +458,7 @@ void pumpOff() {
       digitalWrite(pin4Relay, relayOff);
       pin4PumpStatus="off";
   }
+  schedulePumpUpdate();
 }
 
 void pumpOn() {
@@ -480,6 +470,7 @@ void pumpOn() {
       digitalWrite(pin4Relay, relayOn);
       pin4PumpStatus = "on";
   }
+  schedulePumpUpdate();
 }
 
 void timeToUpdate() {

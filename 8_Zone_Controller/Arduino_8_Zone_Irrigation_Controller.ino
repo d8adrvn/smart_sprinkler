@@ -313,7 +313,7 @@ void messageCallout(String message)
     Serial.print(message);
     Serial.println("' "); 
   }
-  char* inValue[stations+2]; //array holds any values being delivered with message (1-8) and NULL; [0] is not used
+  char* inValue[relays+2]; //array holds any values being delivered with message (1-8) and NULL; [0] is not used
   char delimiters[] = ",";
   char charMessage[100];
   strncpy(charMessage, message.c_str(), sizeof(charMessage));
@@ -366,7 +366,10 @@ void messageCallout(String message)
   if (strcmp(inValue[0],"pump")==0) {
     if (strcmp(inValue[1],"0")==0) {
       isConfigPump = false;
-      stations = relays;
+//      stations = relays;
+      if (stations == 7) {  
+        stations = 8;
+      }
     }
     if (strcmp(inValue[1],"1")==0) {
       pumpOff();
@@ -378,7 +381,10 @@ void messageCallout(String message)
       isConfigPump = true;
       digitalWrite(relay[8], relayOff); 
       configPumpStatus = "enabled";
-      stations = relays - 1;
+//      stations = relays - 1;
+      if (stations == 8) {  
+        stations = 7;
+      }
     }
     schedulePumpUpdate();
   }

@@ -2,7 +2,7 @@
 /**
 * 
  ****************************************************************************************************************************
- * Irrigation Controller v3.1
+ * Irrigation Controller v3.1.1
  * Simple, elegant irrigation controller that takes advantage of the cloud and SmartThings ecosystem
  * Arduino UNO with SmartThings Shield  and an 8 Relay Module
  * Works by receiving irrigation run times from the Cloud and then builds a queue to execute

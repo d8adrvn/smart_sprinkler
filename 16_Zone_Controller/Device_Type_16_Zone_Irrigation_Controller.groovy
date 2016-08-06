@@ -40,7 +40,7 @@ preferences {
 }
 
 metadata {
-    definition (name: "Irrigation Controller 16 Zones with Optional Pump v3.0.1", version: "3.0.1", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") {
+    definition (name: "Irrigation Controller 16 Zones with Optional Pump v3.0.2", version: "3.0.2", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") {
         
         
         capability "Switch"
@@ -313,9 +313,13 @@ def parse(String description) {
     if(anyZoneOn()) {
         //manages the state of the overall system.  Overall state is "on" if any zone is on
         //set displayed to false; does not need to be logged in mobile app
-        return createEvent(name: "switch", value: "on", descriptionText: "Irrigation Is On", displayed: false)
+        if(device.currentValue("switch") != "on") {
+        	sendEvent (name: "switch", value: "on", descriptionText: "Irrigation System Is On", displayed: false)  //displayed default is false to minimize logging
+            }
     } else if (device.currentValue("switch") != "rainDelayed") {
-        return createEvent(name: "switch", value: "off", descriptionText: "Irrigation Is Off", displayed: false)
+        if(device.currentValue("switch") != "off") {
+        	sendEvent (name: "switch", value: "off", descriptionText: "Irrigation System Is Off", displayed: false)  //displayed default is false to minimize logging
+       	}
     }
 }
 
@@ -698,8 +702,3 @@ def	onHold() {
     log.info("Sending: $evt")
     sendEvent(evt)
 }
-
-
-
-
-

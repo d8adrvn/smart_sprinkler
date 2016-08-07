@@ -22,11 +22,11 @@
 **/
 
 definition(
-    name: "Irrigation Scheduler v3.0",
+    name: "Irrigation Scheduler v3.0.2",
     namespace: "d8adrvn/smart_sprinkler",
     author: "matt@nichols.name and stan@dotson.info",
     description: "Schedule sprinklers to run unless there is rain.",
-    version: "3.0",
+    version: "3.0.2",
     iconUrl: "https://s3.amazonaws.com/smartapp-icons/Meta/water_moisture.png",
     iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Meta/water_moisture@2x.png"
 )
@@ -184,12 +184,12 @@ def scheduleCheck() {
     if (schedulerState != "delay") {
         state.daysSinceLastWatering[state.currentTimerIx] = daysSince() + 1
     }
-
+// 	  Next line is useful log statement for debugging why the smart app may not be triggering.
 //    log.info("${app.label} scheduler state: $schedulerState. Days since last watering: ${daysSince()}. Is watering day? ${isWateringDay()}. Enought time? ${enoughTimeElapsed(schedulerState)} ")
 
     if ((isWateringDay() && enoughTimeElapsed(schedulerState) && schedulerState != "delay") || schedulerState == "expedite") {
         if (isNotificationEnabled.equals("true")) {
-        	sendPush("${app.label} Is Watering Now!" ?: "null pointer on app name")
+        	sendPush("${app.label} Is Checking The Weather Before Starting Irrigation" ?: "null pointer on app name")
         }
         state.daysSinceLastWatering[state.currentTimerIx] = 0
         def wateringAttempts = 1
@@ -305,6 +305,7 @@ def isHot() {
     return todaysHighTemp
 }
 
+//send watering times over to the device handler
 def water(attempts) {
 	log.info ("Starting Irrigation Schedule: ${app.label}")
     if(anyZoneTimes()) {

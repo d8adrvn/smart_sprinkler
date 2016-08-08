@@ -40,7 +40,7 @@ preferences {
 }
 
 metadata {
-    definition (name: "Irrigation Controller 16 Zones with Optional Pump v3.0.2", version: "3.0.2", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") {
+    definition (name: "Irrigation Controller 16 Zones with Optional Pump v3.0.3", version: "3.0.3", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") {
         
         
         capability "Switch"
@@ -245,13 +245,14 @@ metadata {
 
 // parse events into attributes to create events
 def parse(String description) {
-//    log.debug "Parsing '${description}'"
-
     def value = zigbee.parse(description)?.text
-    if (!value.contains("ping") && value.trim().length() > 0 && value != "havePump" && value != "noPump" && value != "pumpRemoved") {
-     	String delims = ","
-		String[] tokens = value.split(delims)
-
+//    log.debug "Parsing '${value}'"    
+	if (value == null || value?.contains("ping") || value?.equals("")) {
+    	// Do nothing
+        return
+    }else if (value?.trim().length() >= 0 && value != "havePump" && value != "noPump" && value != "pumpRemoved") {
+        String delims = ","
+		String[] tokens = value?.split(delims)
         for (int x=0; x<tokens.length; x++) {
             def displayed = tokens[x] && tokens[x] != "ping"  //evaluates whether to display message
 
@@ -280,11 +281,11 @@ def parse(String description) {
             def isPhysical = true
             
             //manage which events are displayed in log
-			if (tokens[x].contains("q")) {
+			if (tokens[x]?.contains("q")) {
 				isDisplayed = false
                 isPhysical = false
             }         
-            if (tokens[x].contains("o") && currentVal.contains("q")) {
+            if (tokens[x]?.contains("o") && currentVal.contains("q")) {
 				isDisplayed = false
             	isPhysical = false
             }

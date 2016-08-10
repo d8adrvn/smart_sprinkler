@@ -40,7 +40,7 @@ preferences {
 }
 
 metadata {
-    definition (name: "Irrigation Controller 16 Zones with Optional Pump v3.0.3", version: "3.0.3", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") {
+    definition (name: "Irrigation Controller 16 Zones with Optional Pump v3.0.4", version: "3.0.4", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") {
         
         
         capability "Switch"
@@ -246,16 +246,17 @@ metadata {
 // parse events into attributes to create events
 def parse(String description) {
     def value = zigbee.parse(description)?.text
-//    log.debug "Parsing '${value}'"    
-	if (value == null || value?.contains("ping") || value?.equals("")) {
-    	// Do nothing
+    log.debug "Parsing '${value}'"    
+	if (value == 'null'  || value == "" || value?.contains("ping") || value?.trim()?.length() == 0 ) {  
+        // Do nothing
         return
-    }else if (value?.trim().length() >= 0 && value != "havePump" && value != "noPump" && value != "pumpRemoved") {
-        String delims = ","
+    }
+    if (value != "havePump" && value != "noPump" && value != "pumpRemoved") {
+		String delims = ","
 		String[] tokens = value?.split(delims)
-        for (int x=0; x<tokens.length; x++) {
-            def displayed = tokens[x] && tokens[x] != "ping"  //evaluates whether to display message
-
+        for (int x=0; x<tokens?.length; x++) {
+           
+           def displayed = tokens[x] && tokens[x] != "ping"  //evaluates whether to display message
            def name = tokens[x] in ["r1", "q1", "o1"] ? "zoneOne"
             : tokens[x] in ["r2", "q2", "o2"] ? "zoneTwo"
             : tokens[x] in ["r3", "q3", "o3"] ? "zoneThree"
@@ -274,9 +275,9 @@ def parse(String description) {
             : tokens[x] in ["r16", "q16", "o16"] ? "zoneSixteen"
             : tokens[x] in ["onPump", "offPump"] ? "pump"
             : tokens[x] in ["ok"] ? "refresh" : null
-
+			
             //manage and display events
-            def currentVal = device.currentValue(name)
+            def currentVal = device?.currentValue(name)
             def isDisplayed = true
             def isPhysical = true
             
@@ -284,15 +285,17 @@ def parse(String description) {
 			if (tokens[x]?.contains("q")) {
 				isDisplayed = false
                 isPhysical = false
-            }         
-            if (tokens[x]?.contains("o") && currentVal.contains("q")) {
+            } 
+            
+            if (tokens[x]?.contains("o") && currentVal?.contains("q")) {
 				isDisplayed = false
             	isPhysical = false
             }
-			//send an event if there is a state change
+			
+            //send an event if there is a state change
 			if (currentVal != tokens[x]) {
 				def result = createEvent(name: name, value: tokens[x], displayed: isDisplayed, isStateChange: true, isPhysical: isPhysical)
-//            	log.debug "Parse returned ${result?.descriptionText}"
+            	log.debug "Parse returned ${result?.descriptionText}"
             	sendEvent(result)
             }
         }
@@ -310,7 +313,6 @@ def parse(String description) {
     		sendEvent (name:"pump", value:"noPump", displayed: true, isStateChange: true, isPhysical: true)
     	}
     }
-
     if(anyZoneOn()) {
         //manages the state of the overall system.  Overall state is "on" if any zone is on
         //set displayed to false; does not need to be logged in mobile app

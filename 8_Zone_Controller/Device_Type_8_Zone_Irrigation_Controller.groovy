@@ -1,6 +1,6 @@
 /**
  *  Irrigation Controller 8 Zones
- *  This SmartThings Device Type Code Works With Arduino Irrigation Controller also available at this site
+ *  This SmartThings Device Handler (Device Type) Code Works With Arduino Irrigation Controller also available at this site
  *  
  *
  *	Creates connected irrigation controller
@@ -31,7 +31,7 @@ preferences {
 }
 
 metadata {
-    definition (name: "Irrigation Controller 8 Zones v3.0.2", version: "3.0.2", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") {
+    definition (name: "Irrigation Controller 8 Zones v3.0.4", version: "3.0.4", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") {
         
         capability "Switch"
         capability "Momentary"
@@ -164,10 +164,14 @@ metadata {
 def parse(String description) {
     def value = zigbee.parse(description)?.text
     log.debug "Parsing: $value" 
-    if (!value.contains("ping") && value.trim().length() > 0 && value != "havePump" && value != "noPump" && value != "pumpRemoved") {
+	if (value == 'null'  || value == "" || value?.contains("ping") || value?.trim()?.length() == 0 ) {  
+    	// Do nothing
+        return
+    }
+    if (value != "havePump" && value != "noPump" && value != "pumpRemoved") {
         String delims = ","
-        String[] tokens = value.split(delims)
-        for (int x=0; x<tokens.length; x++) {
+        String[] tokens = value?.split(delims)
+        for (int x=0; x<tokens?.length; x++) {
             def displayed = tokens[x]  //evaluates whether to display message
 
             def name = tokens[x] in ["on1", "q1", "off1"] ? "zoneOne"
@@ -182,16 +186,16 @@ def parse(String description) {
             : tokens[x] in ["ok"] ? "refresh" : null
 
             //manage and display events
-            def currentVal = device.currentValue(name)
+            def currentVal = device?.currentValue(name)
             def isDisplayed = true
             def isPhysical = true
             
             //manage which events are displayed in log
-	    if (tokens[x].contains("q")) {
+	    if (tokens[x]?.contains("q")) {
 		isDisplayed = false
                 isPhysical = false
             }
-            if (tokens[x].contains("off") && currentVal.contains("q")) {
+            if (tokens[x]?.contains("off") && currentVal?.contains("q")) {
 		isDisplayed = false
             	isPhysical = false
             }
@@ -206,36 +210,40 @@ def parse(String description) {
     if (value == "pumpAdded") {
     	//send an event if there is a state change
         log.debug "parsing pump"
-        if (device.currentValue("zoneEight") != "havePump" && device.currentValue("pump") != "offPump") {
+        if (device?.currentValue("zoneEight") != "havePump" && device?.currentValue("pump") != "offPump") {
     		sendEvent (name:"zoneEight", value:"havePump", displayed: true, isStateChange: true, isPhysical: true)
         	sendEvent (name:"pump", value:"offPump", displayed: true, isStateChange: true, isPhysical: true)
     	}
     }
     if (value == "pumpRemoved") {
     	//send event if there is a state change
-        if (device.currentValue("pump") != "noPump") {
+        if (device?.currentValue("pump") != "noPump") {
     		sendEvent (name:"pump", value:"noPump", displayed: true, isStateChange: true, isPhysical: true)
     	}
     }
 
-    if(anyZoneOn()) {
+	if(anyZoneOn()) {
         //manages the state of the overall system.  Overall state is "on" if any zone is on
         //set displayed to false; does not need to be logged in mobile app
-        return createEvent(name: "switch", value: "on", descriptionText: "Irrigation Is On", displayed: false)
-    } else if (device.currentValue("switch") != "rainDelayed") {
-        return createEvent(name: "switch", value: "off", descriptionText: "Irrigation Is Off", displayed: false)
+        if(device?.currentValue("switch") != "on") {
+        	sendEvent (name: "switch", value: "on", descriptionText: "Irrigation System Is On", displayed: false)  //displayed default is false to minimize logging
+            }
+    } else if (device?.currentValue("switch") != "rainDelayed") {
+        if(device?.currentValue("switch") != "off") {
+        	sendEvent (name: "switch", value: "off", descriptionText: "Irrigation System Is Off", displayed: false)  //displayed default is false to minimize logging
+       	}
     }
 }
 
 def anyZoneOn() {
-    if(device.currentValue("zoneOne") in ["on1","q1"]) return true;
-    if(device.currentValue("zoneTwo") in ["on2","q2"]) return true;
-    if(device.currentValue("zoneThree") in ["on3","q3"]) return true;
-    if(device.currentValue("zoneFour") in ["on4","q4"]) return true;
-    if(device.currentValue("zoneFive") in ["on5","q5"]) return true;
-    if(device.currentValue("zoneSix") in ["on6","q6"]) return true;
-    if(device.currentValue("zoneSeven") in ["on7","q7"]) return true;
-    if(device.currentValue("zoneEight") in ["on8","q8"]) return true;
+    if(device?.currentValue("zoneOne") in ["on1","q1"]) return true;
+    if(device?.currentValue("zoneTwo") in ["on2","q2"]) return true;
+    if(device?.currentValue("zoneThree") in ["on3","q3"]) return true;
+    if(device?.currentValue("zoneFour") in ["on4","q4"]) return true;
+    if(device?.currentValue("zoneFive") in ["on5","q5"]) return true;
+    if(device?.currentValue("zoneSix") in ["on6","q6"]) return true;
+    if(device?.currentValue("zoneSeven") in ["on7","q7"]) return true;
+    if(device?.currentValue("zoneEight") in ["on8","q8"]) return true;
 
     false;
 }

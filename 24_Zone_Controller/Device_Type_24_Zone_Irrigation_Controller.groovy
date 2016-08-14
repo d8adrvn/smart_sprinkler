@@ -1,6 +1,6 @@
 /**
  *  Irrigation Controller 24Zones with Master Valve and Pump Options 
- *  This SmartThings Device Type Code Works With Arduino Irrigation Controller for 24 zones v1.3 also available at this site
+ *  This SmartThings Device Handler (Device Type) Code Works With Arduino Irrigation Controller for 24 zones v1.3 also available at this site
  *  
  *
  *	Creates connected irrigation controller
@@ -47,7 +47,7 @@ preferences {
     
 }
 metadata {
-    definition (name: "Irrigation Controller 24 Zones with Optional Pump v3.0.1", version: "3.0.1", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") 
+    definition (name: "Irrigation Controller 24 Zones with Optional Pump v3.02", version: "3.02", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") 
     {
         capability "Switch"
         command "OnWithZoneTimes"
@@ -326,14 +326,17 @@ def parse(String description) {
 //    log.debug "Parsing '${description}'"
   
     def value = zigbee.parse(description)?.text
-    if (value != null && !value.contains("ping") && value.trim().length() > 0 && value != "havePump" && value != "noPump" && value != "pumpRemoved") {
-     	String delims = ","
-		String[] tokens = value.split(delims)
+	if (value == 'null'  || value == "" || value?.contains("ping") || value?.trim()?.length() == 0 ) {  
+        // Do nothing
+        return
+    }
+    if (value != "havePump" && value != "noPump" && value != "pumpRemoved") {
+		String delims = ","
+		String[] tokens = value?.split(delims)
 
-        for (int x=0; x<tokens.length; x++) {
+        for (int x=0; x<tokens?.length; x++) {
             def displayed = tokens[x] && tokens[x] != "ping"  //evaluates whether to display message
-
-           def name = tokens[x] in ["r1", "q1", "o1"] ? "zoneOne"
+           	def name = tokens[x] in ["r1", "q1", "o1"] ? "zoneOne"
             : tokens[x] in ["r2", "q2", "o2"] ? "zoneTwo"
             : tokens[x] in ["r3", "q3", "o3"] ? "zoneThree"
             : tokens[x] in ["r4", "q4", "o4"] ? "zoneFour"
@@ -361,16 +364,16 @@ def parse(String description) {
             : tokens[x] in ["ok"] ? "refresh" : null
 
             //manage and display events
-            def currentVal = device.currentValue(name)
+            def currentVal = device?.currentValue(name)
             def isDisplayed = true
             def isPhysical = true
             
             //manage which events are displayed in log
-			if (tokens[x].contains("q")) {
+			if (tokens[x]?.contains("q")) {
 				isDisplayed = false
                 isPhysical = false
             }
-            if (tokens[x].contains("o") && currentVal.contains("q")) {
+            if (tokens[x]?.contains("o") && currentVal?.contains("q")) {
 				isDisplayed = false
             	isPhysical = false
             }

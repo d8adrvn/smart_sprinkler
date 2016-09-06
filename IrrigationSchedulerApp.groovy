@@ -22,11 +22,11 @@
 **/
 
 definition(
-    name: "Irrigation Scheduler v3.0.2",
+    name: "Irrigation Scheduler v3.0.3",
     namespace: "d8adrvn/smart_sprinkler",
     author: "matt@nichols.name and stan@dotson.info",
     description: "Schedule sprinklers to run unless there is rain.",
-    version: "3.0.2",
+    version: "3.0.3",
     iconUrl: "https://s3.amazonaws.com/smartapp-icons/Meta/water_moisture.png",
     iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Meta/water_moisture@2x.png"
 )
@@ -37,8 +37,9 @@ preferences {
         section("Preferences") {
         	label name: "title", title: "Name this irrigation schedule...", required: false, multiple: false, defaultValue: "Irrigation Scheduler"
         	input "isNotificationEnabled", "boolean", title: "Send Push Notification When Irrigation Starts", description: "Do You Want To Receive Push Notifications?", defaultValue: "true", required: false
-        }
-        
+        	input "isRainGuageNotificationEnabled", "boolean", title: "Send Push Notification With Rain Guage Report", description: "Do You Want To Receive Push Notifications?", defaultValue: "false", required: false
+}
+           
         section {
             input (
             name: "wateringDays",
@@ -59,14 +60,11 @@ preferences {
             input name: "waterTimeThree",  type: "time", required: false, title: "and again at..."
         }
     }
-    
 
     page(name: "sprinklerPage", title: "Sprinkler Controller Setup", nextPage: "weatherPage", uninstall: true) {
         section("Select your sprinkler controller...") {
             input "switches", "capability.switch", multiple: false
         }
-
-
 
         section("Zone Times...") {
             input "zone1", "string", title: "Zone 1 Time", description: "minutes", multiple: false, required: false
@@ -185,12 +183,9 @@ def scheduleCheck() {
         state.daysSinceLastWatering[state.currentTimerIx] = daysSince() + 1
     }
 // 	  Next line is useful log statement for debugging why the smart app may not be triggering.
-//    log.info("${app.label} scheduler state: $schedulerState. Days since last watering: ${daysSince()}. Is watering day? ${isWateringDay()}. Enought time? ${enoughTimeElapsed(schedulerState)} ")
+//    log.info("${app.label} scheduler state: ${schedulerState}. Days since last watering: ${daysSince()}. Is watering day? ${isWateringDay()}. Enought time? ${enoughTimeElapsed(schedulerState)} ")
 
     if ((isWateringDay() && enoughTimeElapsed(schedulerState) && schedulerState != "delay") || schedulerState == "expedite") {
-        if (isNotificationEnabled.equals("true")) {
-        	sendPush("${app.label} Is Checking The Weather Before Starting Irrigation" ?: "null pointer on app name")
-        }
         state.daysSinceLastWatering[state.currentTimerIx] = 0
         def wateringAttempts = 1
         water(wateringAttempts)
@@ -224,25 +219,36 @@ def isWeatherDelay() {
         
         //add rain to virtual rain guage
         def rainGauge = 0
+        def todaysInches
+		def yesterdaysInches
+        def forecastInches
+        
         if (isYesterdaysRainEnabled.equals("true")) {        
-            rainGauge = rainGauge + wasWetYesterday()
+            yesterdaysInches = wasWetYesterday()
+            rainGauge = rainGauge + yesterdaysInches
         }
 
         if (isTodaysRainEnabled.equals("true")) {
-            rainGauge = rainGauge + isWet()
+            todaysInches=isWet()
+            rainGauge = rainGauge + todaysInches
         }
 
         if (isForecastRainEnabled.equals("true")) {
-            rainGauge = rainGauge + isStormy()
+            forecastInches = isStormy()
+            rainGauge = rainGauge + forecastInches
         }
-        log.info ("Virtual rain gauge reads $rainGauge in")
+      
+        if (isRainGuageNotificationEnabled.equals("true")) {
+        		sendPush("Virtual rain gauge reads ${rainGauge.round(2)} inches.\nToday's Rain: ${todaysInches} inches, \nYesterday's Rain: ${yesterdaysInches} inches, \nForecast Rain: ${forecastInches} inches")  
+        }
+        log.info ("Virtual rain gauge reads ${rainGauge.round(2)} inches")
         
  //     check to see if virtual rainguage exceeds threshold
         if (rainGauge > (wetThreshold?.toFloat() ?: 0.5)) {
             if (isNotificationEnabled.equals("true")) {
-                sendPush("Skipping watering today due to precipitation.")
-                log.info "${app.label} skipping watering today due to precipitation."
+                sendPush("Skipping watering today due to precipitation.")    
             }
+            log.info "${app.label} skipping watering today due to precipitation."
             for(s in switches) {
                 if("rainDelayed" in s.supportedCommands.collect { it.name }) {
                     s.rainDelayed()
@@ -255,7 +261,7 @@ def isWeatherDelay() {
         def maxThermometer = isHot()
         if (maxThermometer < (tempThreshold?.toFloat() ?: 0)) {
         	if (isNotificationEnabled.equals("true")) {
-                sendPush("Skipping watering: temp is below threshold temp.")
+                sendPush("Skipping watering: $maxThermometer forecast high temp is below threshold temp.")
             }
             log.info "${app.label} is skipping watering: temp is below threshold temp."
             return true
@@ -270,44 +276,46 @@ def safeToFloat(value) {
 }
 
 def wasWetYesterday() {
-
+    
     def yesterdaysWeather = getWeatherFeature("yesterday", zipcode)
-    def yesterdaysPrecip=yesterdaysWeather.history.dailysummary.precipi.toArray()
+    def yesterdaysPrecip =yesterdaysWeather?.history?.dailysummary?.precipi?.toArray()
     def yesterdaysInches=safeToFloat(yesterdaysPrecip[0])
-    log.info("Checking yesterday's percipitation for $zipcode: $yesterdaysInches in")
-	return yesterdaysInches
+    log.info("Yesterday's percipitation for $zipcode: $yesterdaysInches in")
+	return yesterdaysInches    
 }
-
 
 def isWet() {
 
     def todaysWeather = getWeatherFeature("conditions", zipcode)
     def todaysInches = safeToFloat(todaysWeather.current_observation.precip_today_in)
-    log.info("Checking today's percipitation for $zipcode: $todaysInches in")
+    log.info("Today's percipitation for ${zipcode}: ${todaysInches} in")
     return todaysInches
 }
 
 def isStormy() {
 
     def forecastWeather = getWeatherFeature("forecast", zipcode)
-    def forecastPrecip=forecastWeather.forecast.simpleforecast.forecastday.qpf_allday.in.toArray()
+    def forecastPrecip=forecastWeather.forecast.simpleforecast.forecastday.qpf_allday.in?.toArray()
     def forecastInches=(forecastPrecip[0])
-    log.info("Checking forecast percipitation for $zipcode: $forecastInches in")
+    log.info("Forecast percipitation for $zipcode: $forecastInches in")
     return forecastInches
 }
 
 def isHot() {
 
     def forecastWeather = getWeatherFeature("forecast", zipcode)
-    def todaysTemps=forecastWeather.forecast.simpleforecast.forecastday.high.fahrenheit.toArray()
+    def todaysTemps=forecastWeather.forecast.simpleforecast.forecastday.high.fahrenheit?.toArray()
     def todaysHighTemp=(todaysTemps[0]).toFloat()
-    log.info("Checking forecast high temperature for $zipcode: $todaysHighTemp F")
+    log.info("Forecast high temperature for $zipcode: $todaysHighTemp F")
     return todaysHighTemp
 }
 
 //send watering times over to the device handler
 def water(attempts) {
 	log.info ("Starting Irrigation Schedule: ${app.label}")
+    if (isNotificationEnabled.equals("true")) {
+        	sendPush("${app.label} Is Starting Irrigation" ?: "null pointer on app name")
+    }
     if(anyZoneTimes()) {
         def zoneTimes = []
         for(int z = 1; z <= 24; z++) {

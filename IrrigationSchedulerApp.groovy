@@ -22,11 +22,11 @@
 **/
 
 definition(
-    name: "Irrigation Scheduler v3.0.3",
+    name: "Irrigation Scheduler v3.0.4",
     namespace: "d8adrvn/smart_sprinkler",
     author: "matt@nichols.name and stan@dotson.info",
     description: "Schedule sprinklers to run unless there is rain.",
-    version: "3.0.3",
+    version: "3.0.4",
     iconUrl: "https://s3.amazonaws.com/smartapp-icons/Meta/water_moisture.png",
     iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Meta/water_moisture@2x.png"
 )
@@ -37,7 +37,7 @@ preferences {
         section("Preferences") {
         	label name: "title", title: "Name this irrigation schedule...", required: false, multiple: false, defaultValue: "Irrigation Scheduler"
         	input "isNotificationEnabled", "boolean", title: "Send Push Notification When Irrigation Starts", description: "Do You Want To Receive Push Notifications?", defaultValue: "true", required: false
-        	input "isRainGuageNotificationEnabled", "boolean", title: "Send Push Notification With Rain Guage Report", description: "Do You Want To Receive Push Notifications?", defaultValue: "true", required: false
+        	input "isRainGuageNotificationEnabled", "boolean", title: "Send Push Notification With Rain Guage Report", description: "Do You Want To Receive Push Notifications?", defaultValue: "false", required: false
 }
            
         section {
@@ -278,8 +278,8 @@ def safeToFloat(value) {
 def wasWetYesterday() {
     
     def yesterdaysWeather = getWeatherFeature("yesterday", zipcode)
-    def yesterdaysPrecip =yesterdaysWeather?.history?.dailysummary?.precipi?.toArray()
-    def yesterdaysInches=safeToFloat(yesterdaysPrecip[0])
+    def yesterdaysPrecip = yesterdaysWeather?.history?.dailysummary?.precipi?.toArray() 
+    def yesterdaysInches= yesterdaysPrecip ? safeToFloat(yesterdaysPrecip[0]) : 0
     log.info("Yesterday's percipitation for $zipcode: $yesterdaysInches in")
 	return yesterdaysInches    
 }
@@ -287,7 +287,8 @@ def wasWetYesterday() {
 def isWet() {
 
     def todaysWeather = getWeatherFeature("conditions", zipcode)
-    def todaysInches = safeToFloat(todaysWeather.current_observation.precip_today_in)
+    def todaysPrecip = (todaysWeather?.current_observation?.precip_today_in)
+    def todaysInches = todaysPrecip ? safeToFloat(todaysPrecip) : 0
     log.info("Today's percipitation for ${zipcode}: ${todaysInches} in")
     return todaysInches
 }
@@ -296,7 +297,7 @@ def isStormy() {
 
     def forecastWeather = getWeatherFeature("forecast", zipcode)
     def forecastPrecip=forecastWeather.forecast.simpleforecast.forecastday.qpf_allday.in?.toArray()
-    def forecastInches=(forecastPrecip[0])
+    def forecastInches = forecastPrecip ? safeToFloat(forecastPrecip[0]) : 0
     log.info("Forecast percipitation for $zipcode: $forecastInches in")
     return forecastInches
 }
@@ -305,7 +306,7 @@ def isHot() {
 
     def forecastWeather = getWeatherFeature("forecast", zipcode)
     def todaysTemps=forecastWeather.forecast.simpleforecast.forecastday.high.fahrenheit?.toArray()
-    def todaysHighTemp=(todaysTemps[0]).toFloat()
+    def todaysHighTemp = todaysTemps ? safeToFloat(todaysTemps[0]) : 50
     log.info("Forecast high temperature for $zipcode: $todaysHighTemp F")
     return todaysHighTemp
 }

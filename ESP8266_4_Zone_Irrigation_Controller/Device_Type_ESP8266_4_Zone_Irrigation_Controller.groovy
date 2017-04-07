@@ -39,7 +39,7 @@ preferences {
 }
 
 metadata {
-    definition (name: "ESP8266 Irrigation Controller 4 Zones", version: "1.0.1", author: "aaron.nienhuis@gmail.com", namespace: "anienhuis/smart_sprinkler") {
+    definition (name: "ESP8266 Irrigation Controller 4 Zones", version: "1.0.2", author: "aaron.nienhuis@gmail.com", namespace: "anienhuis/smart_sprinkler") {
         
         capability "Switch"
         capability "Momentary"

@@ -2,7 +2,6 @@
  *  This is a start to porting the Arduino and SmartShield based
  *  Irrigation Controllers to an ESP8266 based controller
  *  Author:  Aaron Nienhuis (aaron.nienhuis@gmail.com)
- *
  *  Date:  2017-04-07
  *  
  *  Irrigation Controller 4 Zones
@@ -40,7 +39,7 @@ preferences {
 }
 
 metadata {
-    definition (name: "ESP8266 Irrigation Controller 4 Zones", version: "1.0.0", author: "aaron.nienhuis@gmail.com", namespace: "anienhuis/smart_sprinkler") {
+    definition (name: "ESP8266 Irrigation Controller 4 Zones", version: "1.0.1", author: "aaron.nienhuis@gmail.com", namespace: "anienhuis/smart_sprinkler") {
         
         capability "Switch"
         capability "Momentary"

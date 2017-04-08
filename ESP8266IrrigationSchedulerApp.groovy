@@ -1,9 +1,16 @@
 /**
+*  This is a start to porting the Arduino and SmartShield based
+*  Irrigation Controllers to an ESP8266 based controller
+*  Author:  Aaron Nienhuis (aaron.nienhuis@gmail.com)
+*
+*  Date:  2017-04-07
+*  
 *  
 * 
 *  Irrigation Scheduler SmartApp Smarter Lawn Contoller
 *  Compatible with up to 24 Zones
 *
+*  ESP8266 port based on the extensive previous work of:
 *  Author: Stan Dotson (stan@dotson.info) and Matthew Nichols (matt@nichols.name)
 *  Date: 2014-06-16
 *

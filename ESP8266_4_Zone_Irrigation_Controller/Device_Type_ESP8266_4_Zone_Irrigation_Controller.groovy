@@ -2,6 +2,7 @@
  *  This is a start to porting the Arduino and SmartShield based
  *  Irrigation Controllers to an ESP8266 based controller
  *  Author:  Aaron Nienhuis (aaron.nienhuis@gmail.com)
+ *
  *  Date:  2017-04-07
  *  
  *  Irrigation Controller 4 Zones
@@ -26,6 +27,8 @@
  *  for the specific language governing permissions and limitations under the License.
  */
  
+ import groovy.json.JsonSlurper
+ 
  // for the UI
 preferences {
     input("oneTimer", "text", title: "Zone One", description: "Zone One Time", required: false, defaultValue: "1")
@@ -39,10 +42,17 @@ preferences {
 }
 
 metadata {
-    definition (name: "ESP8266 Irrigation Controller 4 Zones", version: "1.0.2", author: "aaron.nienhuis@gmail.com", namespace: "anienhuis/smart_sprinkler") {
+    definition (name: "ESP8266 Irrigation Controller 4 Zones", version: "1.0.3", author: "aaron.nienhuis@gmail.com", namespace: "anienhuis") {
         
         capability "Switch"
         capability "Momentary"
+        capability "Actuator"
+		capability "Refresh"
+		capability "Sensor"
+        capability "Configuration"
+        capability "Health Check"
+
+        
         command "OnWithZoneTimes"
         command "RelayOn1"
         command "RelayOn1For"
@@ -169,8 +179,12 @@ metadata {
 }
 
 // parse events into attributes to create events
+
+// Original Parse from Irrigation Controller
+
 def parse(String description) {
-    def value = zigbee.parse(description)?.text
+	log.debug "Parsing......."
+    //def value = zigbee.parse(description)?.text
     log.debug "Parsing: $value" 
 	if (value == 'null'  || value == "" || value?.contains("ping") || value?.trim()?.length() == 0 ) {  
     	// Do nothing
@@ -243,6 +257,115 @@ def parse(String description) {
     }
 }
 
+/* Test Parse from H801 LED controller
+def parse(description) {
+    def map = [:]
+    def events = []
+    def cmds = []
+    
+    log.debug "Parsing.... "
+    if(description == "updated") return
+    def descMap = parseDescriptionAsMap(description)
+
+    if (!state.mac || state.mac != descMap["mac"]) {
+		log.debug "Mac address of device found ${descMap["mac"]}"
+        updateDataValue("mac", descMap["mac"])
+	}
+    if (state.mac != null && state.dni != state.mac) state.dni = setDeviceNetworkId(state.mac)
+    
+    def body = new String(descMap["body"].decodeBase64())
+    log.debug body
+    
+    def slurper = new JsonSlurper()
+    def result = slurper.parseText(body)
+    
+    if (result.containsKey("type")) {
+        if (result.type == "configuration")
+            events << update_current_properties(result)
+    }
+    if (result.containsKey("power")) {
+        events << createEvent(name: "switch", value: result.power)
+        toggleTiles("all")
+    }
+    if (result.containsKey("rgb")) {
+       events << createEvent(name:"color", value:"#$result.rgb")
+
+       // only store the previous value if the response did not come from a power-off command
+       if (result.power != "off")
+         state.previousRGB = result.rgb
+    }
+    if (result.containsKey("r")) {
+       events << createEvent(name:"redLevel", value: Integer.parseInt(result.r,16)/255 * 100 as Integer, displayed: false)
+       if ((Integer.parseInt(result.r,16)/255 * 100 as Integer) > 0 ) {
+          events << createEvent(name:"red", value: "on", displayed: false)
+       } else {
+    	  events << createEvent(name:"red", value: "off", displayed: false)
+       }
+    }
+    if (result.containsKey("g")) {
+       events << createEvent(name:"greenLevel", value: Integer.parseInt(result.g,16)/255 * 100 as Integer, displayed: false)
+       if ((Integer.parseInt(result.g,16)/255 * 100 as Integer) > 0 ) {
+          events << createEvent(name:"green", value: "on", displayed: false)
+       } else {
+    	  events << createEvent(name:"green", value: "off", displayed: false)
+       }
+    }
+    if (result.containsKey("b")) {
+       events << createEvent(name:"blueLevel", value: Integer.parseInt(result.b,16)/255 * 100 as Integer, displayed: false)
+       if ((Integer.parseInt(result.b,16)/255 * 100 as Integer) > 0 ) {
+          events << createEvent(name:"blue", value: "on", displayed: false)
+       } else {
+    	  events << createEvent(name:"blue", value: "off", displayed: false)
+       }
+    }
+    if (result.containsKey("w1")) {
+       events << createEvent(name:"white1Level", value: Integer.parseInt(result.w1,16)/255 * 100 as Integer, displayed: false)
+       if ((Integer.parseInt(result.w1,16)/255 * 100 as Integer) > 0 ) {
+          events << createEvent(name:"white1", value: "on", displayed: false)
+       } else {
+    	  events << createEvent(name:"white1", value: "off", displayed: false)
+       }
+
+       // only store the previous value if the response did not come from a power-off command
+       if (result.power != "off")
+          state.previousW1 = result.w1
+    }
+    if (result.containsKey("w2")) {
+       events << createEvent(name:"white2Level", value: Integer.parseInt(result.w2,16)/255 * 100 as Integer, displayed: false)
+       if ((Integer.parseInt(result.w2,16)/255 * 100 as Integer) > 0 ) {
+          events << createEvent(name:"white2", value: "on", displayed: false)
+       } else {
+    	  events << createEvent(name:"white2", value: "off", displayed: false)
+       }
+
+       // only store the previous value if the response did not come from a power-off command
+       if (result.power != "off")
+          state.previousW2 = result.w2
+    }
+    if (result.containsKey("version")) {
+       events << createEvent(name:"firmware", value: result.version + "\r\n" + result.date, displayed: false)
+    }
+
+    if (result.containsKey("success")) {
+       if (result.success == "true") state.configSuccess = "true" else state.configSuccess = "false" 
+    }
+    if (result.containsKey("program")) {
+        if (result.running == "false") {
+            toggleTiles("all")
+        }
+        else {
+            toggleTiles("switch$result.program")
+            events << createEvent(name:"switch$result.program", value: "on")
+        }
+    }
+    
+    if (!device.currentValue("ip") || (device.currentValue("ip") != getDataValue("ip"))) events << createEvent(name: 'ip', value: getDataValue("ip"))
+
+    return events
+}
+*/
+
+
 def anyZoneOn() {
     if(device?.currentValue("zoneOne") in ["on1","q1"]) return true;
     if(device?.currentValue("zoneTwo") in ["on2","q2"]) return true;
@@ -257,137 +380,180 @@ def anyZoneOn() {
 }
 
 // handle commands
+
+def RelayOn1() {
+log.debug "Executing 'blah on,1'"
+    def result = new physicalgraph.device.HubAction(
+        method: "GET",
+        path: "/command?command=on,1,${oneTimer}",
+        headers: [
+            HOST: getHostAddress()
+        ]
+    )
+    return result
+}
+
+/*
 def RelayOn1() {
     log.info "Executing 'on,1'"
-    zigbee.smartShield(text: "on,1,${oneTimer}").format()
+    //zigbee.smartShield(text: "on,1,${oneTimer}").format()
+    def cmds = []
+    cmds << getAction("/command?command=on,1,${oneTimer}")
+    //log.info "RelayOn1 returned $cmds"
+    return cmds
 }
+*/
 
 def RelayOn1For(value) {
     value = checkTime(value)
     log.info "Executing 'on,1,$value'"
-    zigbee.smartShield(text: "on,1,${value}").format()
+    //zigbee.smartShield(text: "on,1,${value}").format()
+    getAction("/command?command=on,1,${value}")
 }
 
 def RelayOff1() {
     log.info "Executing 'off,1'"
-    zigbee.smartShield(text: "off,1").format()
+    //zigbee.smartShield(text: "off,1").format()
+    getAction("/command?command=off,1")
 }
 
 def RelayOn2() {
     log.info "Executing 'on,2'"
-    zigbee.smartShield(text: "on,2,${twoTimer}").format()
+    //zigbee.smartShield(text: "on,2,${twoTimer}").format()
+    getAction("/command?command=on,2,${oneTimer}")
 }
 
 def RelayOn2For(value) {
     value = checkTime(value)
     log.info "Executing 'on,2,$value'"
-    zigbee.smartShield(text: "on,2,${value}").format()
+    //zigbee.smartShield(text: "on,2,${value}").format()
+    getAction("/command?command=on,2,${value}")
 }
 
 def RelayOff2() {
     log.info "Executing 'off,2'"
-    zigbee.smartShield(text: "off,2").format()
+    //zigbee.smartShield(text: "off,2").format()
+    getAction("/command?command=off,2")
 }
 
 def RelayOn3() {
     log.info "Executing 'on,3'"
-    zigbee.smartShield(text: "on,3,${threeTimer}").format()
+    //zigbee.smartShield(text: "on,3,${threeTimer}").format()
+    getAction("/command?command=on,3,${oneTimer}")
 }
 
 def RelayOn3For(value) {
     value = checkTime(value)
     log.info "Executing 'on,3,$value'"
-    zigbee.smartShield(text: "on,3,${value}").format()
+    //zigbee.smartShield(text: "on,3,${value}").format()
+    getAction("/command?command=on,3,${value}")
 }
 
 def RelayOff3() {
     log.info "Executing 'off,3'"
-    zigbee.smartShield(text: "off,3").format()
+    //zigbee.smartShield(text: "off,3").format()
+    getAction("/command?command=off,3")
 }
 
 def RelayOn4() {
     log.info "Executing 'on,4'"
-    zigbee.smartShield(text: "on,4,${fourTimer}").format()
+    //zigbee.smartShield(text: "on,4,${fourTimer}").format()
+    getAction("/command?command=on,4,${oneTimer}")
 }
 
 def RelayOn4For(value) {
     value = checkTime(value)
     log.info "Executing 'on,4,$value'"
-    zigbee.smartShield(text: "on,4,${value}").format()
+    //zigbee.smartShield(text: "on,4,${value}").format()
+    getAction("/command?command=on,4,${value}")
 }
 
 def RelayOff4() {
     log.info "Executing 'off,4'"
-    zigbee.smartShield(text: "off,4").format()
+    //zigbee.smartShield(text: "off,4").format()
+    getAction("/command?command=off,4")
 }
 
 def RelayOn5() {
     log.info "Executing 'on,5'"
-    zigbee.smartShield(text: "on,5,${fiveTimer}").format()
+    //zigbee.smartShield(text: "on,5,${fiveTimer}").format()
+    getAction("/command?command=on,5,${oneTimer}")
 }
 
 def RelayOn5For(value) {
     value = checkTime(value)
     log.info "Executing 'on,5,$value'"
-    zigbee.smartShield(text: "on,5,${value}").format()
+    //zigbee.smartShield(text: "on,5,${value}").format()
+    getAction("/command?command=on,5,${value}")
 }
 
 def RelayOff5() {
     log.info "Executing 'off,5'"
-    zigbee.smartShield(text: "off,5").format()
+    //zigbee.smartShield(text: "off,5").format()
+    getAction("/command?command=off,5")
 }
 
 def RelayOn6() {
     log.info "Executing 'on,6'"
-    zigbee.smartShield(text: "on,6,${sixTimer}").format()
+    //zigbee.smartShield(text: "on,6,${sixTimer}").format()
+    getAction("/command?command=on,6,${oneTimer}")
 }
 
 def RelayOn6For(value) {
     value = checkTime(value)
     log.info "Executing 'on,6,$value'"
-    zigbee.smartShield(text: "on,6,${value}").format()
+    //zigbee.smartShield(text: "on,6,${value}").format()
+    getAction("/command?command=on,6,${value}")
 }
 
 def RelayOff6() {
     log.info "Executing 'off,6'"
-    zigbee.smartShield(text: "off,6").format()
+    //zigbee.smartShield(text: "off,6").format()
+    getAction("/command?command=off,6")
 }
 
 def RelayOn7() {
     log.info "Executing 'on,7'"
-    zigbee.smartShield(text: "on,7,${sevenTimer}").format()
+    //zigbee.smartShield(text: "on,7,${sevenTimer}").format()
+    getAction("/command?command=on,7,${oneTimer}")
 }
 
 def RelayOn7For(value) {
     value = checkTime(value)
     log.info "Executing 'on,7,$value'"
-    zigbee.smartShield(text: "on,7,${value}").format()
+    //zigbee.smartShield(text: "on,7,${value}").format()
+    getAction("/command?command=on,7,${value}")
 }
 
 def RelayOff7() {
     log.info "Executing 'off,7'"
-    zigbee.smartShield(text: "off,7").format()
+    //zigbee.smartShield(text: "off,7").format()
+    getAction("/command?command=off,7")
 }
 
 def RelayOn8() {
     log.info "Executing 'on,8'"
-    zigbee.smartShield(text: "on,8,${eightTimer}").format()
+    //zigbee.smartShield(text: "on,8,${eightTimer}").format()
+    getAction("/command?command=on,8,${oneTimer}")
 }
 
 def RelayOn8For(value) {
     value = checkTime(value)
     log.info "Executing 'on,8,$value'"
-    zigbee.smartShield(text: "on,8,${value}").format()
+    //zigbee.smartShield(text: "on,8,${value}").format()
+    getAction("/command?command=on,8,${value}")
 }
 
 def RelayOff8() {
     log.info "Executing 'off,8'"
-    zigbee.smartShield(text: "off,8").format()
+    //zigbee.smartShield(text: "off,8").format()
+    getAction("/command?command=off,8")
 }
 
 def on() {
     log.info "Executing 'allOn'"
-    zigbee.smartShield(text: "allOn,${oneTimer ?: 0},${twoTimer ?: 0},${threeTimer ?: 0},${fourTimer ?: 0},${fiveTimer ?: 0},${sixTimer ?: 0},${sevenTimer ?: 0},${eightTimer ?: 0}").format()
+    //zigbee.smartShield(text: "allOn,${oneTimer ?: 0},${twoTimer ?: 0},${threeTimer ?: 0},${fourTimer ?: 0},${fiveTimer ?: 0},${sixTimer ?: 0},${sevenTimer ?: 0},${eightTimer ?: 0}").format()
+    getAction("/command?command=allOn,${oneTimer ?: 0},${twoTimer ?: 0},${threeTimer ?: 0},${fourTimer ?: 0},${fiveTimer ?: 0},${sixTimer ?: 0},${sevenTimer ?: 0},${eightTimer ?: 0}")
 }
 
 def OnWithZoneTimes(value) {
@@ -401,12 +567,15 @@ def OnWithZoneTimes(value) {
         zoneTimes[parts[0].toInteger()] = parts[1]
         log.info("Zone ${parts[0].toInteger()} on for ${parts[1]} minutes")
     }
-    zigbee.smartShield(text: "allOn,${checkTime(zoneTimes[1]) ?: 0},${checkTime(zoneTimes[2]) ?: 0},${checkTime(zoneTimes[3]) ?: 0},${checkTime(zoneTimes[4]) ?: 0},${checkTime(zoneTimes[5]) ?: 0},${checkTime(zoneTimes[6]) ?: 0},${checkTime(zoneTimes[7]) ?: 0},${checkTime(zoneTimes[8]) ?: 0}").format()
+    //zigbee.smartShield(text: "allOn,${checkTime(zoneTimes[1]) ?: 0},${checkTime(zoneTimes[2]) ?: 0},${checkTime(zoneTimes[3]) ?: 0},${checkTime(zoneTimes[4]) ?: 0},${checkTime(zoneTimes[5]) ?: 0},${checkTime(zoneTimes[6]) ?: 0},${checkTime(zoneTimes[7]) ?: 0},${checkTime(zoneTimes[8]) ?: 0}").format()
+    getAction("/command?command=allOn,${checkTime(zoneTimes[1]) ?: 0},${checkTime(zoneTimes[2]) ?: 0},${checkTime(zoneTimes[3]) ?: 0},${checkTime(zoneTimes[4]) ?: 0},${checkTime(zoneTimes[5]) ?: 0},${checkTime(zoneTimes[6]) ?: 0},${checkTime(zoneTimes[7]) ?: 0},${checkTime(zoneTimes[8]) ?: 0}")
 }
 
 def off() {
     log.info "Executing 'allOff'"
-    zigbee.smartShield(text: "allOff").format()
+    //zigbee.smartShield(text: "allOff").format()
+    getAction("/command?command=allOff")
+    
 }
 
 def checkTime(t) {
@@ -416,7 +585,8 @@ def checkTime(t) {
 
 def update() {
     log.info "Executing refresh"
-    zigbee.smartShield(text: "update").format()
+    //zigbee.smartShield(text: "update").format()
+    getAction("/status")
 }
 
 def rainDelayed() {
@@ -435,24 +605,29 @@ def warning() {
 
 def enablePump() {
     log.info "Enabling Pump"
-    zigbee.smartShield(text: "pump,3").format()  //pump is queued and ready to turn on when zone is activated
+    //zigbee.smartShield(text: "pump,3").format()  //pump is queued and ready to turn on when zone is activated
+    getAction("/command?command=pump,3")
 }
 def disablePump() {
     log.info "Disabling Pump"
-    zigbee.smartShield(text: "pump,0").format()  //remove pump from system, reactivate Zone8
+    //zigbee.smartShield(text: "pump,0").format()  //remove pump from system, reactivate Zone8
+    getAction("/command?command=pump,0")
 }
 def onPump() {
     log.info "Turning On Pump"
-    zigbee.smartShield(text: "pump,2").format()
+    //zigbee.smartShield(text: "pump,2").format()
+    getAction("/command?command=pump,2")
     }
 
 def offPump() {
 	log.info "Turning Off Pump"
-    zigbee.smartShield(text: "pump,1").format()  //pump returned to queue state to turn on when zone turns on
+    //zigbee.smartShield(text: "pump,1").format()  //pump returned to queue state to turn on when zone turns on
+    getAction("/command?command=pump,1")
         }
 def push() {
     log.info "advance to next zone"
-    zigbee.smartShield(text: "advance").format()  //turn off currently running zone and advance to next
+    //zigbee.smartShield(text: "advance").format()  //turn off currently running zone and advance to next
+    getAction("/command?command=advance")
     }
 
 // commands that over-ride the SmartApp
@@ -484,3 +659,208 @@ def	onHold() {
     sendEvent(evt)
 }
 
+//Start of added functions
+
+def reset() {
+	log.debug "reset()"
+	//setColor(white: "ff")
+}
+
+def refresh() {
+	log.debug "refresh()"
+    getAction("/status")
+}
+
+def ping() {
+    log.debug "ping()"
+    refresh()
+}
+
+def sync(ip, port) {
+    def existingIp = getDataValue("ip")
+    def existingPort = getDataValue("port")
+    if (ip && ip != existingIp) {
+        updateDataValue("ip", ip)
+        sendEvent(name: 'ip', value: ip)
+    }
+    if (port && port != existingPort) {
+        updateDataValue("port", port)
+    }
+}
+private encodeCredentials(username, password){
+	def userpassascii = "${username}:${password}"
+    def userpass = "Basic " + userpassascii.encodeAsBase64().toString()
+    return userpass
+}
+
+private getAction(uri){ 
+  updateDNI()
+  def userpass
+  log.debug uri
+  if(password != null && password != "") 
+    userpass = encodeCredentials("admin", password)
+    
+  def headers = getHeader(userpass)
+
+  def hubAction = new physicalgraph.device.HubAction(
+    method: "GET",
+    path: uri,
+    headers: headers
+  )
+  return hubAction    
+}
+
+private postAction(uri, data){ 
+  updateDNI()
+  
+  def userpass
+  
+  if(password != null && password != "") 
+    userpass = encodeCredentials("admin", password)
+  
+  def headers = getHeader(userpass)
+  
+  def hubAction = new physicalgraph.device.HubAction(
+    method: "POST",
+    path: uri,
+    headers: headers,
+    body: data
+  )
+  return hubAction    
+}
+
+private setDeviceNetworkId(ip, port = null){
+    def myDNI
+    if (port == null) {
+        myDNI = ip
+    } else {
+  	    def iphex = convertIPtoHex(ip)
+  	    def porthex = convertPortToHex(port)
+        
+        myDNI = "$iphex:$porthex"
+    }
+    log.debug "Device Network Id set to ${myDNI}"
+    return myDNI
+}
+
+private updateDNI() { 
+    if (state.dni != null && state.dni != "" && device.deviceNetworkId != state.dni) {
+       device.deviceNetworkId = state.dni
+    }
+}
+
+private getHostAddress() {
+    if(getDeviceDataByName("ip") && getDeviceDataByName("port")){
+        return "${getDeviceDataByName("ip")}:${getDeviceDataByName("port")}"
+    }else{
+	    return "${ip}:80"
+    }
+}
+
+private String convertIPtoHex(ipAddress) { 
+    String hex = ipAddress.tokenize( '.' ).collect {  String.format( '%02x', it.toInteger() ) }.join()
+    return hex
+}
+
+private String convertPortToHex(port) {
+	String hexport = port.toString().format( '%04x', port.toInteger() )
+    return hexport
+}
+
+def parseDescriptionAsMap(description) {
+	description.split(",").inject([:]) { map, param ->
+		def nameAndValue = param.split(":")
+		map += [(nameAndValue[0].trim()):nameAndValue[1].trim()]
+	}
+}
+
+private getHeader(userpass = null){
+    def headers = [:]
+    headers.put("Host", getHostAddress())
+    headers.put("Content-Type", "application/x-www-form-urlencoded")
+    if (userpass != null)
+       headers.put("Authorization", userpass)
+    return headers
+}
+
+def toAscii(s){
+        StringBuilder sb = new StringBuilder();
+        String ascString = null;
+        long asciiInt;
+                for (int i = 0; i < s.length(); i++){
+                    sb.append((int)s.charAt(i));
+                    sb.append("|");
+                    char c = s.charAt(i);
+                }
+                ascString = sb.toString();
+                asciiInt = Long.parseLong(ascString);
+                return asciiInt;
+}
+
+def setProgram(value, program){
+   state."program${program}" = value
+}
+
+def hex2int(value){
+   return Integer.parseInt(value, 10)
+}
+
+ /*  Code has elements from other community source @CyrilPeponnet (Z-Wave Parameter Sync). */
+
+def update_current_properties(cmd)
+{
+    def currentProperties = state.currentProperties ?: [:]
+    currentProperties."${cmd.name}" = cmd.value
+
+    if (settings."${cmd.name}" != null)
+    {
+        if (convertParam("${cmd.name}", settings."${cmd.name}").toString() == cmd.value)
+        {
+            sendEvent(name:"needUpdate", value:"NO", displayed:false, isStateChange: true)
+        }
+        else
+        {
+            sendEvent(name:"needUpdate", value:"YES", displayed:false, isStateChange: true)
+        }
+    }
+    state.currentProperties = currentProperties
+}
+
+
+def update_needed_settings()
+{
+    def cmds = []
+    def currentProperties = state.currentProperties ?: [:]
+     
+    def configuration = parseXml(configuration_model())
+    def isUpdateNeeded = "NO"
+    
+    cmds << getAction("/configSet?name=haip&value=${device.hub.getDataValue("localIP")}")
+    cmds << getAction("/configSet?name=haport&value=${device.hub.getDataValue("localSrvPortTCP")}")
+    
+    configuration.Value.each
+    {     
+        if ("${it.@setting_type}" == "lan" && it.@disabled != "true"){
+            if (currentProperties."${it.@index}" == null)
+            {
+               if (it.@setonly == "true"){
+                  logging("Setting ${it.@index} will be updated to ${convertParam("${it.@index}", it.@value)}", 2)
+                  cmds << getAction("/configSet?name=${it.@index}&value=${convertParam("${it.@index}", it.@value)}")
+               } else {
+                  isUpdateNeeded = "YES"
+                  logging("Current value of setting ${it.@index} is unknown", 2)
+                  cmds << getAction("/configGet?name=${it.@index}")
+               }
+            }
+            else if ((settings."${it.@index}" != null || it.@hidden == "true") && currentProperties."${it.@index}" != (settings."${it.@index}"? convertParam("${it.@index}", settings."${it.@index}".toString()) : convertParam("${it.@index}", "${it.@value}")))
+            { 
+                isUpdateNeeded = "YES"
+                logging("Setting ${it.@index} will be updated to ${convertParam("${it.@index}", settings."${it.@index}")}", 2)
+                cmds << getAction("/configSet?name=${it.@index}&value=${convertParam("${it.@index}", settings."${it.@index}")}")
+            } 
+        }
+    }
+    
+    sendEvent(name:"needUpdate", value: isUpdateNeeded, displayed:false, isStateChange: true)
+    return cmds
+}

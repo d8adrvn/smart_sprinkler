@@ -32,9 +32,9 @@
 
 //user configurable global variables to set before loading to Arduino
 int relays = 4;  //set up before loading to Arduino (max = 8 with current code)
-boolean isActiveHigh=false; //set to true if using "active high" relay, set to false if using "active low" relay
+boolean isActiveHigh=true; //set to true if using "active high" relay, set to false if using "active low" relay
 boolean isDebugEnabled=true;    // enable or disable debug in this example
-boolean isPin4Pump =false;  //set to true if you add an additional relay to pin4 and use as pump or master valve.  
+boolean isPin4Pump=false;  //set to true if you add an additional relay to pin4 and use as pump or master valve.  
 
 //set global variables
 Timer t;
@@ -89,31 +89,29 @@ void handleOn() {
   
 }
 void handleCommand() {
-  //*****************ADD Custom Code Here**********************
+
   String message = server.arg("command");
   
-  //if (server.args() != 0 && server.arg(0) != "0" && server.arg(0) != "") { //&& strcmp(runTime,"null")!=0 {  //do not add to queue if zero time
-  ///  Serial.println("Print handleOn ");
-  //  Serial.println(runTime);
-    //int addStation=atoi(server.arg(1));
-    //queue[addStation]=1;
-    //stationTime[addStation]=atol(inValue[2])*60L*1000L;
-  //}
-    //scheduleUpdate()
-  //}
-
   messageCallout(message);
 
-  String updateStatus = "<html><body>";
-  updateStatus.concat (makeUpdate("OK,"));
-  updateStatus.concat ("</body></html>");
+  String updateStatus = "";
+  updateStatus.concat (makeUpdate("OK:"));
+  //updateStatus.concat ("</body></html>");
   
-  //digitalWrite(ledZone1, HIGH);  
-  state = 1;
-  //****************End Turn on Device Code********************
   server.send(200, "text/html", updateStatus);
   
 }
+
+void handleStatus() {
+ 
+  String updateStatus = "<html><body>";
+  updateStatus.concat (makeUpdate("OK:"));
+  updateStatus.concat ("</body></html>");
+  
+  server.send(200, "text/html", updateStatus);
+  
+}
+
 
 void handleOff() {
   //*****************ADD Custom Code Here**********************
@@ -256,8 +254,12 @@ void setup(void){
   server.on("/advance", handleAdvance);
   server.on("/pump", handlePump);
   server.on("/command", handleCommand);
+  server.on("/status", handleStatus);
 
-  server.on("/esp8266.xml", HTTP_GET, [](){
+  server.on("/esp8266ic.xml", HTTP_GET, [](){
+    if (isDebugEnabled) {
+      Serial.println("Request for /esp8266ic.xml");
+    }
     SSDP.schema(server.client());
   });
   
@@ -266,16 +268,16 @@ void setup(void){
 
   server.begin();
 
-  SSDP.setSchemaURL("esp8266.xml");
+  SSDP.setSchemaURL("esp8266ic.xml");
   SSDP.setHTTPPort(80);
-  SSDP.setName("ESP8266 Basic Switch");
+  SSDP.setName("ESP8266 Irrigation Controller");
   SSDP.setSerialNumber("0112358132134");
   SSDP.setURL("index.html");
-  SSDP.setModelName("SmartThingsESP8266 Basic Switch");
+  SSDP.setModelName("ESP8266Irrigation Controller");
   SSDP.setModelNumber("1");
-  SSDP.setModelURL("https://github.com/SchreiverJ/SmartThingsESP8266/");
-  SSDP.setManufacturer("Jacob Schreiver");
-  SSDP.setManufacturerURL("https://github.com/SchreiverJ/SmartThingsESP8266/");
+  SSDP.setModelURL("https://github.com/anienhuis/smart_sprinkler/");
+  SSDP.setManufacturer("Aaron Nienhuis");
+  SSDP.setManufacturerURL("https://github.com/anienhuis/smart_sprinkler/");
     
   SSDP.begin();
   
@@ -285,13 +287,13 @@ void setup(void){
 void loop(void){
 
   if (isDebugEnabled) {
-    Serial.println("Starting loop");
+    //Serial.println("Starting loop");
   }
     //run timer 
   t.update();
   
   if (doUpdate) {
-    sendUpdate("ok,");
+    sendUpdate("");
     doUpdate = false;
   }
   if (doPumpUpdate) {
@@ -304,9 +306,9 @@ void loop(void){
   
   
   server.handleClient();
-  delay(1000);
+  delay(10);
   if (isDebugEnabled) {
-    Serial.println("Ending loop");
+    //Serial.println("Ending loop");
   }
 }
 
@@ -640,6 +642,7 @@ String makeUpdate(String statusUpdate) {
   if (isDebugEnabled) {
     Serial.println("Starting makeUpdate");
   }
+  statusUpdate="{";
   // builds a status update to send to SmartThings hub
   String action="";
   for (int i=1; i<stations+1; i++) {
@@ -653,8 +656,10 @@ String makeUpdate(String statusUpdate) {
     if (queue[i]==2) {
       action="on";
     }
-    statusUpdate.concat (action + i + ",");
+    statusUpdate.concat (action + i + ":");
   }
+  statusUpdate.concat ("}");
+  
   if (isDebugEnabled) {
     Serial.print("Created Update Message ");
     Serial.println(statusUpdate);

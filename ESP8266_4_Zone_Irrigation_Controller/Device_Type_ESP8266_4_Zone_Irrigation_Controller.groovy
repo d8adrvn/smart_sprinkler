@@ -183,13 +183,33 @@ metadata {
 // Original Parse from Irrigation Controller
 
 def parse(String description) {
-	log.debug "Parsing......."
+
+	log.debug "Parsing: ${description}"
+    def events = []
+    def descMap = parseDescriptionAsMap(description)
+    def body
+    log.debug "descMap: ${descMap}"
+
+    if (!state.mac || state.mac != descMap["mac"]) {
+		log.debug "Mac address of device found ${descMap["mac"]}"
+        updateDataValue("mac", descMap["mac"])
+	}
+    
+    if (state.mac != null && state.dni != state.mac) state.dni = setDeviceNetworkId(state.mac)
+    if (descMap["body"]) body = new String(descMap["body"].decodeBase64())
+log.debug "body: $body"
+    if (body && body != "") {
+    
+    //if(body.startsWith("{") || body.startsWith("[")) {
+   
     //def value = zigbee.parse(description)?.text
+    def value = body
     log.debug "Parsing: $value" 
 	if (value == 'null'  || value == "" || value?.contains("ping") || value?.trim()?.length() == 0 ) {  
     	// Do nothing
         return
     }
+    
     if (value != "havePump" && value != "noPump" && value != "pumpRemoved") {
         String delims = ","
         String[] tokens = value?.split(delims)
@@ -212,13 +232,16 @@ def parse(String description) {
             def isDisplayed = true
             def isPhysical = true
             
+            log.debug "currentVal $currentVal"
+            log.debug "tokens $tokens[x]"
+            
             //manage which events are displayed in log
-	    if (tokens[x]?.contains("q")) {
-		isDisplayed = false
+	    	if (tokens[x]?.contains("q")) {
+				isDisplayed = false
                 isPhysical = false
             }
             if (tokens[x]?.contains("off") && currentVal?.contains("q")) {
-		isDisplayed = false
+				isDisplayed = false
             	isPhysical = false
             }
 			//send an event if there is a state change
@@ -249,13 +272,60 @@ def parse(String description) {
         //set displayed to false; does not need to be logged in mobile app
         if(device?.currentValue("switch") != "on") {
         	sendEvent (name: "switch", value: "on", descriptionText: "Irrigation System Is On", displayed: false)  //displayed default is false to minimize logging
-            }
+        }
     } else if (device?.currentValue("switch") != "rainDelayed") {
         if(device?.currentValue("switch") != "off") {
         	sendEvent (name: "switch", value: "off", descriptionText: "Irrigation System Is Off", displayed: false)  //displayed default is false to minimize logging
        	}
     }
+  }          
 }
+
+/*
+def parse(description) {
+	//log.debug "Parsing: ${description}"
+    def events = []
+    def descMap = parseDescriptionAsMap(description)
+    def body
+    //log.debug "descMap: ${descMap}"
+
+    if (!state.mac || state.mac != descMap["mac"]) {
+		log.debug "Mac address of device found ${descMap["mac"]}"
+        updateDataValue("mac", descMap["mac"])
+	}
+    
+    if (state.mac != null && state.dni != state.mac) state.dni = setDeviceNetworkId(state.mac)
+    if (descMap["body"]) body = new String(descMap["body"].decodeBase64())
+log.debug "body: $body"
+    if (body && body != "") {
+    
+    	if(body.startsWith("{") || body.startsWith("[")) {
+    
+    		def slurper = new JsonSlurper()
+    		def result = slurper.parseText(body)
+    
+   	 		log.debug "result: ${result}"
+    
+    		if (result.containsKey("type")) {
+        		if (result.type == "configuration")
+            		events << update_current_properties(result)
+    		}
+    		if (result.containsKey("power")) {
+        		events << createEvent(name: "switch", value: result.power)
+    		}
+    		if (result.containsKey("uptime")) {
+        		events << createEvent(name: 'uptime', value: result.uptime)
+    		}
+    	} else {
+        	//log.debug "Response is not JSON: $body"
+    	}
+    }
+    
+    if (!device.currentValue("ip") || (device.currentValue("ip") != getDataValue("ip"))) events << createEvent(name: 'ip', value: getDataValue("ip"))
+    
+    return events
+}
+*/
 
 /* Test Parse from H801 LED controller
 def parse(description) {
@@ -381,8 +451,9 @@ def anyZoneOn() {
 
 // handle commands
 
+/*
 def RelayOn1() {
-log.debug "Executing 'blah on,1'"
+log.debug "Executing 'on,1'"
     def result = new physicalgraph.device.HubAction(
         method: "GET",
         path: "/command?command=on,1,${oneTimer}",
@@ -392,17 +463,15 @@ log.debug "Executing 'blah on,1'"
     )
     return result
 }
+*/
 
-/*
 def RelayOn1() {
     log.info "Executing 'on,1'"
     //zigbee.smartShield(text: "on,1,${oneTimer}").format()
-    def cmds = []
-    cmds << getAction("/command?command=on,1,${oneTimer}")
+    getAction("/command?command=on,1,${oneTimer}")
     //log.info "RelayOn1 returned $cmds"
-    return cmds
 }
-*/
+
 
 def RelayOn1For(value) {
     value = checkTime(value)

@@ -48,6 +48,11 @@ int8_t stationTimer[] = {0,0,0,0,0,0,0,0,0};
 int queue[]={0,0,0,0,0,0,0,0,0};  // off: 0, queued: 1, running: 2
 int relay[9];
 
+// Smartthings hub information
+IPAddress hubIp(192,168,1,225); // smartthings hub ip
+unsigned int hubPort = 39500; // smartthings hub port
+
+
 //initialize pump related variables. 
 int pin4Relay = 16;  //pin16 reserved for optional additional relay to control a pump or master valve
 boolean isConfigPump = false; // if true, relay8 is used as the pump/master valve switch.  Can be toggled by device tye v2.7 and later
@@ -59,35 +64,17 @@ long pumpOffDelay = 0; // set number of minutes to delay turning pump or master 
 
 
 ESP8266WebServer server(80);
+WiFiClient client; //client
+
 
 int state = 1;
 
 void handleRoot() {
-  if (state == 1)
-    server.send(200, "text/html", "<html><body>the device is on</body></html>");
-  else
-    server.send(200, "text/html", "<html><body>the device is off</body></html>");     
+  String updateStatus = "";
+  updateStatus.concat (makeUpdate(""));  
+  server.send(200, "application/json", updateStatus);  
 }
 
-void handleOn() {
-  //*****************ADD Custom Code Here**********************
-  String runTime = server.arg("runTime");
-  if (server.args() != 0 && server.arg(0) != "0" && server.arg(0) != "") { //&& strcmp(runTime,"null")!=0 {  //do not add to queue if zero time
-    Serial.println("Print handleOn ");
-    Serial.println(runTime);
-    //int addStation=atoi(server.arg(1));
-    //queue[addStation]=1;
-    //stationTime[addStation]=atol(inValue[2])*60L*1000L;
-  }
-    //scheduleUpdate()
-  //}
-  
-  //digitalWrite(ledZone1, HIGH);  
-  state = 1;
-  //****************End Turn on Device Code********************
-  server.send(200, "text/html", "<html><body>on</body></html>");
-  
-}
 void handleCommand() {
 
   String message = server.arg("command");
@@ -95,75 +82,25 @@ void handleCommand() {
   messageCallout(message);
 
   String updateStatus = "";
-  updateStatus.concat (makeUpdate("OK:"));
-  //updateStatus.concat ("</body></html>");
-  
-  server.send(200, "text/html", updateStatus);
+  updateStatus.concat (makeUpdate(""));
+    
+  server.send(200, "application/json", updateStatus);
   
 }
 
 void handleStatus() {
  
-  String updateStatus = "<html><body>";
-  updateStatus.concat (makeUpdate("OK:"));
-  updateStatus.concat ("</body></html>");
+  String updateStatus = "";
+  updateStatus.concat (makeUpdate(""));
+  //updateStatus.concat ("</body></html>");
   
-  server.send(200, "text/html", updateStatus);
+  server.send(200, "application/json", updateStatus);
   
-}
-
-
-void handleOff() {
-  //*****************ADD Custom Code Here**********************
-
-  
- //digitalWrite(ledZone1, LOW);  
-  state = 0;
-  //****************End Turn off Device Code********************
-  server.send(200, "text/html", "<html><body>off</body></html>");
-}
-
-void handleUpdate() {
-  if (state == 1)
-    server.send(200, "text/html", "<html><body>on</body></html>");
-  else
-    server.send(200, "text/html", "<html><body>off</body></html>");
-}
-
-void handleAllOn() {
-  if (state == 1)
-    server.send(200, "text/html", "<html><body>on</body></html>");
-  else
-    server.send(200, "text/html", "<html><body>off</body></html>");
-}
-
-void handleAllOff() {
-  if (state == 1)
-    server.send(200, "text/html", "<html><body>on</body></html>");
-  else
-    server.send(200, "text/html", "<html><body>off</body></html>");
-}
-
-void handleAdvance() {
-  if (state == 1)
-    server.send(200, "text/html", "<html><body>on</body></html>");
-  else
-    server.send(200, "text/html", "<html><body>off</body></html>");
-}
-
-void handlePump() {
-  if (state == 1)
-    server.send(200, "text/html", "<html><body>on</body></html>");
-  else
-    server.send(200, "text/html", "<html><body>off</body></html>");
 }
 
 void handleNotFound(){
   server.send(404, "text/html", "<html><body>Error! Page Not Found!</body></html>");
 }
-
-
-
 
 void setup(void){
 
@@ -200,11 +137,9 @@ void setup(void){
   }
   
     
-  //pinMode(ledZone1, OUTPUT);     // Initialize the ledZone1 pin as an output
+ 
 
   // ***irrigation setup
-  // set SmartThings Shield LED
-  //smartthing.shieldSetLED(0, 0, 1); // set to blue to start
   
   // setup timed actions 
   t.every(3*60L*1000L, queueManager);// double check queue to see if there is work to do
@@ -246,13 +181,7 @@ void setup(void){
   }
   
   server.on("/", handleRoot);
-  server.on("/on", handleOn);
-  server.on("/off", handleOff);
-  server.on("/update", handleUpdate);
-  server.on("/allOn", handleAllOn);
-  server.on("/allOff", handleAllOff);
-  server.on("/advance", handleAdvance);
-  server.on("/pump", handlePump);
+  
   server.on("/command", handleCommand);
   server.on("/status", handleStatus);
 
@@ -281,7 +210,6 @@ void setup(void){
     
   SSDP.begin();
   
-  //digitalWrite(ledZone1, LOW);
 }
 
 void loop(void){
@@ -446,7 +374,7 @@ void toggleOn() {
     Serial.println("Starting toggleOn");
   }
   queue[trafficCop]=2;
-  //smartthing.shieldSetLED(83, 1, 0); //Orange for relay one
+  
   if (isConfigPump) {
     digitalWrite(relay[8], relayOn);
     if (isDebugEnabled) {
@@ -487,7 +415,7 @@ void toggleOff() {
     Serial.println(relay[trafficCop]);
   }
 
-  //smartthing.shieldSetLED(0, 0, 1);
+  
   queue[trafficCop]=0; //remove relay from from queue
   if (maxvalue() ==0) {
     if (isConfigPump || isPin4Pump) {
@@ -521,7 +449,7 @@ void allOff() {
   if (isConfigPump || isPin4Pump) {
     int8_t pumpOffEvent = t.after(pumpOffDelay*60L*1000L, pumpOff);  //turns off pump after delay
   } 
-  //smartthing.shieldSetLED(0, 0, 1);
+  
   trafficCop=0;
   scheduleUpdate();
   schedulePumpUpdate();
@@ -608,6 +536,48 @@ int maxvalue () {
     Serial.println("Ending maxvalue");
   }
 };
+
+// send json data to client connection
+void sendJSONData(WiFiClient client) {
+  client.println(F("CONTENT-TYPE: application/json"));
+  //client.println(F("CONTENT-LENGTH: 29"));
+  client.println();
+  //client.print("{\"name\":\"contact\",\"status\":");
+  client.println(makeUpdate(""));
+  //client.print(currentSensorState);
+  //client.println("}");
+}
+
+// send data
+int sendNotify() //client function to send/receieve POST data.
+{
+  int returnStatus = 1;
+  if (client.connect(hubIp, hubPort)) {
+    client.println(F("POST / HTTP/1.1"));
+    client.print(F("HOST: "));
+    client.print(hubIp);
+    client.print(F(":"));
+    client.println(hubPort);
+    sendJSONData(client);
+    Serial.println(F("Pushing new values to hub..."));
+  }
+  else {
+    //connection failed
+    returnStatus = 0;
+    Serial.println(F("Connection to hub failed."));
+  }
+
+  // read any data returned from the POST
+  while(client.connected() && !client.available()) delay(1); //waits for data
+  while (client.connected() || client.available()) { //connected or data available
+    char c = client.read();
+  }
+
+  delay(1);
+  client.stop();
+  return returnStatus;
+}
+
 void sendUpdate(String statusUpdate) {
   if (isDebugEnabled) {
     Serial.println("Starting sendUpdate");
@@ -632,6 +602,7 @@ void sendUpdate(String statusUpdate) {
     Serial.println(statusUpdate);
   }
   //smartthing.send(statusUpdate);
+  sendNotify();
   statusUpdate = "";
   if (isDebugEnabled) {
     Serial.println("Ending sendUpdate ");
@@ -642,7 +613,7 @@ String makeUpdate(String statusUpdate) {
   if (isDebugEnabled) {
     Serial.println("Starting makeUpdate");
   }
-  statusUpdate="{";
+  //statusUpdate="{";
   // builds a status update to send to SmartThings hub
   String action="";
   for (int i=1; i<stations+1; i++) {
@@ -656,9 +627,9 @@ String makeUpdate(String statusUpdate) {
     if (queue[i]==2) {
       action="on";
     }
-    statusUpdate.concat (action + i + ":");
+    statusUpdate.concat (action + i + ",");
   }
-  statusUpdate.concat ("}");
+  //statusUpdate.concat ("}");
   
   if (isDebugEnabled) {
     Serial.print("Created Update Message ");

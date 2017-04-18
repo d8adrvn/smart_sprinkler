@@ -105,52 +105,52 @@ metadata {
         	state "warning", label: 'Issue',  icon: "st.Health & Wellness.health7", backgroundColor: "#ff000f", nextState: "off"
         }
         standardTile("zoneOneTile", "device.zoneOne", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
-            state "off1", label: 'One', action: "RelayOn1", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff",nextState: "sending1"
+            state "off", label: 'One', action: "RelayOn1", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff",nextState: "sending1"
             state "sending1", label: 'sending', action: "RelayOff1", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
-            state "q1", label: 'One', action: "RelayOff1",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "sending1"
-            state "on1", label: 'One', action: "RelayOff1",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "sending1"
+            state "q", label: 'One', action: "RelayOff1",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "sending1"
+            state "on", label: 'One', action: "RelayOff1",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "sending1"
         }
         standardTile("zoneTwoTile", "device.zoneTwo", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
-            state "off2", label: 'Two', action: "RelayOn2", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "sending2"
+            state "off", label: 'Two', action: "RelayOn2", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "sending2"
             state "sending2", label: 'sending', action: "RelayOff2", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
-            state "q2", label: 'Two', action: "RelayOff2",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "sending2"
-            state "on2", label: 'Two', action: "RelayOff2",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "sending2"
+            state "q", label: 'Two', action: "RelayOff2",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "sending2"
+            state "on", label: 'Two', action: "RelayOff2",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "sending2"
         }
         standardTile("zoneThreeTile", "device.zoneThree", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
-            state "off3", label: 'Three', action: "RelayOn3", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "sending3"
+            state "off", label: 'Three', action: "RelayOn3", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "sending3"
             state "sending3", label: 'sending', action: "RelayOff3", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
-            state "q3", label: 'Three', action: "RelayOff3",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "sending3"
-            state "on3", label: 'Three', action: "RelayOff3",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "sending3"
+            state "q", label: 'Three', action: "RelayOff3",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "sending3"
+            state "on", label: 'Three', action: "RelayOff3",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "sending3"
         }
         standardTile("zoneFourTile", "device.zoneFour", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
-            state "off4", label: 'Four', action: "RelayOn4", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "sending4"
+            state "off", label: 'Four', action: "RelayOn4", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "sending4"
             state "sending4", label: 'sending', action: "RelayOff4", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
-            state "q4", label: 'Four', action: "RelayOff4",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "sending4"
-            state "on4", label: 'Four', action: "RelayOff4",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "sending4"
+            state "q", label: 'Four', action: "RelayOff4",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "sending4"
+            state "on", label: 'Four', action: "RelayOff4",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "sending4"
         }
         standardTile("zoneFiveTile", "device.zoneFive", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
-            state "off5", label: 'Five', action: "RelayOn5", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "sending5"
+            state "off", label: 'Five', action: "RelayOn5", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "sending5"
             state "sending5", label: 'sending', action: "RelayOff5", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
-            state "q5", label: 'Five', action: "RelayOff5",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "sending5"
-            state "on5", label: 'Five', action: "RelayOff5",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "sending5"
+            state "q", label: 'Five', action: "RelayOff5",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "sending5"
+            state "on", label: 'Five', action: "RelayOff5",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "sending5"
         }
         standardTile("zoneSixTile", "device.zoneSix", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
-            state "off6", label: 'Six', action: "RelayOn6", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "sending6"
+            state "off", label: 'Six', action: "RelayOn6", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "sending6"
             state "sending6", label: 'sending', action: "RelayOff6", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
-            state "q6", label: 'Six', action: "RelayOff6",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "sending6"
-            state "on6", label: 'Six', action: "RelayOff6",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "sending6"
+            state "q", label: 'Six', action: "RelayOff6",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "sending6"
+            state "on", label: 'Six', action: "RelayOff6",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "sending6"
         }
         standardTile("zoneSevenTile", "device.zoneSeven", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
-            state "off7", label: 'Seven', action: "RelayOn7", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "sending7"
+            state "off", label: 'Seven', action: "RelayOn7", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "sending7"
             state "sending7", label: 'sending', action: "RelayOff7", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
-            state "q7", label: 'Seven', action: "RelayOff7",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "sending7"
-            state "on7", label: 'Seven', action: "RelayOff7",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "sending7"
+            state "q", label: 'Seven', action: "RelayOff7",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "sending7"
+            state "on", label: 'Seven', action: "RelayOff7",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "sending7"
         }
         standardTile("zoneEightTile", "device.zoneEight", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
-            state "off8", label: 'Eight', action: "RelayOn8", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "sending8"
+            state "off", label: 'Eight', action: "RelayOn8", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "sending8"
             state "sending8", label: 'sending', action: "RelayOff8", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
-            state "q8", label: 'Eight', action: "RelayOff8",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "sending8"
-            state "on8", label: 'Eight', action: "RelayOff8",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "sending8"
+            state "q", label: 'Eight', action: "RelayOff8",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "sending8"
+            state "on", label: 'Eight', action: "RelayOff8",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "sending8"
             state "havePump", label: 'Eight', action: "disablePump", icon: "st.custom.buttons.subtract-icon", backgroundColor: "#ffffff"
 
         }
@@ -188,6 +188,11 @@ def parse(String description) {
     def events = []
     def descMap = parseDescriptionAsMap(description)
     def body
+    def currentVal
+    def isDisplayed = true
+    def isPhysical = true
+    def name
+    def action
     log.debug "descMap: ${descMap}"
 
     if (!state.mac || state.mac != descMap["mac"]) {
@@ -197,88 +202,128 @@ def parse(String description) {
     
     if (state.mac != null && state.dni != state.mac) state.dni = setDeviceNetworkId(state.mac)
     if (descMap["body"]) body = new String(descMap["body"].decodeBase64())
-log.debug "body: $body"
+//log.debug "body: $body"
     if (body && body != "") {
     
-    //if(body.startsWith("{") || body.startsWith("[")) {
+    	if(body.startsWith("{") || body.startsWith("[")) {
    
-    //def value = zigbee.parse(description)?.text
-    def value = body
-    log.debug "Parsing: $value" 
-	if (value == 'null'  || value == "" || value?.contains("ping") || value?.trim()?.length() == 0 ) {  
-    	// Do nothing
-        return
-    }
+   			def slurper = new JsonSlurper()
+    		def jsonResult = slurper.parseText(body)
+
+			
+            jsonResult.each {  rel ->
+            	name = rel.key
+                action = rel.value
+            
+    		//if (jsonResult.containsKey(name)) {
+            	//name = "zoneOne"
+                currentVal = device?.currentValue(name)
+                
+        		if (action != currentVal){
+                	log.debug "Name $name Action $action Currentval $currentVal"
+                    if (action == "on" ) {
+            			isDisplayed = true
+                		isPhysical = true
+                     }
+                     if (action == "off" || action == "q") {
+            			isDisplayed = false
+                		isPhysical = false
+                     }
+                     //log.debug "Executing $jsonResult.zoneOne"
+                	 def result = createEvent(name: name, value: action, displayed: isDisplayed, isStateChange: true, isPhysical: isPhysical)
+            		 sendEvent(result)
+            	} else {
+                	//log.debug "No change in value"
+                }
+    		//}
+
+			}
+
+/*
+    		//def value = zigbee.parse(description)?.text
+    		def value = body
+    		log.debug "Parsing: $value" 
+			if (value == 'null'  || value == "" || value?.contains("ping") || value?.trim()?.length() == 0 ) {  
+    			// Do nothing
+        		return
+    		}
     
-    if (value != "havePump" && value != "noPump" && value != "pumpRemoved") {
-        String delims = ","
-        String[] tokens = value?.split(delims)
-        for (int x=0; x<tokens?.length; x++) {
-            def displayed = tokens[x]  //evaluates whether to display message
+    		if (value != "havePump" && value != "noPump" && value != "pumpRemoved") {
+        		String delims = ","
+        		String[] tokens = value?.split(delims)
+        		for (int x=0; x<tokens?.length; x++) {
+            		def displayed = tokens[x]  //evaluates whether to display message
 
-            def name = tokens[x] in ["on1", "q1", "off1"] ? "zoneOne"
-            : tokens[x] in ["on2", "q2", "off2"] ? "zoneTwo"
-            : tokens[x] in ["on3", "q3", "off3"] ? "zoneThree"
-            : tokens[x] in ["on4", "q4", "off4"] ? "zoneFour"
-            : tokens[x] in ["on5", "q5", "off5"] ? "zoneFive"
-            : tokens[x] in ["on6", "q6", "off6"] ? "zoneSix"
-            : tokens[x] in ["on7", "q7", "off7"] ? "zoneSeven"
-            : tokens[x] in ["on8", "q8", "off8"] ? "zoneEight"
-            : tokens[x] in ["onPump", "offPump"] ? "pump"
-            : tokens[x] in ["ok"] ? "refresh" : null
 
-            //manage and display events
-            def currentVal = device?.currentValue(name)
-            def isDisplayed = true
-            def isPhysical = true
+            		def name = tokens[x] in ["on1", "q1", "off1"] ? "zoneOne"
+            		: tokens[x] in ["on2", "q2", "off2"] ? "zoneTwo"
+            		: tokens[x] in ["on3", "q3", "off3"] ? "zoneThree"
+            		: tokens[x] in ["on4", "q4", "off4"] ? "zoneFour"
+            		: tokens[x] in ["on5", "q5", "off5"] ? "zoneFive"
+            		: tokens[x] in ["on6", "q6", "off6"] ? "zoneSix"
+            		: tokens[x] in ["on7", "q7", "off7"] ? "zoneSeven"
+            		: tokens[x] in ["on8", "q8", "off8"] ? "zoneEight"
+            		: tokens[x] in ["onPump", "offPump"] ? "pump"
+            		: tokens[x] in ["ok"] ? "refresh" : null
+
+
+
+            		//manage and display events
+            		def currentVal = device?.currentValue(name)
+            		def isDisplayed = true
+            		def isPhysical = true
             
-            log.debug "currentVal $currentVal"
-            log.debug "tokens $tokens[x]"
+            		log.debug "currentVal $currentVal"
+            		log.debug "tokens $tokens[x]"
             
-            //manage which events are displayed in log
-	    	if (tokens[x]?.contains("q")) {
-				isDisplayed = false
-                isPhysical = false
-            }
-            if (tokens[x]?.contains("off") && currentVal?.contains("q")) {
-				isDisplayed = false
-            	isPhysical = false
-            }
-			//send an event if there is a state change
-			if (currentVal != tokens[x]) {
-				def result = createEvent(name: name, value: tokens[x], displayed: isDisplayed, isStateChange: true, isPhysical: isPhysical)
-            	log.info "Parse returned ${result?.descriptionText}"
-            	sendEvent(result)
-            }
-        }
-    }
-    if (value == "pumpAdded") {
-    	//send an event if there is a state change
-        log.debug "parsing pump"
-        if (device?.currentValue("zoneEight") != "havePump" && device?.currentValue("pump") != "offPump") {
-    		sendEvent (name:"zoneEight", value:"havePump", displayed: true, isStateChange: true, isPhysical: true)
-        	sendEvent (name:"pump", value:"offPump", displayed: true, isStateChange: true, isPhysical: true)
+            		//manage which events are displayed in log
+	    			if (tokens[x]?.contains("q")) {
+						isDisplayed = false
+                		isPhysical = false
+            		}
+            		if (tokens[x]?.contains("off") && currentVal?.contains("q")) {
+						isDisplayed = false
+            			isPhysical = false
+            		}
+					//send an event if there is a state change
+					if (currentVal != tokens[x]) {
+						def result = createEvent(name: name, value: tokens[x], displayed: isDisplayed, isStateChange: true, isPhysical: isPhysical)
+            			log.info "Parse returned ${result?.descriptionText}"
+            			sendEvent(result)
+            		}
+        		}
+    	
+    		}
+    		if (value == "pumpAdded") {
+    			//send an event if there is a state change
+        		log.debug "parsing pump"
+        		if (device?.currentValue("zoneEight") != "havePump" && device?.currentValue("pump") != "offPump") {
+    				sendEvent (name:"zoneEight", value:"havePump", displayed: true, isStateChange: true, isPhysical: true)
+        			sendEvent (name:"pump", value:"offPump", displayed: true, isStateChange: true, isPhysical: true)
+    			}
+    		}
+    		if (value == "pumpRemoved") {
+    			//send event if there is a state change
+        		if (device?.currentValue("pump") != "noPump") {
+    				sendEvent (name:"pump", value:"noPump", displayed: true, isStateChange: true, isPhysical: true)
+    			}
+    		}
+*/
+			if(anyZoneOn()) {
+        		//manages the state of the overall system.  Overall state is "on" if any zone is on
+        		//set displayed to false; does not need to be logged in mobile app
+        		if(device?.currentValue("switch") != "on") {
+        			sendEvent (name: "switch", value: "on", descriptionText: "Irrigation System Is On", displayed: false)  //displayed default is false to minimize logging
+        		}
+    		} else if (device?.currentValue("switch") != "rainDelayed") {
+        		if(device?.currentValue("switch") != "off") {
+        			sendEvent (name: "switch", value: "off", descriptionText: "Irrigation System Is Off", displayed: false)  //displayed default is false to minimize logging
+       			}
+    		}
+    	} else {
+        	//log.debug "Response is not JSON: $body"
     	}
-    }
-    if (value == "pumpRemoved") {
-    	//send event if there is a state change
-        if (device?.currentValue("pump") != "noPump") {
-    		sendEvent (name:"pump", value:"noPump", displayed: true, isStateChange: true, isPhysical: true)
-    	}
-    }
-
-	if(anyZoneOn()) {
-        //manages the state of the overall system.  Overall state is "on" if any zone is on
-        //set displayed to false; does not need to be logged in mobile app
-        if(device?.currentValue("switch") != "on") {
-        	sendEvent (name: "switch", value: "on", descriptionText: "Irrigation System Is On", displayed: false)  //displayed default is false to minimize logging
-        }
-    } else if (device?.currentValue("switch") != "rainDelayed") {
-        if(device?.currentValue("switch") != "off") {
-        	sendEvent (name: "switch", value: "off", descriptionText: "Irrigation System Is Off", displayed: false)  //displayed default is false to minimize logging
-       	}
-    }
-  }          
+  	}          
 }
 
 /*

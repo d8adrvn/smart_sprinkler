@@ -21,7 +21,9 @@
 #include <DNSServer.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
-#include <WiFiManager.h> 
+#include <WiFiManager.h>
+
+#include <ArduinoJson.h>
 #include <ESP8266mDNS.h>
 #include <ESP8266SSDP.h>
 //#include <Event.h>
@@ -30,13 +32,28 @@
 
 //const int ledZone1 = 13;    // Pin labeled GPIO13
 
+const char* version = "2.0.6";
+
 //user configurable global variables to set before loading to Arduino
+int maxrelays = 16;  //set up before loading to Arduino (maximum possible relays)
 int relays = 4;  //set up before loading to Arduino (max = 8 with current code)
 boolean isActiveHigh=true; //set to true if using "active high" relay, set to false if using "active low" relay
 boolean isDebugEnabled=true;    // enable or disable debug in this example
 boolean isPin4Pump=false;  //set to true if you add an additional relay to pin4 and use as pump or master valve.  
 
 //set global variables
+
+// Smartthings hub information
+IPAddress hubIp(192,168,1,225); // smartthings hub ip
+unsigned int hubPort = 39500; // smartthings hub port
+//IPAddress hubIp = INADDR_NONE; // smartthings hub ip
+//unsigned int hubPort = 0; // smartthings hub port
+
+//OTA
+
+const char* serverIndex = "<form method='POST' action='/updateOTA' enctype='multipart/form-data'><input type='file' name='update'><input type='submit' value='Update'></form>";
+
+//Irrigation
 Timer t;
 int trafficCop =0;  //tracks which station has the right of way (is on)
 int stations=relays; //sets number of stations = number of relays. This is software configurable in device type
@@ -48,9 +65,6 @@ int8_t stationTimer[] = {0,0,0,0,0,0,0,0,0};
 int queue[]={0,0,0,0,0,0,0,0,0};  // off: 0, queued: 1, running: 2
 int relay[9];
 
-// Smartthings hub information
-IPAddress hubIp(192,168,1,225); // smartthings hub ip
-unsigned int hubPort = 39500; // smartthings hub port
 
 
 //initialize pump related variables. 
@@ -69,9 +83,20 @@ WiFiClient client; //client
 
 int state = 1;
 
+IPAddress IPfromString(String address) {
+  int ip1, ip2, ip3, ip4;
+  ip1 = address.toInt();
+  address = address.substring(address.indexOf('.') + 1);
+  ip2 = address.toInt();
+  address = address.substring(address.indexOf('.') + 1);
+  ip3 = address.toInt();
+  address = address.substring(address.indexOf('.') + 1);
+  ip4 = address.toInt();
+  return IPAddress(ip1, ip2, ip3, ip4);
+}
+
 void handleRoot() {
-  String updateStatus = "";
-  updateStatus.concat (makeUpdate(""));  
+  String updateStatus = makeUpdate();  
   server.send(200, "application/json", updateStatus);  
 }
 
@@ -81,8 +106,7 @@ void handleCommand() {
   
   messageCallout(message);
 
-  String updateStatus = "";
-  updateStatus.concat (makeUpdate(""));
+  String updateStatus = makeUpdate();
     
   server.send(200, "application/json", updateStatus);
   
@@ -90,9 +114,9 @@ void handleCommand() {
 
 void handleStatus() {
  
-  String updateStatus = "";
-  updateStatus.concat (makeUpdate(""));
-  //updateStatus.concat ("</body></html>");
+  
+  String updateStatus = makeUpdate();
+  
   
   server.send(200, "application/json", updateStatus);
   
@@ -137,13 +161,15 @@ void setup(void){
   }
   
     
- 
+  Serial.print("Version:  ");
+  Serial.println(version);
 
   // ***irrigation setup
   
   // setup timed actions 
-  t.every(3*60L*1000L, queueManager);// double check queue to see if there is work to do
-  t.every(10L*60L*1000L, timeToUpdate); //send update to smartThings hub every 10 min
+  t.every(10 * 60L * 1000L, timeToUpdate); //send update to smartThings hub every 10 min
+  t.every(1 * 60L * 1000L, queueManager);// double check queue to see if there is work to do
+  
  
   
   //set up relays to control irrigation valves
@@ -184,6 +210,40 @@ void setup(void){
   
   server.on("/command", handleCommand);
   server.on("/status", handleStatus);
+  server.on("/update", HTTP_GET, [](){
+      server.sendHeader("Connection", "close");
+      server.sendHeader("Access-Control-Allow-Origin", "*");
+      server.send(200, "text/html", serverIndex);
+    });
+  server.on("/updateOTA", HTTP_POST, [](){
+      server.sendHeader("Connection", "close");
+      server.sendHeader("Access-Control-Allow-Origin", "*");
+      server.send(200, "text/plain", (Update.hasError())?"FAIL":"OK");
+      ESP.restart();
+    },[](){
+      HTTPUpload& upload = server.upload();
+      if(upload.status == UPLOAD_FILE_START){
+        Serial.setDebugOutput(true);
+        WiFiUDP::stopAll();
+        Serial.printf("Update: %s\n", upload.filename.c_str());
+        uint32_t maxSketchSpace = (ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000;
+        if(!Update.begin(maxSketchSpace)){//start with max available size
+          Update.printError(Serial);
+        }
+      } else if(upload.status == UPLOAD_FILE_WRITE){
+        if(Update.write(upload.buf, upload.currentSize) != upload.currentSize){
+          Update.printError(Serial);
+        }
+      } else if(upload.status == UPLOAD_FILE_END){
+        if(Update.end(true)){ //true to set the size to the current progress
+          Serial.printf("Update Success: %u\nRebooting...\n", upload.totalSize);
+        } else {
+          Update.printError(Serial);
+        }
+        Serial.setDebugOutput(false);
+      }
+      yield();
+    });
 
   server.on("/esp8266ic.xml", HTTP_GET, [](){
     if (isDebugEnabled) {
@@ -229,10 +289,6 @@ void loop(void){
     doPumpUpdate = false;
   }
  
-  //run smartthing logic
-  //smartthing.run();
-  
-  
   server.handleClient();
   delay(10);
   if (isDebugEnabled) {
@@ -248,7 +304,7 @@ void messageCallout(String message)
     Serial.print(message);
     Serial.println("' "); 
   }
-  char* inValue[relays+2]; //array holds any values being delivered with message (1-8) and NULL; [0] is not used
+  char* inValue[maxrelays+2]; //array holds any values being delivered with message (1-8) and NULL; [0] is not used
   char delimiters[] = ",";
   char charMessage[100];
   strncpy(charMessage, message.c_str(), sizeof(charMessage));
@@ -276,12 +332,12 @@ void messageCallout(String message)
     queue[removeStation]=0;
     scheduleUpdate();
   }
-  if (strcmp(inValue[0],"update")==0) {
-    scheduleUpdate();
-  }
+  
   if (strcmp(inValue[0],"allOn")==0) {
+    Serial.println("Calling allOn");
     int i=1;
     while (i<stations+1) {
+      
       if (i != trafficCop) {
         if (strcmp(inValue[i],"0")!=0 && strcmp(inValue[i],"null")!=0) {  //do not add to queue if zero time
           queue[i]=1;
@@ -307,10 +363,10 @@ void messageCallout(String message)
       }
     }
     if (strcmp(inValue[1],"1")==0) {
-      //pumpOff();
+      pumpOff();
     }
     if (strcmp(inValue[1],"2")==0) {
-       //pumpOn();
+       pumpOn();
     }
     if (strcmp(inValue[1],"3")==0) {
       isConfigPump = true;
@@ -349,8 +405,7 @@ void schedulePumpUpdate() {
   }
 }
 //run through queue to check to see if there is work to do
-void queueManager() 
-{
+void queueManager() {
   if (isDebugEnabled) {
     Serial.println("Starting queueManager");
   }
@@ -539,13 +594,11 @@ int maxvalue () {
 
 // send json data to client connection
 void sendJSONData(WiFiClient client) {
+  String updateStatus = makeUpdate();
   client.println(F("CONTENT-TYPE: application/json"));
   //client.println(F("CONTENT-LENGTH: 29"));
   client.println();
-  //client.print("{\"name\":\"contact\",\"status\":");
-  client.println(makeUpdate(""));
-  //client.print(currentSensorState);
-  //client.println("}");
+  client.println(updateStatus);
 }
 
 // send data
@@ -582,41 +635,54 @@ void sendUpdate(String statusUpdate) {
   if (isDebugEnabled) {
     Serial.println("Starting sendUpdate");
   }
-  // builds a status update to send to SmartThings hub
-  String action="";
-  for (int i=1; i<stations+1; i++) {
-    
-    if (queue[i]==0) {
-      action="off";
-    }
-    if (queue[i]==1) {
-      action="q";
-    }
-    if (queue[i]==2) {
-      action="on";
-    }
-    statusUpdate.concat (action + i + ",");
-  }
-  if (isDebugEnabled) {
-    Serial.print("Sending Update Message ");
-    Serial.println(statusUpdate);
-  }
-  //smartthing.send(statusUpdate);
+
   sendNotify();
-  statusUpdate = "";
+  
   if (isDebugEnabled) {
     Serial.println("Ending sendUpdate ");
   }
 }
 
-String makeUpdate(String statusUpdate) {
+String makeUpdate() {
   if (isDebugEnabled) {
     Serial.println("Starting makeUpdate");
   }
-  //statusUpdate="{";
+
+  const int BUFFER_SIZE = JSON_OBJECT_SIZE(3);
+  StaticJsonBuffer<200> jsonBuffer;
+  JsonObject& json = jsonBuffer.createObject();
+  JsonObject& rel = json.createNestedObject("relay");
+    
   // builds a status update to send to SmartThings hub
   String action="";
+  String key="";
+  String number="";
+  String statusUpdate="";
   for (int i=1; i<stations+1; i++) {
+    if (i==1){
+      key="zoneOne";
+    }
+    if (i==2){
+      key="zoneTwo";
+    }
+    if (i==3){
+      key="zoneThree";
+    }
+    if (i==4){
+      key="zoneFour";
+    }
+    if (i==5){
+      key="zoneFive";
+    }
+    if (i==6){
+      key="zoneSix";
+    }
+    if (i==7){
+      key="zoneSeven";
+    }
+    if (i==8){
+      key="zoneEight";
+    }
     
     if (queue[i]==0) {
       action="off";
@@ -627,9 +693,34 @@ String makeUpdate(String statusUpdate) {
     if (queue[i]==2) {
       action="on";
     }
-    statusUpdate.concat (action + i + ",");
+
+    //rel["name"] = key;
+    //rel["action"] = action;
+    rel[key] = action;
+    key="";
   }
-  //statusUpdate.concat ("}");
+
+  if (isConfigPump && configPumpStatus == "enabled") {
+    json["pump"] = "pumpAdded";
+  }
+  if (!isConfigPump && !isPin4Pump) {
+    json["pump"] = "pumpRemoved";
+  }
+  if (configPumpStatus == "on" || pin4PumpStatus == "on") {
+    json["pump"] = "onPump";
+  }
+  if (configPumpStatus =="off" && isConfigPump) {
+    json["pump"] = "offPump";
+  }
+  if (pin4PumpStatus =="off" && isPin4Pump) {
+    json["pump"] = "offPump";
+  }
+  
+  json["version"] = version;
+  
+  Serial.print("JSON ");
+  json.printTo(Serial);
+  json.printTo(statusUpdate);
   
   if (isDebugEnabled) {
     Serial.print("Created Update Message ");

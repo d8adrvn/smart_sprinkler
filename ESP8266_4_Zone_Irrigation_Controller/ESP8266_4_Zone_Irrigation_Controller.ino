@@ -17,6 +17,7 @@
  *
  */
 
+#include <FS.h>
 #include <ESP8266WiFi.h>
 #include <DNSServer.h>
 #include <WiFiClient.h>
@@ -28,6 +29,7 @@
 #include <ESP8266SSDP.h>
 //#include <Event.h>
 #include <Timer.h>
+
 
 
 //const int ledZone1 = 13;    // Pin labeled GPIO13
@@ -43,11 +45,23 @@ boolean isPin4Pump=false;  //set to true if you add an additional relay to pin4 
 
 //set global variables
 
+
+const char APPSETTINGS[] PROGMEM = "/appSettings.json";
+const char LOADED[] PROGMEM = " loaded: ";
+const char HUBPORT[] PROGMEM = "hubPort";
+const char HUPIP[] PROGMEM = "hubIp";
+const char DEVICENAME[] PROGMEM = "deviceName";
+
+
 // Smartthings hub information
 IPAddress hubIp(192,168,1,225); // smartthings hub ip
 unsigned int hubPort = 39500; // smartthings hub port
 //IPAddress hubIp = INADDR_NONE; // smartthings hub ip
 //unsigned int hubPort = 0; // smartthings hub port
+String deviceName = "ESP8266 Irrigation Controller";
+
+
+
 
 //OTA
 
@@ -122,6 +136,43 @@ void handleStatus() {
   
 }
 
+void handleConfig() {
+
+  
+  StaticJsonBuffer<100> jsonBuffer;
+  JsonObject& json = jsonBuffer.createObject();
+  
+  //If we have received an ST IP then update as needed
+  if (server.hasArg("hubIp")) {
+      json[FPSTR(HUPIP)] = server.arg("hubIp");
+      IPAddress newHubIp = IPfromString(json[FPSTR(HUPIP)]);
+      if (newHubIp != hubIp) {
+        hubIp = newHubIp;
+      }
+  }
+
+  //If we have received an ST Port then update as needed
+  if (server.hasArg("hubPort")) {
+      
+      unsigned int newHubPort = atoi(server.arg("hubPort").c_str());
+      json[FPSTR(HUBPORT)] = newHubPort;
+      if (newHubPort != hubPort) { 
+        hubPort = newHubPort;
+      }
+  }
+
+  //save config
+  String settingsJSON;
+  json.printTo(settingsJSON);
+  Serial.print("Saving JSON ");
+  Serial.println("settingsJSON");
+  saveAppConfig(settingsJSON);
+  
+  String updateStatus = makeUpdate();
+  server.send(200, "application/json", updateStatus);
+}
+
+
 void handleNotFound(){
   server.send(404, "text/html", "<html><body>Error! Page Not Found!</body></html>");
 }
@@ -134,7 +185,27 @@ void setup(void){
     Serial.begin(115200);         // setup serial with a baud rate of 9600
     Serial.println("setup..");  // print out 'setup..' on start
   }
-  
+
+  Serial.print(F("Sketch size: "));
+  Serial.println(ESP.getSketchSize());
+  Serial.print(F("Free size: "));
+  Serial.print(ESP.getFreeSketchSpace());
+
+  Serial.println(F("Mounting FS..."));
+  if (!SPIFFS.begin()) {
+    Serial.println(F("Failed to mount file system"));
+    return;
+  }
+
+  // DEBUG: remove all files from file system
+//  SPIFFS.format();
+
+  if (!loadAppConfig()) {
+    Serial.println(F("Failed to load application config"));
+  } else {
+    Serial.println(F("Application config loaded"));
+  }
+
     //WiFiManager
     //Local intialization. Once its business is done, there is no need to keep it around
   WiFiManager wifiManager;
@@ -159,8 +230,7 @@ void setup(void){
     Serial.println("local ip");
     Serial.println(WiFi.localIP());
   }
-  
-    
+      
   Serial.print("Version:  ");
   Serial.println(version);
 
@@ -178,10 +248,10 @@ void setup(void){
     relayOff=HIGH;
   }
 
-   relay[1]=12;
+   relay[1]=14;
    relay[2]=13;
-   relay[3]=14;
-   relay[4]=16;
+   relay[3]=16;
+   relay[4]=12;
   
   int i=1;
   while (i<5) {
@@ -251,7 +321,7 @@ void setup(void){
     }
     SSDP.schema(server.client());
   });
-  
+  server.on("/config", handleConfig);
   server.onNotFound(handleNotFound);
   
 
@@ -648,7 +718,6 @@ String makeUpdate() {
     Serial.println("Starting makeUpdate");
   }
 
-  const int BUFFER_SIZE = JSON_OBJECT_SIZE(3);
   StaticJsonBuffer<200> jsonBuffer;
   JsonObject& json = jsonBuffer.createObject();
   JsonObject& rel = json.createNestedObject("relay");
@@ -755,3 +824,61 @@ void sendPumpUpdate() {
     Serial.println("Ending sendPumpUpdate");
   }
 }
+
+
+bool loadAppConfig() {
+  File configFile = SPIFFS.open(FPSTR(APPSETTINGS), "r");
+  if (!configFile) {
+    Serial.println(F("Failed to open config file"));
+    return false;
+  }
+
+  size_t size = configFile.size();
+  if (size > 1024) {
+    Serial.println(F("Config file size is too large"));
+    return false;
+  }
+
+  std::unique_ptr<char[]> buf(new char[size]);
+  configFile.readBytes(buf.get(), size);
+  configFile.close();
+
+  const int BUFFER_SIZE = JSON_OBJECT_SIZE(3);
+  StaticJsonBuffer<BUFFER_SIZE> jsonBuffer;
+  JsonObject& json = jsonBuffer.parseObject(buf.get());
+
+  if (!json.success()) {
+    Serial.println(F("Failed to parse application config file"));
+    return false;
+  }
+
+  hubPort = json[FPSTR(HUBPORT)];
+  Serial.print(FPSTR(HUBPORT));
+  Serial.print(FPSTR(LOADED));
+  Serial.println(hubPort);
+  String hubAddress = json[FPSTR(HUPIP)];
+  Serial.print(FPSTR(HUPIP));
+  Serial.print(FPSTR(LOADED));
+  Serial.println(hubAddress);
+  hubIp = IPfromString(hubAddress);
+  String savedDeviceName = json[FPSTR(DEVICENAME)];
+  deviceName = savedDeviceName;
+  Serial.print(FPSTR(DEVICENAME));
+  Serial.print(FPSTR(LOADED));
+  Serial.println(deviceName);
+  return true;
+}
+
+bool saveAppConfig(String jsonString) {
+  Serial.print(F("Saving new settings: "));
+  Serial.println(jsonString);
+  File configFile = SPIFFS.open(FPSTR(APPSETTINGS), "w");
+  if (!configFile) {
+    Serial.println(F("Failed to open application config file for writing"));
+    return false;
+  }
+  configFile.print(jsonString);
+  configFile.close();
+  return true;
+}
+

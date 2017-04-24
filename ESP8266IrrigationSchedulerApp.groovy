@@ -254,12 +254,16 @@ private getDeviceID(number) {
 }
 
 def installed() {
-	initialize()
+	scheduling()
+    state.daysSinceLastWatering = [0,0,0]
+    initialize()
 }
 
 def updated() {
 	unsubscribe()
     unschedule()
+    scheduling()
+    state.daysSinceLastWatering = [0,0,0]
 	initialize()
 }
 
@@ -735,7 +739,7 @@ def isWateringCheckTwice() {
     def switchCurrentState = switches.currentSwitch    
 	if (switchCurrentState != "on") {
 		switches.warning()
-        sendPush("${app.label} did not start after two attempts.  Check system")
+        //sendPush("${app.label} did not start after two attempts.  Check system")
         log.info "WARNING: ${app.label} failed to water. Check your system"
 	}  
 }		

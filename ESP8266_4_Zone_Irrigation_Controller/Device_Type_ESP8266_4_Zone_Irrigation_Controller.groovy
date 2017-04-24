@@ -172,9 +172,15 @@ metadata {
             state("expedite", label: "Expedite", action: "onHold", icon: "st.Office.office7", backgroundColor: "#53a7c0")
             state("onHold", label: "Pause", action: "noEffect", icon: "st.Office.office7", backgroundColor: "#bc2323")
         }
-    
+    	valueTile("ip", "ip", width: 1, height: 1) {
+    		state "ip", label:'IP Address\r\n${currentValue}'
+		}
+        valueTile("firmware", "firmware", width: 1, height: 1) {
+    		state "firmware", label:'Firmware ${currentValue}'
+		}
+        
         main "allZonesTile"
-        details(["zoneOneTile","zoneTwoTile","zoneThreeTile","zoneFourTile","zoneFiveTile","zoneSixTile","zoneSevenTile","zoneEightTile", "pumpTile","scheduleEffect","refreshTile"])
+        details(["zoneOneTile","zoneTwoTile","zoneThreeTile","zoneFourTile","zoneFiveTile","zoneSixTile","zoneSevenTile","zoneEightTile", "pumpTile","scheduleEffect","ip","firmware","refreshTile"])
     }
 }
 
@@ -184,7 +190,7 @@ metadata {
 
 def parse(String description) {
 
-	log.debug "Parsing: ${description}"
+	//log.debug "Parsing: ${description}"
     def events = []
     def descMap = parseDescriptionAsMap(description)
     def body
@@ -193,7 +199,7 @@ def parse(String description) {
     def isPhysical = true
     def name
     def action
-    log.debug "descMap: ${descMap}"
+    //log.debug "descMap: ${descMap}"
 
     if (!state.mac || state.mac != descMap["mac"]) {
 		log.debug "Mac address of device found ${descMap["mac"]}"
@@ -201,8 +207,10 @@ def parse(String description) {
 	}
     
     if (state.mac != null && state.dni != state.mac) state.dni = setDeviceNetworkId(state.mac)
+    if (!device.currentValue("ip") || (device.currentValue("ip") != getDataValue("ip"))) sendEvent(name: 'ip', value: getDataValue("ip"))
+    
     if (descMap["body"]) body = new String(descMap["body"].decodeBase64())
-//log.debug "body: $body"
+log.debug "body: $body"
     if (body && body != "") {
     
     	if(body.startsWith("{") || body.startsWith("[")) {
@@ -210,17 +218,17 @@ def parse(String description) {
    			def slurper = new JsonSlurper()
     		def jsonResult = slurper.parseText(body)
 
-			
-            jsonResult.each {  rel ->
+			//log.debug "jsonResult: $jsonResult"
+            
+            if (jsonResult.containsKey("relay")) {
+            jsonResult.relay.each {  rel ->
             	name = rel.key
                 action = rel.value
             
-    		//if (jsonResult.containsKey(name)) {
-            	//name = "zoneOne"
                 currentVal = device?.currentValue(name)
-                
+                //log.debug "Name $name Action $action Currentval $currentVal"
         		if (action != currentVal){
-                	log.debug "Name $name Action $action Currentval $currentVal"
+                	
                     if (action == "on" ) {
             			isDisplayed = true
                 		isPhysical = true
@@ -235,80 +243,66 @@ def parse(String description) {
             	} else {
                 	//log.debug "No change in value"
                 }
-    		//}
 
 			}
+            }
 
+            if (jsonResult.containsKey("pump")) {
+            	def value = jsonResult.pump
+    			if (value == "onPump") {
+    				//send an event if there is a state change
+        			if (device?.currentValue("pump") != "onPump") {
+                    	log.debug "parsing pump onPump"
+        				sendEvent (name:"pump", value:"onPump", displayed: true, isStateChange: true, isPhysical: true)
+                    }
+    			}
+                if (value == "offPump") {
+    				//send an event if there is a state change
+        			if (device?.currentValue("pump") != "offPump") {
+                    	log.debug "parsing pump offPump"
+        				sendEvent (name:"pump", value:"offPump", displayed: true, isStateChange: true, isPhysical: true)
+                    }
+    			}
+                if (value == "pumpAdded") {
+    				//send an event if there is a state change
+        			log.debug "parsing pump pumpAdded"
+        			if (device?.currentValue("zoneEight") != "havePump" && device?.currentValue("pump") != "offPump") {
+    					sendEvent (name:"zoneEight", value:"havePump", displayed: true, isStateChange: true, isPhysical: true)
+        				sendEvent (name:"pump", value:"offPump", displayed: true, isStateChange: true, isPhysical: true)
+    				}
+    			}
+    			if (value == "pumpRemoved") {
+    				//send event if there is a state change
+        			if (device?.currentValue("pump") != "noPump") {
+    					sendEvent (name:"pump", value:"noPump", displayed: true, isStateChange: true, isPhysical: true)
+    				}
+    			}
+			}
+			if (jsonResult.containsKey("version")) {
+            	//log.debug "firmware version: $jsonResult.version"
+                if (device?.currentValue("firmware") != jsonResult.version) {
+                	//log.debug "updating firmware version"
+       				sendEvent(name:"firmware", value: jsonResult.version, displayed: false)
+                }
+    		}
 /*
-    		//def value = zigbee.parse(description)?.text
-    		def value = body
-    		log.debug "Parsing: $value" 
-			if (value == 'null'  || value == "" || value?.contains("ping") || value?.trim()?.length() == 0 ) {  
-    			// Do nothing
-        		return
+
+
+    		if (jsonResult.containsKey("success")) {
+       			if (result.success == "true") state.configSuccess = "true" else state.configSuccess = "false" 
     		}
-    
-    		if (value != "havePump" && value != "noPump" && value != "pumpRemoved") {
-        		String delims = ","
-        		String[] tokens = value?.split(delims)
-        		for (int x=0; x<tokens?.length; x++) {
-            		def displayed = tokens[x]  //evaluates whether to display message
-
-
-            		def name = tokens[x] in ["on1", "q1", "off1"] ? "zoneOne"
-            		: tokens[x] in ["on2", "q2", "off2"] ? "zoneTwo"
-            		: tokens[x] in ["on3", "q3", "off3"] ? "zoneThree"
-            		: tokens[x] in ["on4", "q4", "off4"] ? "zoneFour"
-            		: tokens[x] in ["on5", "q5", "off5"] ? "zoneFive"
-            		: tokens[x] in ["on6", "q6", "off6"] ? "zoneSix"
-            		: tokens[x] in ["on7", "q7", "off7"] ? "zoneSeven"
-            		: tokens[x] in ["on8", "q8", "off8"] ? "zoneEight"
-            		: tokens[x] in ["onPump", "offPump"] ? "pump"
-            		: tokens[x] in ["ok"] ? "refresh" : null
-
-
-
-            		//manage and display events
-            		def currentVal = device?.currentValue(name)
-            		def isDisplayed = true
-            		def isPhysical = true
-            
-            		log.debug "currentVal $currentVal"
-            		log.debug "tokens $tokens[x]"
-            
-            		//manage which events are displayed in log
-	    			if (tokens[x]?.contains("q")) {
-						isDisplayed = false
-                		isPhysical = false
-            		}
-            		if (tokens[x]?.contains("off") && currentVal?.contains("q")) {
-						isDisplayed = false
-            			isPhysical = false
-            		}
-					//send an event if there is a state change
-					if (currentVal != tokens[x]) {
-						def result = createEvent(name: name, value: tokens[x], displayed: isDisplayed, isStateChange: true, isPhysical: isPhysical)
-            			log.info "Parse returned ${result?.descriptionText}"
-            			sendEvent(result)
-            		}
+    		if (jsonResult.containsKey("program")) {
+        		if (result.running == "false") {
+            		toggleTiles("all")
         		}
-    	
+        		else {
+           			toggleTiles("switch$result.program")
+            		events << createEvent(name:"switch$result.program", value: "on")
+        		}
     		}
-    		if (value == "pumpAdded") {
-    			//send an event if there is a state change
-        		log.debug "parsing pump"
-        		if (device?.currentValue("zoneEight") != "havePump" && device?.currentValue("pump") != "offPump") {
-    				sendEvent (name:"zoneEight", value:"havePump", displayed: true, isStateChange: true, isPhysical: true)
-        			sendEvent (name:"pump", value:"offPump", displayed: true, isStateChange: true, isPhysical: true)
-    			}
-    		}
-    		if (value == "pumpRemoved") {
-    			//send event if there is a state change
-        		if (device?.currentValue("pump") != "noPump") {
-    				sendEvent (name:"pump", value:"noPump", displayed: true, isStateChange: true, isPhysical: true)
-    			}
-    		}
-*/
+*/    
+    
+
 			if(anyZoneOn()) {
         		//manages the state of the overall system.  Overall state is "on" if any zone is on
         		//set displayed to false; does not need to be logged in mobile app
@@ -482,191 +476,175 @@ def parse(description) {
 
 
 def anyZoneOn() {
-    if(device?.currentValue("zoneOne") in ["on1","q1"]) return true;
-    if(device?.currentValue("zoneTwo") in ["on2","q2"]) return true;
-    if(device?.currentValue("zoneThree") in ["on3","q3"]) return true;
-    if(device?.currentValue("zoneFour") in ["on4","q4"]) return true;
-    if(device?.currentValue("zoneFive") in ["on5","q5"]) return true;
-    if(device?.currentValue("zoneSix") in ["on6","q6"]) return true;
-    if(device?.currentValue("zoneSeven") in ["on7","q7"]) return true;
-    if(device?.currentValue("zoneEight") in ["on8","q8"]) return true;
+    if(device?.currentValue("zoneOne") in ["on","q"]) return true;
+    if(device?.currentValue("zoneTwo") in ["on","q"]) return true;
+    if(device?.currentValue("zoneThree") in ["o3","q"]) return true;
+    if(device?.currentValue("zoneFour") in ["on","q"]) return true;
+    if(device?.currentValue("zoneFive") in ["on","q"]) return true;
+    if(device?.currentValue("zoneSix") in ["on","q"]) return true;
+    if(device?.currentValue("zoneSeven") in ["on","q"]) return true;
+    if(device?.currentValue("zoneEight") in ["on","q"]) return true;
 
     false;
 }
 
 // handle commands
 
-/*
-def RelayOn1() {
-log.debug "Executing 'on,1'"
-    def result = new physicalgraph.device.HubAction(
-        method: "GET",
-        path: "/command?command=on,1,${oneTimer}",
-        headers: [
-            HOST: getHostAddress()
-        ]
-    )
-    return result
-}
-*/
-
 def RelayOn1() {
     log.info "Executing 'on,1'"
-    //zigbee.smartShield(text: "on,1,${oneTimer}").format()
     getAction("/command?command=on,1,${oneTimer}")
-    //log.info "RelayOn1 returned $cmds"
 }
 
 
 def RelayOn1For(value) {
     value = checkTime(value)
     log.info "Executing 'on,1,$value'"
-    //zigbee.smartShield(text: "on,1,${value}").format()
+    
     getAction("/command?command=on,1,${value}")
 }
 
 def RelayOff1() {
     log.info "Executing 'off,1'"
-    //zigbee.smartShield(text: "off,1").format()
+    
     getAction("/command?command=off,1")
 }
 
 def RelayOn2() {
     log.info "Executing 'on,2'"
-    //zigbee.smartShield(text: "on,2,${twoTimer}").format()
+    
     getAction("/command?command=on,2,${oneTimer}")
 }
 
 def RelayOn2For(value) {
     value = checkTime(value)
     log.info "Executing 'on,2,$value'"
-    //zigbee.smartShield(text: "on,2,${value}").format()
+    
     getAction("/command?command=on,2,${value}")
 }
 
 def RelayOff2() {
     log.info "Executing 'off,2'"
-    //zigbee.smartShield(text: "off,2").format()
+    
     getAction("/command?command=off,2")
 }
 
 def RelayOn3() {
     log.info "Executing 'on,3'"
-    //zigbee.smartShield(text: "on,3,${threeTimer}").format()
+    
     getAction("/command?command=on,3,${oneTimer}")
 }
 
 def RelayOn3For(value) {
     value = checkTime(value)
     log.info "Executing 'on,3,$value'"
-    //zigbee.smartShield(text: "on,3,${value}").format()
+    
     getAction("/command?command=on,3,${value}")
 }
 
 def RelayOff3() {
     log.info "Executing 'off,3'"
-    //zigbee.smartShield(text: "off,3").format()
+    
     getAction("/command?command=off,3")
 }
 
 def RelayOn4() {
     log.info "Executing 'on,4'"
-    //zigbee.smartShield(text: "on,4,${fourTimer}").format()
+    
     getAction("/command?command=on,4,${oneTimer}")
 }
 
 def RelayOn4For(value) {
     value = checkTime(value)
     log.info "Executing 'on,4,$value'"
-    //zigbee.smartShield(text: "on,4,${value}").format()
+    
     getAction("/command?command=on,4,${value}")
 }
 
 def RelayOff4() {
     log.info "Executing 'off,4'"
-    //zigbee.smartShield(text: "off,4").format()
+    
     getAction("/command?command=off,4")
 }
 
 def RelayOn5() {
     log.info "Executing 'on,5'"
-    //zigbee.smartShield(text: "on,5,${fiveTimer}").format()
+    
     getAction("/command?command=on,5,${oneTimer}")
 }
 
 def RelayOn5For(value) {
     value = checkTime(value)
     log.info "Executing 'on,5,$value'"
-    //zigbee.smartShield(text: "on,5,${value}").format()
+    
     getAction("/command?command=on,5,${value}")
 }
 
 def RelayOff5() {
     log.info "Executing 'off,5'"
-    //zigbee.smartShield(text: "off,5").format()
+    
     getAction("/command?command=off,5")
 }
 
 def RelayOn6() {
     log.info "Executing 'on,6'"
-    //zigbee.smartShield(text: "on,6,${sixTimer}").format()
+    
     getAction("/command?command=on,6,${oneTimer}")
 }
 
 def RelayOn6For(value) {
     value = checkTime(value)
     log.info "Executing 'on,6,$value'"
-    //zigbee.smartShield(text: "on,6,${value}").format()
+    
     getAction("/command?command=on,6,${value}")
 }
 
 def RelayOff6() {
     log.info "Executing 'off,6'"
-    //zigbee.smartShield(text: "off,6").format()
+    
     getAction("/command?command=off,6")
 }
 
 def RelayOn7() {
     log.info "Executing 'on,7'"
-    //zigbee.smartShield(text: "on,7,${sevenTimer}").format()
+    
     getAction("/command?command=on,7,${oneTimer}")
 }
 
 def RelayOn7For(value) {
     value = checkTime(value)
     log.info "Executing 'on,7,$value'"
-    //zigbee.smartShield(text: "on,7,${value}").format()
+    
     getAction("/command?command=on,7,${value}")
 }
 
 def RelayOff7() {
     log.info "Executing 'off,7'"
-    //zigbee.smartShield(text: "off,7").format()
+    
     getAction("/command?command=off,7")
 }
 
 def RelayOn8() {
     log.info "Executing 'on,8'"
-    //zigbee.smartShield(text: "on,8,${eightTimer}").format()
+    
     getAction("/command?command=on,8,${oneTimer}")
 }
 
 def RelayOn8For(value) {
     value = checkTime(value)
     log.info "Executing 'on,8,$value'"
-    //zigbee.smartShield(text: "on,8,${value}").format()
+    
     getAction("/command?command=on,8,${value}")
 }
 
 def RelayOff8() {
     log.info "Executing 'off,8'"
-    //zigbee.smartShield(text: "off,8").format()
+    
     getAction("/command?command=off,8")
 }
 
 def on() {
     log.info "Executing 'allOn'"
-    //zigbee.smartShield(text: "allOn,${oneTimer ?: 0},${twoTimer ?: 0},${threeTimer ?: 0},${fourTimer ?: 0},${fiveTimer ?: 0},${sixTimer ?: 0},${sevenTimer ?: 0},${eightTimer ?: 0}").format()
+    
     getAction("/command?command=allOn,${oneTimer ?: 0},${twoTimer ?: 0},${threeTimer ?: 0},${fourTimer ?: 0},${fiveTimer ?: 0},${sixTimer ?: 0},${sevenTimer ?: 0},${eightTimer ?: 0}")
 }
 
@@ -681,13 +659,13 @@ def OnWithZoneTimes(value) {
         zoneTimes[parts[0].toInteger()] = parts[1]
         log.info("Zone ${parts[0].toInteger()} on for ${parts[1]} minutes")
     }
-    //zigbee.smartShield(text: "allOn,${checkTime(zoneTimes[1]) ?: 0},${checkTime(zoneTimes[2]) ?: 0},${checkTime(zoneTimes[3]) ?: 0},${checkTime(zoneTimes[4]) ?: 0},${checkTime(zoneTimes[5]) ?: 0},${checkTime(zoneTimes[6]) ?: 0},${checkTime(zoneTimes[7]) ?: 0},${checkTime(zoneTimes[8]) ?: 0}").format()
+    
     getAction("/command?command=allOn,${checkTime(zoneTimes[1]) ?: 0},${checkTime(zoneTimes[2]) ?: 0},${checkTime(zoneTimes[3]) ?: 0},${checkTime(zoneTimes[4]) ?: 0},${checkTime(zoneTimes[5]) ?: 0},${checkTime(zoneTimes[6]) ?: 0},${checkTime(zoneTimes[7]) ?: 0},${checkTime(zoneTimes[8]) ?: 0}")
 }
 
 def off() {
     log.info "Executing 'allOff'"
-    //zigbee.smartShield(text: "allOff").format()
+    
     getAction("/command?command=allOff")
     
 }
@@ -699,7 +677,7 @@ def checkTime(t) {
 
 def update() {
     log.info "Executing refresh"
-    //zigbee.smartShield(text: "update").format()
+    
     getAction("/status")
 }
 
@@ -719,28 +697,28 @@ def warning() {
 
 def enablePump() {
     log.info "Enabling Pump"
-    //zigbee.smartShield(text: "pump,3").format()  //pump is queued and ready to turn on when zone is activated
+    
     getAction("/command?command=pump,3")
 }
 def disablePump() {
     log.info "Disabling Pump"
-    //zigbee.smartShield(text: "pump,0").format()  //remove pump from system, reactivate Zone8
+    
     getAction("/command?command=pump,0")
 }
 def onPump() {
     log.info "Turning On Pump"
-    //zigbee.smartShield(text: "pump,2").format()
+    
     getAction("/command?command=pump,2")
     }
 
 def offPump() {
 	log.info "Turning Off Pump"
-    //zigbee.smartShield(text: "pump,1").format()  //pump returned to queue state to turn on when zone turns on
+    
     getAction("/command?command=pump,1")
         }
 def push() {
     log.info "advance to next zone"
-    //zigbee.smartShield(text: "advance").format()  //turn off currently running zone and advance to next
+    
     getAction("/command?command=advance")
     }
 
@@ -777,7 +755,7 @@ def	onHold() {
 
 def reset() {
 	log.debug "reset()"
-	//setColor(white: "ff")
+	
 }
 
 def refresh() {
@@ -944,37 +922,32 @@ def update_current_properties(cmd)
 def update_needed_settings()
 {
     def cmds = []
-    def currentProperties = state.currentProperties ?: [:]
-     
-    def configuration = parseXml(configuration_model())
+    
     def isUpdateNeeded = "NO"
     
-    cmds << getAction("/configSet?name=haip&value=${device.hub.getDataValue("localIP")}")
-    cmds << getAction("/configSet?name=haport&value=${device.hub.getDataValue("localSrvPortTCP")}")
-    
-    configuration.Value.each
-    {     
-        if ("${it.@setting_type}" == "lan" && it.@disabled != "true"){
-            if (currentProperties."${it.@index}" == null)
-            {
-               if (it.@setonly == "true"){
-                  logging("Setting ${it.@index} will be updated to ${convertParam("${it.@index}", it.@value)}", 2)
-                  cmds << getAction("/configSet?name=${it.@index}&value=${convertParam("${it.@index}", it.@value)}")
-               } else {
-                  isUpdateNeeded = "YES"
-                  logging("Current value of setting ${it.@index} is unknown", 2)
-                  cmds << getAction("/configGet?name=${it.@index}")
-               }
-            }
-            else if ((settings."${it.@index}" != null || it.@hidden == "true") && currentProperties."${it.@index}" != (settings."${it.@index}"? convertParam("${it.@index}", settings."${it.@index}".toString()) : convertParam("${it.@index}", "${it.@value}")))
-            { 
-                isUpdateNeeded = "YES"
-                logging("Setting ${it.@index} will be updated to ${convertParam("${it.@index}", settings."${it.@index}")}", 2)
-                cmds << getAction("/configSet?name=${it.@index}&value=${convertParam("${it.@index}", settings."${it.@index}")}")
-            } 
-        }
-    }
-    
+    cmds << getAction("/config?hubIp=${device.hub.getDataValue("localIP")}&hubPort=${device.hub.getDataValue("localSrvPortTCP")}")
+        
     sendEvent(name:"needUpdate", value: isUpdateNeeded, displayed:false, isStateChange: true)
     return cmds
+}
+def installed() {
+	log.debug "installed()"
+	configure()
+}
+
+def configure() {
+    logging("configure()", 1)
+    def cmds = []
+    cmds = update_needed_settings()
+    if (cmds != []) cmds
+}
+
+def updated()
+{
+    logging("updated()", 1)
+    def cmds = [] 
+    cmds = update_needed_settings()
+    sendEvent(name: "checkInterval", value: 2 * 15 * 60 + 2 * 60, displayed: false, data: [protocol: "lan", hubHardwareId: device.hub.hardwareID])
+    sendEvent(name:"needUpdate", value: device.currentValue("needUpdate"), displayed:false, isStateChange: true)
+    if (cmds != []) response(cmds)
 }

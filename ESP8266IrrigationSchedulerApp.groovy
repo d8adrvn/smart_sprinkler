@@ -223,10 +223,6 @@ def configured() {
 	
 }
 
-//def buttonConfigured(idx) {
-//	return settings["lights_$idx"]
-//}
-
 def isConfigured(){
    if(getChildDevices().size() > 0) return true else return false
 }
@@ -253,19 +249,6 @@ private getDeviceID(number) {
     return "${state.currentDeviceId}/${app.id}/${number}"
 }
 
-def installed() {
-	scheduling()
-    state.daysSinceLastWatering = [0,0,0]
-    initialize()
-}
-
-def updated() {
-	unsubscribe()
-    unschedule()
-    scheduling()
-    state.daysSinceLastWatering = [0,0,0]
-	initialize()
-}
 
 def initialize() {
     ssdpSubscribe()
@@ -514,6 +497,21 @@ preferences {
 //    state.daysSinceLastWatering = [0,0,0]
 //}
 
+def installed() {
+	scheduling()
+    state.daysSinceLastWatering = [0,0,0]
+    initialize()
+}
+
+def updated() {
+	//unsubscribe()
+    unschedule()
+    scheduling()
+    state.daysSinceLastWatering = [0,0,0]
+	initialize()
+}
+
+
 // Scheduling
 def scheduling() {
     schedule(waterTimeOne, "waterTimeOneStart")
@@ -568,7 +566,7 @@ def scheduleCheck() {
         state.daysSinceLastWatering[state.currentTimerIx] = daysSince() + 1
     }
 // 	  Next line is useful log statement for debugging why the smart app may not be triggering.
-//    log.info("${app.label} scheduler state: ${schedulerState}. Days since last watering: ${daysSince()}. Is watering day? ${isWateringDay()}. Enought time? ${enoughTimeElapsed(schedulerState)} ")
+    log.info("${app.label} scheduler state: ${schedulerState}. Days since last watering: ${daysSince()}. Is watering day? ${isWateringDay()}. Enought time? ${enoughTimeElapsed(schedulerState)} ")
 
     if ((isWateringDay() && enoughTimeElapsed(schedulerState) && schedulerState != "delay") || schedulerState == "expedite") {
         state.daysSinceLastWatering[state.currentTimerIx] = 0

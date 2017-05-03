@@ -51,6 +51,7 @@ metadata {
 		capability "Sensor"
         capability "Configuration"
         capability "Health Check"
+        command "reboot"
 
         
         command "OnWithZoneTimes"
@@ -172,7 +173,10 @@ metadata {
             state("expedite", label: "Expedite", action: "onHold", icon: "st.Office.office7", backgroundColor: "#53a7c0")
             state("onHold", label: "Pause", action: "noEffect", icon: "st.Office.office7", backgroundColor: "#bc2323")
         }
-    	valueTile("ip", "ip", width: 1, height: 1) {
+    	standardTile("reboot", "device.reboot", decoration: "flat", height: 1, width: 1, inactiveLabel: false) {
+            state "default", label:"Reboot", action:"reboot", icon:"", backgroundColor:"#ffffff"
+        }
+        valueTile("ip", "ip", width: 1, height: 1) {
     		state "ip", label:'IP Address\r\n${currentValue}'
 		}
         valueTile("firmware", "firmware", width: 1, height: 1) {
@@ -180,7 +184,7 @@ metadata {
 		}
         
         main "allZonesTile"
-        details(["zoneOneTile","zoneTwoTile","zoneThreeTile","zoneFourTile","zoneFiveTile","zoneSixTile","zoneSevenTile","zoneEightTile", "pumpTile","scheduleEffect","ip","firmware","refreshTile"])
+        details(["zoneOneTile","zoneTwoTile","zoneThreeTile","zoneFourTile","zoneFiveTile","zoneSixTile","zoneSevenTile","zoneEightTile", "pumpTile","scheduleEffect","ip","firmware","refreshTile","reboot"])
     }
 }
 
@@ -768,6 +772,12 @@ def ping() {
     refresh()
 }
 
+def reboot() {
+	log.debug "reboot()"
+    def uri = "/reboot"
+    getAction(uri)
+}
+
 def sync(ip, port) {
     def existingIp = getDataValue("ip")
     def existingPort = getDataValue("port")
@@ -898,7 +908,7 @@ def hex2int(value){
 }
 
  /*  Code has elements from other community source @CyrilPeponnet (Z-Wave Parameter Sync). */
-
+/*
 def update_current_properties(cmd)
 {
     def currentProperties = state.currentProperties ?: [:]
@@ -917,7 +927,7 @@ def update_current_properties(cmd)
     }
     state.currentProperties = currentProperties
 }
-
+*/
 
 def update_needed_settings()
 {
@@ -936,7 +946,7 @@ def installed() {
 }
 
 def configure() {
-    logging("configure()", 1)
+    log.debug "configure()"
     def cmds = []
     cmds = update_needed_settings()
     if (cmds != []) cmds
@@ -944,7 +954,7 @@ def configure() {
 
 def updated()
 {
-    logging("updated()", 1)
+    log.debug "updated()"
     def cmds = [] 
     cmds = update_needed_settings()
     sendEvent(name: "checkInterval", value: 2 * 15 * 60 + 2 * 60, displayed: false, data: [protocol: "lan", hubHardwareId: device.hub.hardwareID])

@@ -40,7 +40,7 @@ const char* version = "2.0.6";
 int maxrelays = 16;  //set up before loading to Arduino (maximum possible relays)
 int relays = 4;  //set up before loading to Arduino (max = 8 with current code)
 boolean isActiveHigh=true; //set to true if using "active high" relay, set to false if using "active low" relay
-boolean isDebugEnabled=true;    // enable or disable debug in this example
+boolean isDebugEnabled=false;    // enable or disable debug in this example
 boolean isPin4Pump=false;  //set to true if you add an additional relay to pin4 and use as pump or master valve.  
 
 //set global variables
@@ -54,10 +54,8 @@ const char DEVICENAME[] PROGMEM = "deviceName";
 
 
 // Smartthings hub information
-IPAddress hubIp(192,168,1,225); // smartthings hub ip
-unsigned int hubPort = 39500; // smartthings hub port
-//IPAddress hubIp = INADDR_NONE; // smartthings hub ip
-//unsigned int hubPort = 0; // smartthings hub port
+IPAddress hubIp = INADDR_NONE; // smartthings hub ip
+unsigned int hubPort = 0; // smartthings hub port
 String deviceName = "ESP8266 Irrigation Controller";
 
 
@@ -115,30 +113,25 @@ void handleRoot() {
 }
 
 void handleCommand() {
-
   String message = server.arg("command");
-  
   messageCallout(message);
-
   String updateStatus = makeUpdate();
-    
   server.send(200, "application/json", updateStatus);
-  
 }
 
 void handleStatus() {
- 
-  
   String updateStatus = makeUpdate();
-  
-  
   server.send(200, "application/json", updateStatus);
-  
+}
+
+void handleReboot() {
+  messageCallout("allOff");
+  String updateStatus = makeUpdate();
+  server.send(200, "application/json", updateStatus);
+  ESP.restart();
 }
 
 void handleConfig() {
-
-  
   StaticJsonBuffer<100> jsonBuffer;
   JsonObject& json = jsonBuffer.createObject();
   
@@ -164,8 +157,10 @@ void handleConfig() {
   //save config
   String settingsJSON;
   json.printTo(settingsJSON);
-  Serial.print("Saving JSON ");
-  Serial.println("settingsJSON");
+  if (isDebugEnabled) {
+    Serial.print("Saving JSON ");
+    Serial.println("settingsJSON");
+  }
   saveAppConfig(settingsJSON);
   
   String updateStatus = makeUpdate();
@@ -184,16 +179,21 @@ void setup(void){
     // setup debug serial port
     Serial.begin(115200);         // setup serial with a baud rate of 9600
     Serial.println("setup..");  // print out 'setup..' on start
+    Serial.print("Version:  ");
+    Serial.println(version);
+    Serial.print(F("Sketch size: "));
+    Serial.println(ESP.getSketchSize());
+    Serial.print(F("Free size: "));
+    Serial.print(ESP.getFreeSketchSpace());
   }
 
-  Serial.print(F("Sketch size: "));
-  Serial.println(ESP.getSketchSize());
-  Serial.print(F("Free size: "));
-  Serial.print(ESP.getFreeSketchSpace());
-
-  Serial.println(F("Mounting FS..."));
+  if (isDebugEnabled) {
+    Serial.println(F("Mounting FS..."));
+  }
   if (!SPIFFS.begin()) {
-    Serial.println(F("Failed to mount file system"));
+    if (isDebugEnabled) {
+      Serial.println(F("Failed to mount file system"));
+    }
     return;
   }
 
@@ -201,9 +201,13 @@ void setup(void){
 //  SPIFFS.format();
 
   if (!loadAppConfig()) {
-    Serial.println(F("Failed to load application config"));
+    if (isDebugEnabled) {
+      Serial.println(F("Failed to load application config"));
+    }
   } else {
-    Serial.println(F("Application config loaded"));
+    if (isDebugEnabled) {
+      Serial.println(F("Application config loaded"));
+    }
   }
 
     //WiFiManager
@@ -231,8 +235,7 @@ void setup(void){
     Serial.println(WiFi.localIP());
   }
       
-  Serial.print("Version:  ");
-  Serial.println(version);
+  
 
   // ***irrigation setup
   
@@ -295,22 +298,34 @@ void setup(void){
       if(upload.status == UPLOAD_FILE_START){
         Serial.setDebugOutput(true);
         WiFiUDP::stopAll();
-        Serial.printf("Update: %s\n", upload.filename.c_str());
+        if (isDebugEnabled) {
+          Serial.printf("Update: %s\n", upload.filename.c_str());
+        }
         uint32_t maxSketchSpace = (ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000;
         if(!Update.begin(maxSketchSpace)){//start with max available size
-          Update.printError(Serial);
+          if (isDebugEnabled) {
+            Update.printError(Serial);
+          }
         }
       } else if(upload.status == UPLOAD_FILE_WRITE){
         if(Update.write(upload.buf, upload.currentSize) != upload.currentSize){
-          Update.printError(Serial);
+          if (isDebugEnabled) {
+            Update.printError(Serial);
+          }
         }
       } else if(upload.status == UPLOAD_FILE_END){
         if(Update.end(true)){ //true to set the size to the current progress
-          Serial.printf("Update Success: %u\nRebooting...\n", upload.totalSize);
+          if (isDebugEnabled) {
+            Serial.printf("Update Success: %u\nRebooting...\n", upload.totalSize);
+          }
         } else {
-          Update.printError(Serial);
+          if (isDebugEnabled) {
+            Update.printError(Serial);
+          }
         }
-        Serial.setDebugOutput(false);
+          if (isDebugEnabled) {
+            Serial.setDebugOutput(false);
+          }
       }
       yield();
     });
@@ -322,6 +337,7 @@ void setup(void){
     SSDP.schema(server.client());
   });
   server.on("/config", handleConfig);
+  server.on("/reboot", handleReboot);
   server.onNotFound(handleNotFound);
   
 
@@ -404,7 +420,9 @@ void messageCallout(String message)
   }
   
   if (strcmp(inValue[0],"allOn")==0) {
-    Serial.println("Calling allOn");
+    if (isDebugEnabled) {
+      Serial.println("Calling allOn");
+    }
     int i=1;
     while (i<stations+1) {
       
@@ -682,12 +700,16 @@ int sendNotify() //client function to send/receieve POST data.
     client.print(F(":"));
     client.println(hubPort);
     sendJSONData(client);
-    Serial.println(F("Pushing new values to hub..."));
+    if (isDebugEnabled) {
+      Serial.println(F("Pushing new values to hub..."));
+    }
   }
   else {
     //connection failed
     returnStatus = 0;
-    Serial.println(F("Connection to hub failed."));
+    if (isDebugEnabled) {
+      Serial.println(F("Connection to hub failed."));
+    }
   }
 
   // read any data returned from the POST
@@ -786,9 +808,17 @@ String makeUpdate() {
   }
   
   json["version"] = version;
+
+  if (hubPort != 0) {
+    json["configuration"] = "true";
+  }else {
+    json["configuration"] = "false";
+  }
   
-  Serial.print("JSON ");
-  json.printTo(Serial);
+  if (isDebugEnabled) {
+    Serial.print("JSON ");
+    json.printTo(Serial);
+  }
   json.printTo(statusUpdate);
   
   if (isDebugEnabled) {
@@ -829,13 +859,17 @@ void sendPumpUpdate() {
 bool loadAppConfig() {
   File configFile = SPIFFS.open(FPSTR(APPSETTINGS), "r");
   if (!configFile) {
-    Serial.println(F("Failed to open config file"));
+    if (isDebugEnabled) {
+      Serial.println(F("Failed to open config file"));
+    }
     return false;
   }
 
   size_t size = configFile.size();
   if (size > 1024) {
-    Serial.println(F("Config file size is too large"));
+    if (isDebugEnabled) {
+      Serial.println(F("Config file size is too large"));
+    }
     return false;
   }
 
@@ -848,33 +882,43 @@ bool loadAppConfig() {
   JsonObject& json = jsonBuffer.parseObject(buf.get());
 
   if (!json.success()) {
-    Serial.println(F("Failed to parse application config file"));
+    if (isDebugEnabled) {
+      Serial.println(F("Failed to parse application config file"));
+    }
     return false;
   }
 
   hubPort = json[FPSTR(HUBPORT)];
-  Serial.print(FPSTR(HUBPORT));
-  Serial.print(FPSTR(LOADED));
-  Serial.println(hubPort);
+  
   String hubAddress = json[FPSTR(HUPIP)];
-  Serial.print(FPSTR(HUPIP));
-  Serial.print(FPSTR(LOADED));
-  Serial.println(hubAddress);
+  
   hubIp = IPfromString(hubAddress);
   String savedDeviceName = json[FPSTR(DEVICENAME)];
   deviceName = savedDeviceName;
-  Serial.print(FPSTR(DEVICENAME));
-  Serial.print(FPSTR(LOADED));
-  Serial.println(deviceName);
+  if (isDebugEnabled) {
+    Serial.print(FPSTR(HUBPORT));
+    Serial.print(FPSTR(LOADED));
+    Serial.println(hubPort);
+    Serial.print(FPSTR(HUPIP));
+    Serial.print(FPSTR(LOADED));
+    Serial.println(hubAddress);
+    Serial.print(FPSTR(DEVICENAME));
+    Serial.print(FPSTR(LOADED));
+    Serial.println(deviceName);
+  }
   return true;
 }
 
 bool saveAppConfig(String jsonString) {
-  Serial.print(F("Saving new settings: "));
-  Serial.println(jsonString);
+  if (isDebugEnabled) {
+    Serial.print(F("Saving new settings: "));
+    Serial.println(jsonString);
+  }
   File configFile = SPIFFS.open(FPSTR(APPSETTINGS), "w");
   if (!configFile) {
-    Serial.println(F("Failed to open application config file for writing"));
+    if (isDebugEnabled) {
+      Serial.println(F("Failed to open application config file for writing"));
+    }
     return false;
   }
   configFile.print(jsonString);

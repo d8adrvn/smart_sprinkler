@@ -56,6 +56,8 @@ There are a large variety of ESP8266 based options including prefabricated board
 
 * [LinkNode R4] (http://linksprite.com/wiki/index.php5?title=LinkNode_R4:_Arduino-compatible_WiFi_relay_controller)
 
+! [LinkNode R4] (http://linksprite.com/wiki/images/thumb/4/42/211201004-with_pillar-001.jpg/640px-211201004-with_pillar-001.jpg)
+
 * [LinkNode R8] (http://linksprite.com/wiki/index.php5?title=LinkNode_R8:_Arduino-compatible_WiFi_relay_controller)
 
-
+! [LinkNode R8] (http://linksprite.com/wiki/images/thumb/a/ae/LinkNode_R8-5.jpg/640px-LinkNode_R8-5.jpg)

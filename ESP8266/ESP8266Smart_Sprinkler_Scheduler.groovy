@@ -4,17 +4,20 @@
 *  Author:  Aaron Nienhuis (aaron.nienhuis@gmail.com)
 *
 *  Date:  2017-04-07
+*  Copyright 2017 Aaron Nienhuis
 *  
 *  
 * 
-*  Irrigation Scheduler SmartApp Smarter Lawn Controller
+*  Smart Sprinkler Scheduler SmartApp
 *  Compatible with up to 24 Zones
 *
 *  ESP8266 port based on the extensive previous work of:
 *  Author: Stan Dotson (stan@dotson.info) and Matthew Nichols (matt@nichols.name)
-*  Date: 2014-06-16
 *
-*  Copyright 2014 Stan Dotson and Matthew Nichols
+*  Portions of this work previously copyrighted by Stan Dotson and Matthew Nichols
+*
+*	Some code and concepts incorporated from other projects by:
+*  Eric Maycock
 *
 *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
 *  in compliance with the License. You may obtain a copy of the License at:
@@ -33,7 +36,7 @@ definition(
     namespace: "anienhuis",
     author: "aaron.nienhuis@gmail.com",
     description: "Child SmartApp to create schedules for ESP8266 based Smart Sprinkler Controllers",
-    version: "1.0.0",
+    version: "1.0.1",
     parent: "anienhuis:Smart Sprinkler (Connect)",
     iconUrl: "https://s3.amazonaws.com/smartapp-icons/Meta/water_moisture.png",
     iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Meta/water_moisture@2x.png"
@@ -75,7 +78,7 @@ preferences {
         }
 
  	}
-    page(name: "schedulePage", title: "Create An Irrigation Schedule", nextPage: "weatherPage", uninstall: true) {
+    page(name: "schedulePage", title: "Create An Irrigation Schedule", nextPage: "weatherPage", uninstall: false) {
         
         section {
             input (
@@ -97,7 +100,7 @@ preferences {
             input name: "waterTimeThree",  type: "time", required: false, title: "and again at..."
         }
     }
-	page(name: "weatherPage", title: "Virtual Weather Station Setup", nextPage: "scheduleName", uninstall: true) {
+	page(name: "weatherPage", title: "Virtual Weather Station Setup", nextPage: "scheduleName", uninstall: false) {
 		
         section("Zip code or Weather Station ID to check weather...") {
             input "zipcode", "text", title: "Enter zipcode or or pws:stationid", required: false
@@ -193,7 +196,7 @@ def scheduleCheck() {
         state.daysSinceLastWatering[state.currentTimerIx] = daysSince() + 1
     }
 // 	  Next line is useful log statement for debugging why the smart app may not be triggering.
-//    log.info("${app.label} scheduler state: ${schedulerState}. Days since last watering: ${daysSince()}. Is watering day? ${isWateringDay()}. Enought time? ${enoughTimeElapsed(schedulerState)} ")
+    log.info("${app.label} scheduler state: ${schedulerState}. Days since last watering: ${daysSince()}. Is watering day? ${isWateringDay()}. Enought time? ${enoughTimeElapsed(schedulerState)} ")
 
     if ((isWateringDay() && enoughTimeElapsed(schedulerState) && schedulerState != "delay") || schedulerState == "expedite") {
         state.daysSinceLastWatering[state.currentTimerIx] = 0
@@ -288,9 +291,12 @@ def safeToFloat(value) {
 def wasWetYesterday() {
     
     def yesterdaysWeather = getWeatherFeature("yesterday", zipcode)
+    log.debug "Yesterday Weather: $yesterdaysWeather"
     def yesterdaysPrecip = yesterdaysWeather?.history?.dailysummary?.precipi?.toArray() 
+    log.debug "Yesterday Precip: $yesterdaysPrecip"
+    log.debug "Yesterday inches: $yesterdaysPrecip[0])"
     def yesterdaysInches= yesterdaysPrecip ? safeToFloat(yesterdaysPrecip[0]) : 0
-    log.info("Yesterday's percipitation for $zipcode: $yesterdaysInches in")
+    log.info("Yesterday's precipitation for $zipcode: $yesterdaysInches in")
 	return yesterdaysInches    
 }
 
@@ -299,7 +305,7 @@ def isWet() {
     def todaysWeather = getWeatherFeature("conditions", zipcode)
     def todaysPrecip = (todaysWeather?.current_observation?.precip_today_in)
     def todaysInches = todaysPrecip ? safeToFloat(todaysPrecip) : 0
-    log.info("Today's percipitation for ${zipcode}: ${todaysInches} in")
+    log.info("Today's precipitation for ${zipcode}: ${todaysInches} in")
     return todaysInches
 }
 
@@ -308,7 +314,7 @@ def isStormy() {
     def forecastWeather = getWeatherFeature("forecast", zipcode)
     def forecastPrecip=forecastWeather.forecast.simpleforecast.forecastday.qpf_allday.in?.toArray()
     def forecastInches = forecastPrecip ? safeToFloat(forecastPrecip[0]) : 0
-    log.info("Forecast percipitation for $zipcode: $forecastInches in")
+    log.info("Forecast precipitation for $zipcode: $forecastInches in")
     return forecastInches
 }
 

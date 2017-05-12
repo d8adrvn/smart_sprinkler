@@ -4,18 +4,22 @@
  *  Author:  Aaron Nienhuis (aaron.nienhuis@gmail.com)
  *
  *  Date:  2017-04-07
+ *  Copyright 2017 Aaron Nienhuis
  *  
  *  Irrigation Controller 4 Zones
  *
- *  This SmartThings Device Handler (Device Type) Code Works With Arduino Irrigation Controller also available at this site
+ *  This SmartThings Device Handler (Device Type) Code Works With the ESP8266 based  Smart Sprinkler Irrigation Controllers also available at this site
  *  
  *
  *	Creates connected irrigation controller
  *
  *  ESP8266 port based on the extensive previous work of:
  *  Author: Stan Dotson (stan@dotson.info) and Matthew Nichols (matt@nichols.name)
- *  Date: 2014-06-14
- *  Copyright 2014 Stan Dotson and Matthew Nichols
+ *
+ *  Portions of this work previously copyrighted by Stan Dotson and Matthew Nichols
+ *
+ *	Some code and concepts incorporated from other projects by:
+ *  Eric Maycock
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -31,18 +35,15 @@
  
  // for the UI
 preferences {
+        
     input("oneTimer", "text", title: "Zone One", description: "Zone One Time", required: false, defaultValue: "1")
     input("twoTimer", "text", title: "Zone Two", description: "Zone Two Time", required: false, defaultValue: "1")
     input("threeTimer", "text", title: "Zone Three", description: "Zone Three Time", required: false, defaultValue: "1")
     input("fourTimer", "text", title: "Zone Four", description: "Zone Four Time", required: false, defaultValue: "1")
-    input("fiveTimer", "text", title: "Zone Five", description: "Zone Five Time", required: false, defaultValue: "1")
-    input("sixTimer", "text", title: "Zone Six", description: "Zone Six Time", required: false, defaultValue: "1")
-    input("sevenTimer", "text", title: "Zone Seven", description: "Zone Seven Time", required: false, defaultValue: "1")
-    input("eightTimer", "text", title: "Zone Eight", description: "Zone Eight Time", required: false, defaultValue: "1")
 }
 
 metadata {
-    definition (name: "ESP8266 Irrigation Controller 4 Zones", version: "1.0.3", author: "aaron.nienhuis@gmail.com", namespace: "anienhuis") {
+    definition (name: "Smart Sprinkler Controller 4 Zones", version: "1.0.1", author: "aaron.nienhuis@gmail.com", namespace: "anienhuis") {
         
         capability "Switch"
         capability "Momentary"
@@ -67,19 +68,6 @@ metadata {
         command "RelayOn4"
         command "RelayOn4For"
         command "RelayOff4"
-        command "RelayOn5"
-        command "RelayOn5For"
-        command "RelayOff5"
-        command "RelayOn6"
-        command "RelayOn6For"
-        command "RelayOff6"
-        command "RelayOn7"
-        command "RelayOn7For"
-        command "RelayOff7"
-        command "RelayOn8"
-        command "RelayOn8For"
-        command "RelayOff8"
-        command "rainDelayed"
         command "update" 
         command "enablePump"
         command "disablePump"
@@ -91,6 +79,7 @@ metadata {
         command "onHold"
         command "warning"
         attribute "effect", "string"
+        
     }
 
     simulator {
@@ -128,32 +117,7 @@ metadata {
             state "sending4", label: 'sending', action: "RelayOff4", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
             state "q", label: 'Four', action: "RelayOff4",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "sending4"
             state "on", label: 'Four', action: "RelayOff4",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "sending4"
-        }
-        standardTile("zoneFiveTile", "device.zoneFive", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
-            state "off", label: 'Five', action: "RelayOn5", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "sending5"
-            state "sending5", label: 'sending', action: "RelayOff5", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
-            state "q", label: 'Five', action: "RelayOff5",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "sending5"
-            state "on", label: 'Five', action: "RelayOff5",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "sending5"
-        }
-        standardTile("zoneSixTile", "device.zoneSix", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
-            state "off", label: 'Six', action: "RelayOn6", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "sending6"
-            state "sending6", label: 'sending', action: "RelayOff6", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
-            state "q", label: 'Six', action: "RelayOff6",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "sending6"
-            state "on", label: 'Six', action: "RelayOff6",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "sending6"
-        }
-        standardTile("zoneSevenTile", "device.zoneSeven", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
-            state "off", label: 'Seven', action: "RelayOn7", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "sending7"
-            state "sending7", label: 'sending', action: "RelayOff7", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
-            state "q", label: 'Seven', action: "RelayOff7",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "sending7"
-            state "on", label: 'Seven', action: "RelayOff7",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "sending7"
-        }
-        standardTile("zoneEightTile", "device.zoneEight", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
-            state "off", label: 'Eight', action: "RelayOn8", icon: "st.Outdoor.outdoor12", backgroundColor: "#ffffff", nextState: "sending8"
-            state "sending8", label: 'sending', action: "RelayOff8", icon: "st.Health & Wellness.health7", backgroundColor: "#cccccc"
-            state "q", label: 'Eight', action: "RelayOff8",icon: "st.Outdoor.outdoor12", backgroundColor: "#c0a353", nextState: "sending8"
-            state "on", label: 'Eight', action: "RelayOff8",icon: "st.Outdoor.outdoor12", backgroundColor: "#53a7c0", nextState: "sending8"
-            state "havePump", label: 'Eight', action: "disablePump", icon: "st.custom.buttons.subtract-icon", backgroundColor: "#ffffff"
-
+            state "havePump", label: 'Four', action: "disablePump", icon: "st.custom.buttons.subtract-icon", backgroundColor: "#ffffff"
         }
         standardTile("pumpTile", "device.pump", width: 1, height: 1, canChangeIcon: true, canChangeBackground: true) {
             state "noPump", label: 'Pump', action: "enablePump", icon: "st.custom.buttons.subtract-icon", backgroundColor: "#ffffff",nextState: "enablingPump"
@@ -184,7 +148,7 @@ metadata {
 		}
         
         main "allZonesTile"
-        details(["zoneOneTile","zoneTwoTile","zoneThreeTile","zoneFourTile","zoneFiveTile","zoneSixTile","zoneSevenTile","zoneEightTile", "pumpTile","scheduleEffect","ip","firmware","refreshTile","reboot"])
+        details(["zoneOneTile","zoneTwoTile","zoneThreeTile","zoneFourTile","pumpTile","scheduleEffect","ip","firmware","refreshTile","reboot"])
     }
 }
 
@@ -214,18 +178,16 @@ def parse(String description) {
     if (!device.currentValue("ip") || (device.currentValue("ip") != getDataValue("ip"))) sendEvent(name: 'ip', value: getDataValue("ip"))
     
     if (descMap["body"]) body = new String(descMap["body"].decodeBase64())
-log.debug "body: $body"
+
     if (body && body != "") {
     
     	if(body.startsWith("{") || body.startsWith("[")) {
    
    			def slurper = new JsonSlurper()
     		def jsonResult = slurper.parseText(body)
-
-			//log.debug "jsonResult: $jsonResult"
-            
+			           
             if (jsonResult.containsKey("relay")) {
-            jsonResult.relay.each {  rel ->
+            	jsonResult.relay.each {  rel ->
             	name = rel.key
                 action = rel.value
             
@@ -270,8 +232,8 @@ log.debug "body: $body"
                 if (value == "pumpAdded") {
     				//send an event if there is a state change
         			log.debug "parsing pump pumpAdded"
-        			if (device?.currentValue("zoneEight") != "havePump" && device?.currentValue("pump") != "offPump") {
-    					sendEvent (name:"zoneEight", value:"havePump", displayed: true, isStateChange: true, isPhysical: true)
+        			if (device?.currentValue("zoneFour") != "havePump" && device?.currentValue("pump") != "offPump") {
+    					sendEvent (name:"zoneFour", value:"havePump", displayed: true, isStateChange: true, isPhysical: true)
         				sendEvent (name:"pump", value:"offPump", displayed: true, isStateChange: true, isPhysical: true)
     				}
     			}
@@ -289,22 +251,6 @@ log.debug "body: $body"
        				sendEvent(name:"firmware", value: jsonResult.version, displayed: false)
                 }
     		}
-/*
-
-
-    		if (jsonResult.containsKey("success")) {
-       			if (result.success == "true") state.configSuccess = "true" else state.configSuccess = "false" 
-    		}
-    		if (jsonResult.containsKey("program")) {
-        		if (result.running == "false") {
-            		toggleTiles("all")
-        		}
-        		else {
-           			toggleTiles("switch$result.program")
-            		events << createEvent(name:"switch$result.program", value: "on")
-        		}
-    		}
-*/    
     
 
 			if(anyZoneOn()) {
@@ -324,171 +270,13 @@ log.debug "body: $body"
   	}          
 }
 
-/*
-def parse(description) {
-	//log.debug "Parsing: ${description}"
-    def events = []
-    def descMap = parseDescriptionAsMap(description)
-    def body
-    //log.debug "descMap: ${descMap}"
-
-    if (!state.mac || state.mac != descMap["mac"]) {
-		log.debug "Mac address of device found ${descMap["mac"]}"
-        updateDataValue("mac", descMap["mac"])
-	}
-    
-    if (state.mac != null && state.dni != state.mac) state.dni = setDeviceNetworkId(state.mac)
-    if (descMap["body"]) body = new String(descMap["body"].decodeBase64())
-log.debug "body: $body"
-    if (body && body != "") {
-    
-    	if(body.startsWith("{") || body.startsWith("[")) {
-    
-    		def slurper = new JsonSlurper()
-    		def result = slurper.parseText(body)
-    
-   	 		log.debug "result: ${result}"
-    
-    		if (result.containsKey("type")) {
-        		if (result.type == "configuration")
-            		events << update_current_properties(result)
-    		}
-    		if (result.containsKey("power")) {
-        		events << createEvent(name: "switch", value: result.power)
-    		}
-    		if (result.containsKey("uptime")) {
-        		events << createEvent(name: 'uptime', value: result.uptime)
-    		}
-    	} else {
-        	//log.debug "Response is not JSON: $body"
-    	}
-    }
-    
-    if (!device.currentValue("ip") || (device.currentValue("ip") != getDataValue("ip"))) events << createEvent(name: 'ip', value: getDataValue("ip"))
-    
-    return events
-}
-*/
-
-/* Test Parse from H801 LED controller
-def parse(description) {
-    def map = [:]
-    def events = []
-    def cmds = []
-    
-    log.debug "Parsing.... "
-    if(description == "updated") return
-    def descMap = parseDescriptionAsMap(description)
-
-    if (!state.mac || state.mac != descMap["mac"]) {
-		log.debug "Mac address of device found ${descMap["mac"]}"
-        updateDataValue("mac", descMap["mac"])
-	}
-    if (state.mac != null && state.dni != state.mac) state.dni = setDeviceNetworkId(state.mac)
-    
-    def body = new String(descMap["body"].decodeBase64())
-    log.debug body
-    
-    def slurper = new JsonSlurper()
-    def result = slurper.parseText(body)
-    
-    if (result.containsKey("type")) {
-        if (result.type == "configuration")
-            events << update_current_properties(result)
-    }
-    if (result.containsKey("power")) {
-        events << createEvent(name: "switch", value: result.power)
-        toggleTiles("all")
-    }
-    if (result.containsKey("rgb")) {
-       events << createEvent(name:"color", value:"#$result.rgb")
-
-       // only store the previous value if the response did not come from a power-off command
-       if (result.power != "off")
-         state.previousRGB = result.rgb
-    }
-    if (result.containsKey("r")) {
-       events << createEvent(name:"redLevel", value: Integer.parseInt(result.r,16)/255 * 100 as Integer, displayed: false)
-       if ((Integer.parseInt(result.r,16)/255 * 100 as Integer) > 0 ) {
-          events << createEvent(name:"red", value: "on", displayed: false)
-       } else {
-    	  events << createEvent(name:"red", value: "off", displayed: false)
-       }
-    }
-    if (result.containsKey("g")) {
-       events << createEvent(name:"greenLevel", value: Integer.parseInt(result.g,16)/255 * 100 as Integer, displayed: false)
-       if ((Integer.parseInt(result.g,16)/255 * 100 as Integer) > 0 ) {
-          events << createEvent(name:"green", value: "on", displayed: false)
-       } else {
-    	  events << createEvent(name:"green", value: "off", displayed: false)
-       }
-    }
-    if (result.containsKey("b")) {
-       events << createEvent(name:"blueLevel", value: Integer.parseInt(result.b,16)/255 * 100 as Integer, displayed: false)
-       if ((Integer.parseInt(result.b,16)/255 * 100 as Integer) > 0 ) {
-          events << createEvent(name:"blue", value: "on", displayed: false)
-       } else {
-    	  events << createEvent(name:"blue", value: "off", displayed: false)
-       }
-    }
-    if (result.containsKey("w1")) {
-       events << createEvent(name:"white1Level", value: Integer.parseInt(result.w1,16)/255 * 100 as Integer, displayed: false)
-       if ((Integer.parseInt(result.w1,16)/255 * 100 as Integer) > 0 ) {
-          events << createEvent(name:"white1", value: "on", displayed: false)
-       } else {
-    	  events << createEvent(name:"white1", value: "off", displayed: false)
-       }
-
-       // only store the previous value if the response did not come from a power-off command
-       if (result.power != "off")
-          state.previousW1 = result.w1
-    }
-    if (result.containsKey("w2")) {
-       events << createEvent(name:"white2Level", value: Integer.parseInt(result.w2,16)/255 * 100 as Integer, displayed: false)
-       if ((Integer.parseInt(result.w2,16)/255 * 100 as Integer) > 0 ) {
-          events << createEvent(name:"white2", value: "on", displayed: false)
-       } else {
-    	  events << createEvent(name:"white2", value: "off", displayed: false)
-       }
-
-       // only store the previous value if the response did not come from a power-off command
-       if (result.power != "off")
-          state.previousW2 = result.w2
-    }
-    if (result.containsKey("version")) {
-       events << createEvent(name:"firmware", value: result.version + "\r\n" + result.date, displayed: false)
-    }
-
-    if (result.containsKey("success")) {
-       if (result.success == "true") state.configSuccess = "true" else state.configSuccess = "false" 
-    }
-    if (result.containsKey("program")) {
-        if (result.running == "false") {
-            toggleTiles("all")
-        }
-        else {
-            toggleTiles("switch$result.program")
-            events << createEvent(name:"switch$result.program", value: "on")
-        }
-    }
-    
-    if (!device.currentValue("ip") || (device.currentValue("ip") != getDataValue("ip"))) events << createEvent(name: 'ip', value: getDataValue("ip"))
-
-    return events
-}
-*/
-
 
 def anyZoneOn() {
     if(device?.currentValue("zoneOne") in ["on","q"]) return true;
     if(device?.currentValue("zoneTwo") in ["on","q"]) return true;
     if(device?.currentValue("zoneThree") in ["o3","q"]) return true;
     if(device?.currentValue("zoneFour") in ["on","q"]) return true;
-    if(device?.currentValue("zoneFive") in ["on","q"]) return true;
-    if(device?.currentValue("zoneSix") in ["on","q"]) return true;
-    if(device?.currentValue("zoneSeven") in ["on","q"]) return true;
-    if(device?.currentValue("zoneEight") in ["on","q"]) return true;
-
+    
     false;
 }
 
@@ -570,86 +358,10 @@ def RelayOff4() {
     getAction("/command?command=off,4")
 }
 
-def RelayOn5() {
-    log.info "Executing 'on,5'"
-    
-    getAction("/command?command=on,5,${oneTimer}")
-}
-
-def RelayOn5For(value) {
-    value = checkTime(value)
-    log.info "Executing 'on,5,$value'"
-    
-    getAction("/command?command=on,5,${value}")
-}
-
-def RelayOff5() {
-    log.info "Executing 'off,5'"
-    
-    getAction("/command?command=off,5")
-}
-
-def RelayOn6() {
-    log.info "Executing 'on,6'"
-    
-    getAction("/command?command=on,6,${oneTimer}")
-}
-
-def RelayOn6For(value) {
-    value = checkTime(value)
-    log.info "Executing 'on,6,$value'"
-    
-    getAction("/command?command=on,6,${value}")
-}
-
-def RelayOff6() {
-    log.info "Executing 'off,6'"
-    
-    getAction("/command?command=off,6")
-}
-
-def RelayOn7() {
-    log.info "Executing 'on,7'"
-    
-    getAction("/command?command=on,7,${oneTimer}")
-}
-
-def RelayOn7For(value) {
-    value = checkTime(value)
-    log.info "Executing 'on,7,$value'"
-    
-    getAction("/command?command=on,7,${value}")
-}
-
-def RelayOff7() {
-    log.info "Executing 'off,7'"
-    
-    getAction("/command?command=off,7")
-}
-
-def RelayOn8() {
-    log.info "Executing 'on,8'"
-    
-    getAction("/command?command=on,8,${oneTimer}")
-}
-
-def RelayOn8For(value) {
-    value = checkTime(value)
-    log.info "Executing 'on,8,$value'"
-    
-    getAction("/command?command=on,8,${value}")
-}
-
-def RelayOff8() {
-    log.info "Executing 'off,8'"
-    
-    getAction("/command?command=off,8")
-}
-
 def on() {
     log.info "Executing 'allOn'"
     
-    getAction("/command?command=allOn,${oneTimer ?: 0},${twoTimer ?: 0},${threeTimer ?: 0},${fourTimer ?: 0},${fiveTimer ?: 0},${sixTimer ?: 0},${sevenTimer ?: 0},${eightTimer ?: 0}")
+    getAction("/command?command=allOn,${oneTimer ?: 0},${twoTimer ?: 0},${threeTimer ?: 0},${fourTimer ?: 0}")
 }
 
 def OnWithZoneTimes(value) {
@@ -681,8 +393,8 @@ def checkTime(t) {
 
 def update() {
     log.info "Executing refresh"
-    
-    getAction("/status")
+    refresh()
+    //getAction("/status")
 }
 
 def rainDelayed() {
@@ -759,11 +471,11 @@ def	onHold() {
 
 def reset() {
 	log.debug "reset()"
-	
 }
 
 def refresh() {
 	log.debug "refresh()"
+    
     getAction("/status")
 }
 
@@ -907,39 +619,7 @@ def hex2int(value){
    return Integer.parseInt(value, 10)
 }
 
- /*  Code has elements from other community source @CyrilPeponnet (Z-Wave Parameter Sync). */
-/*
-def update_current_properties(cmd)
-{
-    def currentProperties = state.currentProperties ?: [:]
-    currentProperties."${cmd.name}" = cmd.value
 
-    if (settings."${cmd.name}" != null)
-    {
-        if (convertParam("${cmd.name}", settings."${cmd.name}").toString() == cmd.value)
-        {
-            sendEvent(name:"needUpdate", value:"NO", displayed:false, isStateChange: true)
-        }
-        else
-        {
-            sendEvent(name:"needUpdate", value:"YES", displayed:false, isStateChange: true)
-        }
-    }
-    state.currentProperties = currentProperties
-}
-*/
-
-def update_needed_settings()
-{
-    def cmds = []
-    
-    def isUpdateNeeded = "NO"
-    
-    cmds << getAction("/config?hubIp=${device.hub.getDataValue("localIP")}&hubPort=${device.hub.getDataValue("localSrvPortTCP")}")
-        
-    sendEvent(name:"needUpdate", value: isUpdateNeeded, displayed:false, isStateChange: true)
-    return cmds
-}
 def installed() {
 	log.debug "installed()"
 	configure()
@@ -947,17 +627,14 @@ def installed() {
 
 def configure() {
     log.debug "configure()"
-    def cmds = []
-    cmds = update_needed_settings()
-    if (cmds != []) cmds
+    
 }
 
 def updated()
 {
     log.debug "updated()"
-    def cmds = [] 
-    cmds = update_needed_settings()
+    
     sendEvent(name: "checkInterval", value: 2 * 15 * 60 + 2 * 60, displayed: false, data: [protocol: "lan", hubHardwareId: device.hub.hardwareID])
-    sendEvent(name:"needUpdate", value: device.currentValue("needUpdate"), displayed:false, isStateChange: true)
-    if (cmds != []) response(cmds)
+    
+    
 }

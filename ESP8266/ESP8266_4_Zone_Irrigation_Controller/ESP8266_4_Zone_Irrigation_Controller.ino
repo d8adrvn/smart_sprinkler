@@ -1,5 +1,39 @@
 /**
- *  
+* 
+ ****************************************************************************************************************************
+ * ESP8266_4_Zone_Irrigation_Controller - Smart Sprinkler 4 Zones With Options for Master Valve and Pump  v1_0_1
+ * 
+ * Date: 2017-05-08
+ * 
+ * This is a port and redevelopment of the Smart Sprinkler project originally written by:
+ *    Stan Dotson (stan@dotson.info) and Matthew Nichols (matt@nichols.name)
+ *    
+ * The ESP8266 is a network based microprocessor that can be discovered and be controlled by SmartThings
+ * This 4 Zone device sketch has been tested and validated on the LinkNode R4 from LinkSprite.
+ * 
+ * Simple, elegant irrigation controller that takes advantage of the cloud and SmartThings ecosystem
+ * ESP8266 with SmartThings Shield  and 4 relay modules
+ * Works by receiving irrigation run times from the Cloud and then builds a queue to execute
+ * Will automatically shut off if power goes out and/or the queue finishes execution
+ * Updates the Cloud if a station is queued and as each station turns on or off. 
+ * By using the timer library, the CPU remains ready to process any change requests to the queue
+ * Allocates relay 4 to run a master valve or pump
+ * 
+ *
+ ****************************************************************************************************************************
+ * Libraries:
+ * Timer library was created by Simon Monk as modified by JChristensen  https://github.com/JChristensen/Timer.  Note: if you
+ * download the library from the source, you must rename the zip file to "Timer" before importing into the Arduino IDE.
+ * 
+ * An enhanced SmartThings Library was created by  Dan G Ogorchock & Daniel J Ogorchock and their version is required for this implementation.
+ * Their enhanced library can found at:
+ * https://github.com/DanielOgorchock/ST_Anything/tree/master/Arduino/libraries/SmartThings
+ *
+ * SoftwareSerial library was default library provided with Arduino IDE
+ *
+ ****************************************************************************************************************************
+ *  Copyright 2017 Aaron Nienhuis (aaron.nienhuis@gmail....)
+ *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
  *
@@ -8,12 +42,11 @@
  *  Unless required by applicable law or agreed to in writing, software distributed under the License is distributed
  *  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
  *  for the specific language governing permissions and limitations under the License.
+ *********************************************************************************************************************
  *
- * A Basic ESP8266 Device to Integrate with Samsung Smart Things
- * 
- *
- * Author: Jacob Schreiver 
- * Date: 2016-02-21
+ * Some code excerpts incorporated and modified from:
+ *    Stan Dotson (stan@dotson.info) and Matthew Nichols (matt@nichols.name)
+ *    Jacob Schreiver
  *
  */
 
@@ -27,21 +60,17 @@
 #include <ArduinoJson.h>
 #include <ESP8266mDNS.h>
 #include <ESP8266SSDP.h>
-//#include <Event.h>
 #include <Timer.h>
 
 
 
-//const int ledZone1 = 13;    // Pin labeled GPIO13
-
-const char* version = "2.0.6";
+const char* version = "1.0.1";
 
 //user configurable global variables to set before loading to Arduino
 int maxrelays = 16;  //set up before loading to Arduino (maximum possible relays)
 int relays = 4;  //set up before loading to Arduino (max = 8 with current code)
 boolean isActiveHigh=true; //set to true if using "active high" relay, set to false if using "active low" relay
-boolean isDebugEnabled=false;    // enable or disable debug in this example
-boolean isPin4Pump=false;  //set to true if you add an additional relay to pin4 and use as pump or master valve.  
+boolean isDebugEnabled=true;    // enable or disable debug in this example
 
 //set global variables
 
@@ -56,10 +85,7 @@ const char DEVICENAME[] PROGMEM = "deviceName";
 // Smartthings hub information
 IPAddress hubIp = INADDR_NONE; // smartthings hub ip
 unsigned int hubPort = 0; // smartthings hub port
-String deviceName = "ESP8266 Irrigation Controller";
-
-
-
+String deviceName = "Smart Sprinkler 4 Zone Irrigation Controller";
 
 //OTA
 
@@ -75,17 +101,14 @@ int relayOff = LOW;
 long stationTime[] = {0,0,0,0,0,0,0,0,0};
 int8_t stationTimer[] = {0,0,0,0,0,0,0,0,0}; 
 int queue[]={0,0,0,0,0,0,0,0,0};  // off: 0, queued: 1, running: 2
-int relay[9];
+int relay[5];
 
 
 
 //initialize pump related variables. 
-int pin4Relay = 16;  //pin16 reserved for optional additional relay to control a pump or master valve
 boolean isConfigPump = false; // if true, relay8 is used as the pump/master valve switch.  Can be toggled by device tye v2.7 and later
 const char* configPumpStatus = "off";
-const char* pin4PumpStatus= "off";
 boolean doUpdate = false;
-boolean doPumpUpdate = false;
 long pumpOffDelay = 0; // set number of minutes to delay turning pump or master valve off after last zone has finished running
 
 
@@ -108,8 +131,10 @@ IPAddress IPfromString(String address) {
 }
 
 void handleRoot() {
-  String updateStatus = makeUpdate();  
-  server.send(200, "application/json", updateStatus);  
+  String rootStatus;
+  rootStatus = "</style></head><center><table><TH colspan='2'>Smart Sprinkler 4 Zone Irrigation Controller<TR><TD><TD><TR><TD colspan='2'>";
+  rootStatus += "<TR><TD><TD><TR><TD>Main:<TD><a href='/update'>Firmware Update</a><BR><a href='/status'>Status</a><BR><a href='/reboot'>Reboot</a><BR></table><h6>Smart Sprinkler</h6></body></center>";
+  server.send(200, "text/html", rootStatus);  
 }
 
 void handleCommand() {
@@ -251,14 +276,14 @@ void setup(void){
     relayOff=HIGH;
   }
 
+  // GPIO 12,13,14, and 16
    relay[1]=14;
    relay[2]=13;
    relay[3]=16;
    relay[4]=12;
   
   int i=1;
-  while (i<5) {
-    //relay[i]= 13-i;
+  while (i<relays+1) {
     pinMode(relay[i], OUTPUT); 
     digitalWrite(relay[i], relayOff);
     if (isDebugEnabled) {
@@ -266,17 +291,6 @@ void setup(void){
       Serial.println(relay[i]);
     }
     i++;
-  }
- 
-
-
-  // set up optional hardware configured pump to pin4 on Arduino
-  if (isPin4Pump) {
-    pinMode(pin4Relay, OUTPUT);
-    digitalWrite(pin4Relay, relayOff);
-    if (isDebugEnabled) {
-      Serial.println("Turning off Pump");
-    }
   }
   
   server.on("/", handleRoot);
@@ -296,7 +310,9 @@ void setup(void){
     },[](){
       HTTPUpload& upload = server.upload();
       if(upload.status == UPLOAD_FILE_START){
-        Serial.setDebugOutput(true);
+        if (isDebugEnabled) {
+          Serial.setDebugOutput(true);
+        }
         WiFiUDP::stopAll();
         if (isDebugEnabled) {
           Serial.printf("Update: %s\n", upload.filename.c_str());
@@ -345,10 +361,10 @@ void setup(void){
 
   SSDP.setSchemaURL("esp8266ic.xml");
   SSDP.setHTTPPort(80);
-  SSDP.setName("ESP8266 Irrigation Controller");
+  SSDP.setName("Smart Sprinkler Controller 4 Zones");
   SSDP.setSerialNumber("0112358132134");
   SSDP.setURL("index.html");
-  SSDP.setModelName("ESP8266Irrigation Controller");
+  SSDP.setModelName("ESP8266Irrigation_4_Zone Controller");
   SSDP.setModelNumber("1");
   SSDP.setModelURL("https://github.com/anienhuis/smart_sprinkler/");
   SSDP.setManufacturer("Aaron Nienhuis");
@@ -370,13 +386,9 @@ void loop(void){
     sendUpdate("");
     doUpdate = false;
   }
-  if (doPumpUpdate) {
-    sendPumpUpdate();
-    doPumpUpdate = false;
-  }
- 
+
   server.handleClient();
-  delay(10);
+  delay(5);
   if (isDebugEnabled) {
     //Serial.println("Ending loop");
   }
@@ -445,10 +457,7 @@ void messageCallout(String message)
   if (strcmp(inValue[0],"pump")==0) {
     if (strcmp(inValue[1],"0")==0) {
       isConfigPump = false;
-//      stations = relays;
-      if (stations == 7) {  
-        stations = 8;
-      }
+      stations = relays;
     }
     if (strcmp(inValue[1],"1")==0) {
       pumpOff();
@@ -458,18 +467,16 @@ void messageCallout(String message)
     }
     if (strcmp(inValue[1],"3")==0) {
       isConfigPump = true;
-      digitalWrite(relay[8], relayOff); 
+      digitalWrite(relay[relays], relayOff); 
       if (isDebugEnabled) {
         Serial.print("Turning off relay ");
-        Serial.println(relay[8]);
+        Serial.println(relay[relays]);
       }
       configPumpStatus = "enabled";
-//      stations = relays - 1;
-      if (stations == 8) {  
-        stations = 7;
-      }
+      stations = relays - 1;
     }
-    schedulePumpUpdate();
+    scheduleUpdate();
+
   }
   queueManager();
 }
@@ -483,15 +490,8 @@ void scheduleUpdate() {
     Serial.println("Ending scheduleUpdate");
   }
 }
-void schedulePumpUpdate() {
-  if (isDebugEnabled) {
-    Serial.println("Starting schedulePumpUpdate");
-  }  
-  doPumpUpdate = true;
-  if (isDebugEnabled) {
-    Serial.println("Ending schedulePumpUpdate");
-  }
-}
+
+
 //run through queue to check to see if there is work to do
 void queueManager() {
   if (isDebugEnabled) {
@@ -519,20 +519,14 @@ void toggleOn() {
   queue[trafficCop]=2;
   
   if (isConfigPump) {
-    digitalWrite(relay[8], relayOn);
+    digitalWrite(relay[relays], relayOn);
     if (isDebugEnabled) {
       Serial.print("Turn on Relay ");
-      Serial.println(relay[8]);
+      Serial.println(relay[relays]);
     }
     configPumpStatus = "on";
   }
-  if (isPin4Pump) {
-    digitalWrite(pin4Relay, relayOn);
-    if (isDebugEnabled) {
-      Serial.println("Turning on Pump");
-    }
-    pin4PumpStatus = "on";
-  }
+  
   digitalWrite(relay[trafficCop], relayOn);
   if (isDebugEnabled) {
     Serial.print("Turning on Relay ");
@@ -542,7 +536,7 @@ void toggleOn() {
   t.stop(stationTimer[trafficCop]); // Kill any previously started timers.
   stationTimer[trafficCop] = t.after (stationTime[trafficCop],toggleOff);
   scheduleUpdate();
-  schedulePumpUpdate();
+  //schedulePumpUpdate();
 
   if (isDebugEnabled) {
     Serial.println("Ending toggleOn");
@@ -561,13 +555,13 @@ void toggleOff() {
   
   queue[trafficCop]=0; //remove relay from from queue
   if (maxvalue() ==0) {
-    if (isConfigPump || isPin4Pump) {
+    if (isConfigPump) {
       int8_t pumpOffEvent = t.after(pumpOffDelay*60L*1000L, pumpOff);  //turns off pump after delay
     }  
   }
   trafficCop=0; //ready to check queue or watch for new commmonds
   scheduleUpdate();
-  schedulePumpUpdate();
+
   if (isDebugEnabled) {
     Serial.println("Ending toggleOff");
   }
@@ -589,13 +583,13 @@ void allOff() {
 
     i++;
   }
-  if (isConfigPump || isPin4Pump) {
+  if (isConfigPump) {
     int8_t pumpOffEvent = t.after(pumpOffDelay*60L*1000L, pumpOff);  //turns off pump after delay
   } 
   
   trafficCop=0;
   scheduleUpdate();
-  schedulePumpUpdate();
+
   if (isDebugEnabled) {
     Serial.println("Ending allOff");
   }
@@ -606,22 +600,16 @@ void pumpOff() {
     Serial.println("Starting pumpOff");
   }
   if (isConfigPump) { 
-      digitalWrite(relay[8], relayOff); 
+      digitalWrite(relay[relays], relayOff); 
       if (isDebugEnabled) {
         Serial.println("Turning off Pump");
       }
 
       configPumpStatus = "off";
   }
-  if (isPin4Pump) {
-      digitalWrite(pin4Relay, relayOff);
-      if (isDebugEnabled) {
-        Serial.println("Turning off Pump");
-      }
 
-      pin4PumpStatus="off";
-  }
-  schedulePumpUpdate();
+  scheduleUpdate();
+
   if (isDebugEnabled) {
     Serial.println("Ending pumpOff");
   }
@@ -632,21 +620,14 @@ void pumpOn() {
     Serial.println("Starting pumpOn");
   }
   if (isConfigPump) { 
-      digitalWrite(relay[8], relayOn); 
+      digitalWrite(relay[relays], relayOn); 
       if (isDebugEnabled) {
         Serial.println("Turn on Pump");
       }
 
       configPumpStatus = "on";
   }
-  if (isPin4Pump) {
-      digitalWrite(pin4Relay, relayOn);
-      if (isDebugEnabled) {
-        Serial.println("Turn on Pump");
-      }
-
-      pin4PumpStatus = "on";
-  }
+  
   if (isDebugEnabled) {
     Serial.println("Ending pumpOn");
   }
@@ -657,7 +638,7 @@ void timeToUpdate() {
     Serial.println("Starting timeToUpdate");
   }
   scheduleUpdate();
-  schedulePumpUpdate();
+  //schedulePumpUpdate();
   if (isDebugEnabled) {
     Serial.println("Ending timeToUpdate");
   }
@@ -794,25 +775,22 @@ String makeUpdate() {
   if (isConfigPump && configPumpStatus == "enabled") {
     json["pump"] = "pumpAdded";
   }
-  if (!isConfigPump && !isPin4Pump) {
+  if (!isConfigPump) {
     json["pump"] = "pumpRemoved";
   }
-  if (configPumpStatus == "on" || pin4PumpStatus == "on") {
+  if (configPumpStatus == "on") {
     json["pump"] = "onPump";
   }
   if (configPumpStatus =="off" && isConfigPump) {
     json["pump"] = "offPump";
   }
-  if (pin4PumpStatus =="off" && isPin4Pump) {
-    json["pump"] = "offPump";
-  }
-  
+    
   json["version"] = version;
 
   if (hubPort != 0) {
-    json["configuration"] = "true";
+    json["hubconfig"] = "true";
   }else {
-    json["configuration"] = "false";
+    json["hubconfig"] = "false";
   }
   
   if (isDebugEnabled) {
@@ -830,31 +808,6 @@ String makeUpdate() {
   }
   return statusUpdate;
 }
-
-void sendPumpUpdate() {
-  if (isDebugEnabled) {
-    Serial.println("Starting sendPumpUpdate");
-  }
-  if (isConfigPump && configPumpStatus == "enabled") {
-    //smartthing.send("pumpAdded");
-  }
-  if (!isConfigPump && !isPin4Pump) {
-    //smartthing.send("pumpRemoved");
-  }
-  if (configPumpStatus == "on" || pin4PumpStatus == "on") {
-    //smartthing.send("onPump");
-  }
-  if (configPumpStatus =="off" && isConfigPump) {
-    //smartthing.send("offPump");
-  }
-  if (pin4PumpStatus =="off" && isPin4Pump) {
-    //smartthing.send("offPump");
-  }
-  if (isDebugEnabled) {
-    Serial.println("Ending sendPumpUpdate");
-  }
-}
-
 
 bool loadAppConfig() {
   File configFile = SPIFFS.open(FPSTR(APPSETTINGS), "r");

@@ -4,17 +4,22 @@
 *  Author:  Aaron Nienhuis (aaron.nienhuis@gmail.com)
 *
 *  Date:  2017-04-07
+*  Copyright 2017 Aaron Nienhuis
 *  
 *  
 * 
-*  Irrigation Scheduler SmartApp Smarter Lawn Contoller
-*  Compatible with up to 24 Zones
+*  Smart Sprinkler Controller discovery SmartApp
+*  Uses SSDP to discover ESP8266 based Smart Sprinkler controllers
+*
 *
 *  ESP8266 port based on the extensive previous work of:
 *  Author: Stan Dotson (stan@dotson.info) and Matthew Nichols (matt@nichols.name)
-*  Date: 2014-06-16
 *
-*  Copyright 2014 Stan Dotson and Matthew Nichols
+*  Portions of this work previously copyrighted by Stan Dotson and Matthew Nichols
+*
+*	Some code and concepts incorporated from other projects by:
+*  Eric Maycock
+*
 *
 *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
 *  in compliance with the License. You may obtain a copy of the License at:
@@ -33,7 +38,7 @@ definition(
     namespace: "anienhuis",
     author: "aaron.nienhuis@gmail.com",
     description: "Schedule sprinklers to run unless there is rain.",
-    version: "1.0.0",
+    version: "1.0.1",
     singleInstance: true,
     iconUrl: "https://s3.amazonaws.com/smartapp-icons/Meta/water_moisture.png",
     iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Meta/water_moisture@2x.png"
@@ -102,7 +107,7 @@ def manuallyAdd(){
    dynamicPage(name: "manuallyAdd", title: "Manually add a Irrigation Controller", nextPage: "manuallyAddConfirm") {
 		section {
 			paragraph "This process will manually create a Irrigation Controller based on the entered IP address. The SmartApp needs to then communicate with the device to obtain additional information from it. Make sure the device is on and connected to your wifi network."
-            input "deviceType", "enum", title:"Device Type", description: "", required: false, options: ["ESP8266 Irrigation Controller 4 Zones","ESP8266 Irrigation Controller 8 Zones"]
+            input "deviceType", "enum", title:"Device Type", description: "", required: false, options: ["Smart Sprinkler Controller 4 Zones","Smart Sprinkler Controller 8 Zones"]
             input "ipAddress", "text", title:"IP Address", description: "", required: false 
 		}
     }
@@ -110,9 +115,9 @@ def manuallyAdd(){
 
 def manuallyAddConfirm(){
    if ( ipAddress =~ /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/) {
-       log.debug "Creating ESP8266 Irrigation Controller with dni: ${convertIPtoHex(ipAddress)}:${convertPortToHex("80")}"
-       addChildDevice("anienhuis", deviceType ? deviceType : "ESP8266 Irrigation Controller 4 Zones", "${convertIPtoHex(ipAddress)}:${convertPortToHex("80")}", location.hubs[0].id, [
-           "label": (deviceType ? deviceType : "ESP8266 Irrigation Controller 4 Zones") + " (${ipAddress})",
+       log.debug "Creating Smart Sprinkler Controller with dni: ${convertIPtoHex(ipAddress)}:${convertPortToHex("80")}"
+       addChildDevice("anienhuis", deviceType ? deviceType : "Smart Sprinkler Controller 4 Zones", "${convertIPtoHex(ipAddress)}:${convertPortToHex("80")}", location.hubs[0].id, [
+           "label": (deviceType ? deviceType : "Smart Sprinkler Controller 4 Zones") + " (${ipAddress})",
            "data": [
            "ip": ipAddress,
            "port": "80" 
@@ -121,13 +126,13 @@ def manuallyAddConfirm(){
    
        app.updateSetting("ipAddress", "")
             
-       dynamicPage(name: "manuallyAddConfirm", title: "Manually add a ESP8266 Irrigation Controller", nextPage: "mainPage") {
+       dynamicPage(name: "manuallyAddConfirm", title: "Manually add a Smart Sprinkler Irrigation Controller", nextPage: "mainPage") {
 		   section {
 			   paragraph "The device has been added. Press next to return to the main page."
 	    	}
        }
     } else {
-        dynamicPage(name: "manuallyAddConfirm", title: "Manually add a ESP8266 Irrigation Controller", nextPage: "mainPage") {
+        dynamicPage(name: "manuallyAddConfirm", title: "Manually add a Smart Sprinkler Irrigation Controller", nextPage: "mainPage") {
 		    section {
 			    paragraph "The entered ip address is not valid. Please try again."
 		    }
@@ -190,7 +195,7 @@ def deviceDiscovery(params=[:])
 
 	ssdpSubscribe()
 
-	//ESP8266 Irrigation Controller discovery request every 15 //25 seconds
+	//ESP8266 Smart Sprinkler Controller discovery request every 15 //25 seconds
 	if((deviceRefreshCount % 5) == 0) {
 		discoverDevices()
 	}
@@ -201,7 +206,7 @@ def deviceDiscovery(params=[:])
 	}
 
 	return dynamicPage(name:"deviceDiscovery", title:"Discovery Started!", nextPage:"addDevices", refreshInterval:refreshInterval, uninstall: true) {
-		section("Please wait while we discover your ESP8266 Irrigation Controller devices. Discovery can take five minutes or more, so sit back and relax! Select your device below once discovered.") {
+		section("Please wait while we discover your Smart Sprinkler Controller devices. Discovery can take five minutes or more, so sit back and relax! Select your device below once discovered.") {
 			input "selectedDevices", "enum", required:false, title:"Select Irrigation Controller (${numFound} found)", multiple:true, options:options
 		}
         section("Options") {
@@ -294,7 +299,7 @@ def ssdpHandler(evt) {
         if (child) {
             childIP = child.getDeviceDataByName("ip")
             childPort = child.getDeviceDataByName("port").toString()
-            log.debug "Device data: ($childIP:$childPort) - reporting data: (${convertHexToIP(parsedEvent.networkAddress)}:${convertHexToInt(parsedEvent.deviceAddress)})."
+            //log.debug "Device data: ($childIP:$childPort) - reporting data: (${convertHexToIP(parsedEvent.networkAddress)}:${convertHexToInt(parsedEvent.deviceAddress)})."
             if(childIP != convertHexToIP(parsedEvent.networkAddress) || childPort != convertHexToInt(parsedEvent.deviceAddress).toString()){
                log.debug "Device data (${child.getDeviceDataByName("ip")}) does not match what it is reporting(${convertHexToIP(parsedEvent.networkAddress)}). Attempting to update."
                child.sync(convertHexToIP(parsedEvent.networkAddress), convertHexToInt(parsedEvent.deviceAddress).toString())
@@ -327,7 +332,7 @@ def getDevices() {
 void deviceDescriptionHandler(physicalgraph.device.HubResponse hubResponse) {
 	log.trace "esp8266ic.xml response (application/xml)"
 	def body = hubResponse.xml
-    log.debug body?.device?.friendlyName?.text()
+    //log.debug body?.device?.friendlyName?.text()
 	if (body?.device?.modelName?.text().startsWith("ESP8266Irrigation")) {
 		def devices = getDevices()
 		def device = devices.find {it?.key?.contains(body?.device?.UDN?.text())}
@@ -353,22 +358,22 @@ def addDevices() {
         }
 
         if (!d) {
-            log.debug selectedDevice
-            log.debug "Creating Irrigation Controller with dni: ${selectedDevice.value.mac}"
-            log.debug Integer.parseInt(selectedDevice.value.deviceAddress,16)
-            addChildDevice("anienhuis", (selectedDevice?.value?.name?.startsWith("ESP8266 Irrigation") ? "ESP8266 Irrigation Controller 4 Zones" : "ESP8266 Irrigation Controller 8 Zones"), selectedDevice.value.mac, selectedDevice?.value.hub, [
-                "label": selectedDevice?.value?.name ?: "ESP8266 Irrigation Controller 4 Zones",
+            //log.debug selectedDevice
+            //log.debug "Creating Irrigation Controller with dni: ${selectedDevice.value.mac}"
+            //log.debug Integer.parseInt(selectedDevice.value.deviceAddress,16)
+            addChildDevice("anienhuis", (selectedDevice?.value?.name?.startsWith("Smart Sprinkler Controller 4") ? "Smart Sprinkler Controller 4 Zones" : "Smart Sprinkler Controller 8 Zones"), selectedDevice.value.mac, selectedDevice?.value.hub, [
+                "label": selectedDevice?.value?.name ?: "Smart Sprinkler ",
                 "data": [
                     "mac": selectedDevice.value.mac,
                     "ip": convertHexToIP(selectedDevice.value.networkAddress),
                     "port": "" + Integer.parseInt(selectedDevice.value.deviceAddress,16)
                 ]
             ])
-            sectionText = sectionText + "Successfully added ESP8266 Irrigation Controller with ip address ${convertHexToIP(selectedDevice.value.networkAddress)} \r\n"
+            sectionText = sectionText + "Successfully added Smart Sprinkler Controller with ip address ${convertHexToIP(selectedDevice.value.networkAddress)} \r\n"
         }
         
 	} 
-    log.debug sectionText
+    
         return dynamicPage(name:"addDevices", title:"Devices Added", nextPage:"mainPage",  uninstall: true) {
         if(sectionText != ""){
 		section("Add Irrigation Controller Results:") {

@@ -1,4 +1,4 @@
-## **ESP8266 Smart Sprinkler**
+# **ESP8266 Smart Sprinkler**
 
 ### **A project by Aaron Nienhuis (aaron.nienhuis@gmail.com)**
 
@@ -19,7 +19,7 @@ Stan Dotson (stan@dotson.info) and Matthew Nichols (matt@nichols.name) started t
 
 This project contains the ESP8266 code and the groovy code for the SmartThings SmartApps and Device Types.  
 
-# SmartApps
+### SmartApps
 
 There are two SmartApps that need to be installed:
 
@@ -28,14 +28,14 @@ ESP8266Smart_Sprinkler_Scheduler.groovy
 
 The first is a parent SmartApp that will discover ESP8266 Smart Sprinkler devices and add them to SmartThings.  The second is a Child SmartApp that allows schedules to be created for running the sprinklers.
 
-# Device Types
+### Device Types
 Two device types have been written so far.  One for a 4 zone controller, and one for an 8 zone controller.  Both can be installed and the Discovery SmartApp will determine which to install based on the device discovered.
 
 Smart_Sprinkler_4_Zone_Irrigation_Controller.groovy
 Smart_Sprinkler_8_Zone_Irrigation_Controller.groovy
 
 
-# ESP8266 Firmware
+### ESP8266 Firmware
 The source for the firmware was developed in the Arduino IDE. The source as well as a compiled binary is provided.
 
 ESP8266_4_Zone_Irrigation_Controller.ino
@@ -75,7 +75,8 @@ Additional instructions on scheduling, wiring the controller to your sprinkler v
 
 *[Smart Sprinkler](https://github.com/d8adrvn/smart_sprinkler)
 
-#Important Note!!!  To turn on individual Sprinkler Zones using the SmartThings App rather than a schedule, individual zone times must be entered in the preferences for the controller.
+### Important Note!!!
+To turn on individual Sprinkler Zones using the SmartThings App rather than a schedule, individual zone times must be entered in the preferences for the controller.
 
 
 ## Controller Hardware Options

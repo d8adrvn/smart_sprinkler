@@ -248,9 +248,9 @@ void setup(void){
 
     //fetches ssid and pass from eeprom and tries to connect
     //if it does not connect it starts an access point with the specified name
-    //here  "AutoConnectAP"
+    //here  "SmartSprinkler"
     //and goes into a blocking loop awaiting configuration
-  wifiManager.autoConnect("AutoConnectAP");
+  wifiManager.autoConnect("SmartSprinkler");
     //or use this for auto generated name ESP + ChipID
     //wifiManager.autoConnect();
 

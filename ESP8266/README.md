@@ -1,4 +1,4 @@
-## ESP8266 Smart Sprinkler**
+## **ESP8266 Smart Sprinkler**
 
 ### **A project by Aaron Nienhuis (aaron.nienhuis@gmail.com)**
 
@@ -23,16 +23,26 @@ This project contains the ESP8266 code and the groovy code for the SmartThings S
 
 There are two SmartApps that need to be installed:
 
-ESP8266Smart_Sprinkler_Discovery
-ESP8266Smart_Sprinkler_Scheduler
+ESP8266Smart_Sprinkler_Discovery.groovy
+ESP8266Smart_Sprinkler_Scheduler.groovy
 
 The first is a parent SmartApp that will discover ESP8266 Smart Sprinkler devices and add them to SmartThings.  The second is a Child SmartApp that allows schedules to be created for running the sprinklers.
 
 #Device Types
-Two device types have been written so far.  One for a 4 zone controller, and one for an 8 zone controller.
+Two device types have been written so far.  One for a 4 zone controller, and one for an 8 zone controller.  Both can be installed and the Discovery SmartApp will determine which to install based on the device discovered.
 
-ESP8266_4_Zone_Irrigation_Controller
-ESP8266_8_Zone_Irrigation_Controller
+Smart_Sprinkler_4_Zone_Irrigation_Controller.groovy
+Smart_Sprinkler_8_Zone_Irrigation_Controller.groovy
+
+
+#ESP8266 Firmware
+The source for the firmware was developed in the Arduino IDE. The source as well as a compiled binary is provided.
+
+ESP8266_4_Zone_Irrigation_Controller.ino
+ESP8266_4_Zone_Irrigation_Controller.ino.generic.bin
+
+ESP8266_8_Zone_Irrigation_Controller.ino
+ESP8266_8_Zone_Irrigation_Controller.ino.generic.bin
 
 
 
@@ -49,10 +59,28 @@ ESP8266_8_Zone_Irrigation_Controller
 * A virtual temperature guage gives you flexibility to set minimum temperature thresholds to initiate an irrigation
 * Voice controls via the SmartThings integration with Alexa (Amazon Echo)
 
+## High Level Instructions
 
-###Controller Hardware Options
+Install the two SmartApps and the two Device Handlers using the SmartThings IDE.
+
+Flash the firmware onto an ESP8266 microcontroller using ESPEasy or the Arduino IDE.
+
+Once flashed, the ESP8266 controller will start a WIFI Access Point named SmartSprinkler.  Connect to the AP using a WIFI device (phone, laptop, etc.)  If the device is not automatically redirected, use a web browser to connect to http://192.168.4.1.  This web page will show all detected WIFI SSIDs.  Select the SSID that is on the same local network as the SmartThings Hub and enter the password for that SSID.
+
+The controller will then connect to that WIFI AP using DHCP.
+
+Using the SmartThings Phone App, start the SmartApp called Smart Sprinkler (Connect).  Use this SmartApp to discover all Smart Sprinkler controllers on the network and create Irrigation schedules for the controller(s).
+
+Additional instructions on scheduling, wiring the controller to your sprinkler valves, etc. can be found on the original Smart Sprinkler project.
+
+*[Smart Sprinkler](https://github.com/d8adrvn/smart_sprinkler)
+
+#Important Note!!!  To turn on individual Sprinkler Zones using the SmartThings App rather than a schedule, individual zone times must be entered in the preferences for the controller.
+
+
+##Controller Hardware Options
 	
-There are a large variety of ESP8266 based options including prefabricated boards with relays that can be used for Sprinkler Controllers.  The two products I'm currently using are:
+There are a large variety of ESP8266 based options including prefabricated boards with relays that can be used for Sprinkler Controllers.  The two products I'm currently using are the LinkNode R4 and LinkNode R8.  Unfortunately, the R8 was not well designed and only 7 of the 8 relays can be used.  The links below provide detailed product specs and links to 3D print enclosures.
 
 *[LinkNode R4](http://linksprite.com/wiki/index.php5?title=LinkNode_R4:_Arduino-compatible_WiFi_relay_controller)
 
@@ -61,3 +89,4 @@ There are a large variety of ESP8266 based options including prefabricated board
 *[LinkNode R8](http://linksprite.com/wiki/index.php5?title=LinkNode_R8:_Arduino-compatible_WiFi_relay_controller)
 
 ![LinkNode R8](http://linksprite.com/wiki/images/thumb/a/ae/LinkNode_R8-5.jpg/640px-LinkNode_R8-5.jpg)
+

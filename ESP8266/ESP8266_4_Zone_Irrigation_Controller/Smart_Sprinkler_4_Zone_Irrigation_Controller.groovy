@@ -43,7 +43,7 @@ preferences {
 }
 
 metadata {
-    definition (name: "Smart Sprinkler Controller 4 Zones", version: "1.0.1", author: "aaron.nienhuis@gmail.com", namespace: "anienhuis") {
+    definition (name: "Smart Sprinkler Controller 4 Zones", version: "1.0.2", author: "aaron.nienhuis@gmail.com", namespace: "anienhuis") {
         
         capability "Switch"
         capability "Momentary"
@@ -619,6 +619,17 @@ def hex2int(value){
    return Integer.parseInt(value, 10)
 }
 
+def update_needed_settings()
+{
+    def cmds = []
+    
+    def isUpdateNeeded = "NO"
+    
+    cmds << getAction("/config?hubIp=${device.hub.getDataValue("localIP")}&hubPort=${device.hub.getDataValue("localSrvPortTCP")}")
+        
+    sendEvent(name:"needUpdate", value: isUpdateNeeded, displayed:false, isStateChange: true)
+    return cmds
+}
 
 def installed() {
 	log.debug "installed()"
@@ -627,14 +638,16 @@ def installed() {
 
 def configure() {
     log.debug "configure()"
-    
+    def cmds = [] 
+    cmds = update_needed_settings()
+    if (cmds != []) response(cmds)
 }
 
 def updated()
 {
     log.debug "updated()"
-    
+    def cmds = [] 
+    cmds = update_needed_settings()
     sendEvent(name: "checkInterval", value: 2 * 15 * 60 + 2 * 60, displayed: false, data: [protocol: "lan", hubHardwareId: device.hub.hardwareID])
-    
-    
+    if (cmds != []) response(cmds)
 }

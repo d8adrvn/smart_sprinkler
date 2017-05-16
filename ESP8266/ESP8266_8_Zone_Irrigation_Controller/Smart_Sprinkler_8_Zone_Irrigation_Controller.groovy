@@ -47,7 +47,7 @@ preferences {
 }
 
 metadata {
-    definition (name: "Smart Sprinkler Controller 8 Zones", version: "1.0.1", author: "aaron.nienhuis@gmail.com", namespace: "anienhuis") {
+    definition (name: "Smart Sprinkler Controller 8 Zones", version: "1.0.2", author: "aaron.nienhuis@gmail.com", namespace: "anienhuis") {
         
         capability "Switch"
         capability "Momentary"
@@ -747,6 +747,18 @@ def setProgram(value, program){
 
 def hex2int(value){
    return Integer.parseInt(value, 10)
+}
+
+def update_needed_settings()
+{
+    def cmds = []
+    
+    def isUpdateNeeded = "NO"
+    
+    cmds << getAction("/config?hubIp=${device.hub.getDataValue("localIP")}&hubPort=${device.hub.getDataValue("localSrvPortTCP")}")
+        
+    sendEvent(name:"needUpdate", value: isUpdateNeeded, displayed:false, isStateChange: true)
+    return cmds
 }
 
 def installed() {

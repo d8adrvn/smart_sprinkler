@@ -64,7 +64,7 @@
 
 
 
-const char* version = "1.0.1";
+const char* version = "1.0.2";
 
 //user configurable global variables to set before loading to Arduino
 int maxrelays = 16;  //set up before loading to Arduino (maximum possible relays)
@@ -132,8 +132,8 @@ IPAddress IPfromString(String address) {
 
 void handleRoot() {
   String rootStatus;
-  rootStatus = "</style></head><center><table><TH colspan='2'>Smart Sprinkler 4 Zone Irrigation Controller<TR><TD><TD><TR><TD colspan='2'>";
-  rootStatus += "<TR><TD><TD><TR><TD>Main:<TD><a href='/update'>Firmware Update</a><BR><a href='/status'>Status</a><BR><a href='/reboot'>Reboot</a><BR></table><h6>Smart Sprinkler</h6></body></center>";
+  rootStatus = "</style></head><center><table><TH colspan='2'>ESP8266 Smart Sprinkler 4 Zone Irrigation Controller<TR><TD><TD><TR><TD colspan='2'>";
+  rootStatus += "<TR><TD><TD><TR><TD>Main:<TD><a href='/update'>Firmware Update</a><BR><a href='/status'>Status</a><BR><a href='/reboot'>Reboot</a><BR></table><h6>ESP8266 Smart Sprinkler</h6></body></center>";
   server.send(200, "text/html", rootStatus);  
 }
 

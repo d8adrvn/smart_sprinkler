@@ -63,7 +63,7 @@
 #include <Timer.h>
 
 
-const char* version = "1.0.1";
+const char* version = "1.0.2";
 
 //user configurable global variables to set before loading to Arduino
 int maxrelays = 16;  //set up before loading to Arduino (maximum possible relays)
@@ -132,10 +132,12 @@ IPAddress IPfromString(String address) {
 }
 
 void handleRoot() {
-  String updateStatus = makeUpdate();  
-  server.send(200, "application/json", updateStatus);  String rootStatus;
-  rootStatus = "</style></head><center><table><TH colspan='2'>Smart Sprinkler 4 Zone Irrigation Controller<TR><TD><TD><TR><TD colspan='2'>";
-  rootStatus += "<TR><TD><TD><TR><TD>Main:<TD><a href='/update'>Firmware Update</a><BR><a href='/status'>Status</a><BR><a href='/reboot'>Reboot</a><BR></table><h6>Smart Sprinkler</h6></body></center>";
+  if (isDebugEnabled) {
+    Serial.println("Starting handleRoot");
+  }
+  String rootStatus;
+  rootStatus = "</style></head><center><table><TH colspan='2'>ESP8266 Smart Sprinkler 8 Zone Irrigation Controller<TR><TD><TD><TR><TD colspan='2'>";
+  rootStatus += "<TR><TD><TD><TR><TD>Main:<TD><a href='/update'>Firmware Update</a><BR><a href='/status'>Status</a><BR><a href='/reboot'>Reboot</a><BR></table><h6>ESP8266 Smart Sprinkler</h6></body></center>";
   server.send(200, "text/html", rootStatus);  
 }
 
@@ -724,7 +726,7 @@ String makeUpdate() {
     Serial.println("Starting makeUpdate");
   }
 
-  StaticJsonBuffer<200> jsonBuffer;
+  StaticJsonBuffer<400> jsonBuffer;
   JsonObject& json = jsonBuffer.createObject();
   JsonObject& rel = json.createNestedObject("relay");
     
@@ -768,7 +770,12 @@ String makeUpdate() {
     if (queue[i]==2) {
       action="on";
     }
-
+//Serial.print ("i ");
+//Serial.print (i);
+//Serial.print (" key ");
+//Serial.print (key);
+//Serial.print (" action ");
+//Serial.println (action);
     //rel["name"] = key;
     //rel["action"] = action;
     rel[key] = action;

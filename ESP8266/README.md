@@ -63,7 +63,9 @@ ESP8266_8_Zone_Irrigation_Controller.ino.generic.bin
 
 Install the two SmartApps and the two Device Handlers using the SmartThings IDE.
 
-Flash the firmware onto an ESP8266 microcontroller using ESPEasy or the Arduino IDE.
+Flash the firmware onto an ESP8266 microcontroller using ESPEasy or the Arduino IDE.  
+
+To use all 8 Relays on a LinkNode R8, you must flash using DIO instead of QIO!!! (Even though the instructions say otherwise!)
 
 Once flashed, the ESP8266 controller will start a WIFI Access Point named SmartSprinkler.  Connect to the AP using a WIFI device (phone, laptop, etc.)  If the device is not automatically redirected, use a web browser to connect to http://192.168.4.1.  This web page will show all detected WIFI SSIDs.  Select the SSID that is on the same local network as the SmartThings Hub and enter the password for that SSID.
 
@@ -81,7 +83,7 @@ To turn on individual Sprinkler Zones using the SmartThings App rather than a sc
 
 ## Controller Hardware Options
 	
-There are a large variety of ESP8266 based options including prefabricated boards with relays that can be used for Sprinkler Controllers.  The two products I'm currently using are the LinkNode R4 and LinkNode R8.  Unfortunately, the R8 was not well designed and only 7 of the 8 relays can be used.  The links below provide detailed product specs and links to 3D print enclosures.
+There are a large variety of ESP8266 based options including prefabricated boards with relays that can be used for Sprinkler Controllers.  The two products I'm currently using are the LinkNode R4 and LinkNode R8.  The links below provide detailed product specs and links to 3D print enclosures.
 
 *[LinkNode R4](http://linksprite.com/wiki/index.php5?title=LinkNode_R4:_Arduino-compatible_WiFi_relay_controller)
 

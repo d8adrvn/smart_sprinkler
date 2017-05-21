@@ -47,7 +47,7 @@ preferences {
 }
 
 metadata {
-    definition (name: "Smart Sprinkler Controller 8 Zones", version: "1.0.2", author: "aaron.nienhuis@gmail.com", namespace: "anienhuis") {
+    definition (name: "Smart Sprinkler Controller 8 Zones", version: "1.0.3", author: "aaron.nienhuis@gmail.com", namespace: "anienhuis") {
         
         capability "Switch"
         capability "Momentary"
@@ -358,7 +358,7 @@ def RelayOff1() {
 def RelayOn2() {
     log.info "Executing 'on,2'"
     
-    getAction("/command?command=on,2,${oneTimer}")
+    getAction("/command?command=on,2,${twoTimer}")
 }
 
 def RelayOn2For(value) {
@@ -377,7 +377,7 @@ def RelayOff2() {
 def RelayOn3() {
     log.info "Executing 'on,3'"
     
-    getAction("/command?command=on,3,${oneTimer}")
+    getAction("/command?command=on,3,${threeTimer}")
 }
 
 def RelayOn3For(value) {
@@ -396,7 +396,7 @@ def RelayOff3() {
 def RelayOn4() {
     log.info "Executing 'on,4'"
     
-    getAction("/command?command=on,4,${oneTimer}")
+    getAction("/command?command=on,4,${fourTimer}")
 }
 
 def RelayOn4For(value) {
@@ -415,7 +415,7 @@ def RelayOff4() {
 def RelayOn5() {
     log.info "Executing 'on,5'"
     
-    getAction("/command?command=on,5,${oneTimer}")
+    getAction("/command?command=on,5,${fiveTimer}")
 }
 
 def RelayOn5For(value) {
@@ -434,7 +434,7 @@ def RelayOff5() {
 def RelayOn6() {
     log.info "Executing 'on,6'"
     
-    getAction("/command?command=on,6,${oneTimer}")
+    getAction("/command?command=on,6,${sixTimer}")
 }
 
 def RelayOn6For(value) {
@@ -453,7 +453,7 @@ def RelayOff6() {
 def RelayOn7() {
     log.info "Executing 'on,7'"
     
-    getAction("/command?command=on,7,${oneTimer}")
+    getAction("/command?command=on,7,${sevenTimer}")
 }
 
 def RelayOn7For(value) {
@@ -472,7 +472,7 @@ def RelayOff7() {
 def RelayOn8() {
     log.info "Executing 'on,8'"
     
-    getAction("/command?command=on,8,${oneTimer}")
+    getAction("/command?command=on,8,${eightTimer}")
 }
 
 def RelayOn8For(value) {

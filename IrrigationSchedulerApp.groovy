@@ -22,11 +22,11 @@
 **/
 
 definition(
-    name: "Irrigation Scheduler v3.0.4",
+    name: "Irrigation Scheduler v3.0.5",
     namespace: "d8adrvn/smart_sprinkler",
     author: "matt@nichols.name and stan@dotson.info",
     description: "Schedule sprinklers to run unless there is rain.",
-    version: "3.0.4",
+    version: "3.0.5",
     iconUrl: "https://s3.amazonaws.com/smartapp-icons/Meta/water_moisture.png",
     iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Meta/water_moisture@2x.png"
 )
@@ -218,9 +218,9 @@ def isWeatherDelay() {
     if (zipcode) {
         
         //add rain to virtual rain guage
-        def rainGauge = 0
+        def rainGauge = 0f
         def todaysInches
-		def yesterdaysInches
+	def yesterdaysInches
         def forecastInches
         
         if (isYesterdaysRainEnabled.equals("true")) {        

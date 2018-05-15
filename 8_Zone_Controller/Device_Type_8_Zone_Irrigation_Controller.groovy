@@ -1,7 +1,7 @@
 /**
  *  Irrigation Controller 8 Zones
  *  This SmartThings Device Handler (Device Type) Code Works With Arduino Irrigation Controller also available at this site
- *  v3.1 works with SmartThings reduced payload size
+ *  v3.1.1 works with SmartThings reduced payload size
  *
  *	Creates connected irrigation controller
  *  Author: Stan Dotson (stan@dotson.info) and Matthew Nichols (matt@nichols.name)
@@ -31,7 +31,7 @@ preferences {
 }
 
 metadata {
-    definition (name: "Irrigation Controller 8 Zones v3.1", version: "3.1", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") {
+    definition (name: "Irrigation Controller 8 Zones v3.1.1", version: "3.1/1", author: "stan@dotson.info", namespace: "d8adrvn/smart_sprinkler") {
         
         capability "Switch"
         capability "Momentary"
@@ -381,21 +381,20 @@ def on() {
     log.info "Executing 'allOn'"
       	[
  		 zigbee.smartShield(text: "on,1,${oneTimer}").format(),
-  		"delay 3000",
+  		"delay 4000",
  		 zigbee.smartShield(text: "on,2,${twoTimer}").format(),
-  		"delay 3000",
+  		"delay 4000",
   		zigbee.smartShield(text: "on,3,${threeTimer}").format(),
-  		"delay 3000",
+  		"delay 4000",
   		zigbee.smartShield(text: "on,4,${fourTimer}").format(),
-  		"delay 3000",
+  		"delay 4000",
   		zigbee.smartShield(text: "on,5,${fiveTimer}").format(),
-  		"delay 3000",
+  		"delay 4000",
   		zigbee.smartShield(text: "on,6,${sixTimer}").format(),
-  		"delay 3000",
+  		"delay 4000",
   		zigbee.smartShield(text: "on,7,${sevenTimer}").format(),
-  		"delay 3000",
-  		zigbee.smartShield(text: "on,8,${eightTimer}").format(),
-  		"delay 3000"
+  		"delay 4000",
+  		zigbee.smartShield(text: "on,8,${eightTimer}").format()
   	]
     
 }
@@ -412,22 +411,21 @@ def OnWithZoneTimes(value) {
         log.info("Zone ${parts[0].toInteger()} on for ${parts[1]} minutes")
     }
     [
- 		 	zigbee.smartShield(text: "on,1,${checkTime(zoneTimes[1]) ?: 0}").format(),
-  			"delay 3000",
-             zigbee.smartShield(text: "on,2,${checkTime(zoneTimes[2]) ?: 0}").format(),
-  			"delay 3000",
-            zigbee.smartShield(text: "on,3,${checkTime(zoneTimes[3]) ?: 0}").format(),
-  			"delay 3000",
-            zigbee.smartShield(text: "on,4,${checkTime(zoneTimes[4]) ?: 0}").format(),
-  			"delay 3000",
-            zigbee.smartShield(text: "on,5,${checkTime(zoneTimes[5]) ?: 0}").format(),
-  			"delay 3000",
-            zigbee.smartShield(text: "on,6,${checkTime(zoneTimes[6]) ?: 0}").format(),
-  			"delay 3000",
-            zigbee.smartShield(text: "on,7,${checkTime(zoneTimes[7]) ?: 0}").format(),
-  			"delay 3000",
-            zigbee.smartShield(text: "on,8,${checkTime(zoneTimes[8]) ?: 0}").format(),
-  			"delay 3000"
+ 		zigbee.smartShield(text: "on,1,${checkTime(zoneTimes[1]) ?: 0}").format(),
+  		"delay 4000",
+             	zigbee.smartShield(text: "on,2,${checkTime(zoneTimes[2]) ?: 0}").format(),
+  		"delay 4000",
+            	zigbee.smartShield(text: "on,3,${checkTime(zoneTimes[3]) ?: 0}").format(),
+  		"delay 4000",
+            	zigbee.smartShield(text: "on,4,${checkTime(zoneTimes[4]) ?: 0}").format(),
+  		"delay 4000",
+            	zigbee.smartShield(text: "on,5,${checkTime(zoneTimes[5]) ?: 0}").format(),
+  		"delay 4000",
+            	zigbee.smartShield(text: "on,6,${checkTime(zoneTimes[6]) ?: 0}").format(),
+  		"delay 4000",
+            	zigbee.smartShield(text: "on,7,${checkTime(zoneTimes[7]) ?: 0}").format(),
+  		"delay 4000",
+            	zigbee.smartShield(text: "on,8,${checkTime(zoneTimes[8]) ?: 0}").format()
    	]
 }
 

@@ -286,27 +286,24 @@ def wasWetYesterday() {
 
 def isWet() {
 
-    def todaysWeather = getWeatherFeature("conditions", zipcode)
-    def todaysPrecip = (todaysWeather?.current_observation?.precip_today_in)
-    def todaysInches = todaysPrecip ? safeToFloat(todaysPrecip) : 0
+    def todaysWeather = getTwcConditions(zipcode)
+    def todaysPrecip = (todaysWeather?.precip6Hour)
+    def todaysInches = todaysPrecip
     log.info("Today's percipitation for ${zipcode}: ${todaysInches} in")
     return todaysInches
 }
 
 def isStormy() {
 
-    def forecastWeather = getWeatherFeature("forecast", zipcode)
-    def forecastPrecip=forecastWeather.forecast.simpleforecast.forecastday.qpf_allday.in?.toArray()
-    def forecastInches = forecastPrecip ? safeToFloat(forecastPrecip[0]) : 0
+    def forecastPrecip = getTwcForecast(zipcode).qpf[1]
+    def forecastInches = forecastPrecip
     log.info("Forecast percipitation for $zipcode: $forecastInches in")
     return forecastInches
 }
 
 def isHot() {
 
-    def forecastWeather = getWeatherFeature("forecast", zipcode)
-    def todaysTemps=forecastWeather.forecast.simpleforecast.forecastday.high.fahrenheit?.toArray()
-    def todaysHighTemp = todaysTemps ? safeToFloat(todaysTemps[0]) : 50
+    def todaysHighTemp = getTwcConditions(zipcode).temperatureMax24Hour
     log.info("Forecast high temperature for $zipcode: $todaysHighTemp F")
     return todaysHighTemp
 }
